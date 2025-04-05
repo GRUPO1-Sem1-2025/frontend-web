@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from "../context/AuthProvider.jsx";
-
 import axios from '../Configuraciones/axios';
 const LOGIN_URL = '/usuarios';
 
@@ -33,12 +32,12 @@ const Login = () => {
                 }
             );
 
-            console.log(JSON.stringify(response?.data));
+            //console.log(JSON.stringify(response?.data));
             //console.log(JSON.stringify(response));
-            const accessToken = response?.data?.token;
-            console.log(accessToken);
+            const token = response?.data?.token;
+            console.log(token);
             const roles = ''; //response?.data?.roles;           
-            setAuth({ email, pwd, roles, accessToken }); // produce error, faltan datos
+            setAuth({ email, pwd, roles, accessToken: token }); // produce error, faltan datos
             setUser('');
             setPwd('');
             setSuccess(true);
@@ -93,7 +92,7 @@ const Login = () => {
                         <button>Ingresar</button>
                     </form>
                     <p>
-                        Necesitas una cuenta?<br />
+                        ¿Necesitas una cuenta?<br />
                         <span className="line">
                             {/*put router link here*/}
                             <a href="#">Registrarse</a>
