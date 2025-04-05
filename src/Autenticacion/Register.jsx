@@ -1,12 +1,12 @@
 import { useRef, useState, useEffect } from "react";
-//import repositorio from '../Configuraciones/repositorio.js';
+import { API_URL } from "../Configuraciones/Constantes.ts";
+import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "./Validaciones.ts";
 
-const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
-const REGISTER_URL = '/register';
+const URL_USUARIOS = '/usuarios';
 
 const Register = () => {
 	const userRef = useRef();
+	const emailRef = useRef();
 	const errRef = useRef();
 
 	const [user, setUser] = useState('');
@@ -16,6 +16,10 @@ const Register = () => {
 	const [pwd, setPwd] = useState('');
 	const [validPwd, setValidPwd] = useState(false);
 	const [pwdFocus, setPwdFocus] = useState(false);
+
+	const [email, setemail] = useState('');
+	const [validemail, setValidemail] = useState(false);
+	const [emailFocus, setemailFocus] = useState(false);
 
 	const [matchPwd, setMatchPwd] = useState('');
 	const [validMatch, setValidMatch] = useState(false);
@@ -29,11 +33,15 @@ const Register = () => {
 	}, [])
 
 	useEffect(() => {
-		setValidName(USER_REGEX.test(user));
+		setValidName(NOMBRE_REGEX.test(user));
 	}, [user])
 
 	useEffect(() => {
-		setValidPwd(PWD_REGEX.test(pwd));
+		setValidemail(CORREO_REGEX.test(email));
+	}, [email])
+
+	useEffect(() => {
+		setValidPwd(PASSWORD_REGEX.test(pwd));
 		setValidMatch(pwd === matchPwd);
 	}, [pwd, matchPwd])
 
@@ -44,39 +52,54 @@ const Register = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		// if button enabled with JS hack
-		const v1 = USER_REGEX.test(user);
-		const v2 = PWD_REGEX.test(pwd);
-		if (!v1 || !v2) {
+		const v1 = NOMBRE_REGEX.test(user);
+		const v2 = PASSWORD_REGEX.test(pwd);
+		const v3 = CORREO_REGEX.test(email);
+
+		if (!v1 || !v2 || !v3) {
 			setErrMsg("Invalid Entry");
 			return;
 		}
 		try {
-			// const response = await repositorio.post(REGISTER_URL,
-			// 	JSON.stringify({ user, pwd }),
-			// 	{
-			// 		headers: { 'Content-Type': 'application/json' },
-			// 		withCredentials: true
-			// 	}
-			// );
-			// console.log(response?.data);
-			// console.log(response?.accessToken);
-			// console.log(JSON.stringify(response))
-			// setSuccess(true);
+			console.info(`${API_URL}/${URL_USUARIOS}`);
+			console.info(`${user} - ${email} - ${pwd}`);
+
+			await crearUsuario({ user, email, pwd });
+
+			console.log(response?.data);
+			console.log(response?.accessToken);
+			console.log(JSON.stringify(response))
+			setSuccess(true);
 			// //clear state and controlled inputs
 			// //need value attrib on inputs for this
 			setUser('');
+			setemail('');
 			setPwd('');
 			setMatchPwd('');
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg('Error al conectar con el servidor');
 			} else if (err.response?.status === 409) {
-				setErrMsg('nombre de usuario ya existe');
+				setErrMsg('Nombre de usuario ya existe');
 			} else {
 				setErrMsg('Error al registrar');
 			}
 			errRef.current.focus();
 		}
+	}
+
+	async function crearUsuario({ nombre, email, password }) {
+		const usuario = { nombre, email, password };
+
+		const response = await fetch(`${API_URL}/usuarios`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(usuario)
+		});
+
+		return response.json();
 	}
 
 	return (
@@ -93,12 +116,12 @@ const Register = () => {
 					<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
 					<h1>Register</h1>
 					<form onSubmit={handleSubmit}>
-						<label htmlFor="username">
+						<label htmlFor="nombre">
 							Nombre de usuario:
 						</label>
 						<input
 							type="text"
-							id="username"
+							id="nombre"
 							ref={userRef}
 							autoComplete="off"
 							onChange={(e) => setUser(e.target.value)}
@@ -115,6 +138,25 @@ const Register = () => {
 							Se permiten letras, números, guiones bajos y guiones.
 						</p>
 
+						<label htmlFor="correo">
+							Correo:
+						</label>
+						<input
+							type="text"
+							id="correo"
+							ref={emailRef}
+							autoComplete="off"
+							onChange={(e) => setemail(e.target.value)}
+							value={email}
+							required
+							aria-invalid={validemail ? "false" : "true"}
+							aria-describedby="emailnote"
+							onFocus={() => setemailFocus(true)}
+							onBlur={() => setemailFocus(false)}
+						/>
+						<p id="emailnote" className={emailFocus && !validemail ? "instructions" : "offscreen"}>
+							Correo con formato válido xxxx@gmail.com
+						</p>
 
 						<label htmlFor="password">
 							Contraseña:
@@ -135,7 +177,6 @@ const Register = () => {
 							Debe incluir letras mayúsculas y minúsculas, un número y un carácter especial.<br />
 							Caracteres especiales permitidos: <span aria-label="exclamation mark">!</span> <span aria-label="at symbol">@</span> <span aria-label="hashtag">#</span> <span aria-label="dollar sign">$</span> <span aria-label="percent">%</span>
 						</p>
-
 
 						<label htmlFor="confirm_pwd">
 							Confirmar contraseña:

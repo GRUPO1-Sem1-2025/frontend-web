@@ -1,11 +1,9 @@
-/*
+
 import { useState } from 'react'
 import './App.css'
 import Register from './Autenticacion/Register.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <main className="App">
       <Register />
@@ -16,10 +14,12 @@ function App() {
 export default App
 
 import './App.css'
-*/
+
+/*
+import { API_URL } from "./Configuraciones/Constantes.ts";
 
 import React, { useEffect, useState } from 'react';
-
+//const API_URL = 'http://localhost:8080/usuarios'; // URL de la API
 const App = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +28,10 @@ const App = () => {
     // Función que hace la llamada a la API
     const obtenerUsuarios = async () => {
       try {
+        console.info(`URL: ${API_URL}`);
+
         // Realizamos la llamada GET
-        const response = await fetch('http://localhost:8080/usuarios');
+        const response = await fetch(`http://localhost:8080/usuarios`);
         
         // Verificamos que la respuesta es exitosa (código 200)
         if (response.ok) {
@@ -70,3 +72,4 @@ const App = () => {
 
 export default App;
 
+*/
