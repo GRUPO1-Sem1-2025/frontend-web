@@ -2,11 +2,12 @@
 import { useState } from 'react'
 import './App.css'
 import Register from './Autenticacion/Register.jsx';
+import Login from './Autenticacion/Login.jsx';
 
 function App() {
   return (
     <main className="App">
-      <Register />
+      <Login />
     </main>
   )
 }
