@@ -51,7 +51,7 @@ const Register = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		// if button enabled with JS hack
+
 		const v1 = NOMBRE_REGEX.test(user);
 		const v2 = PASSWORD_REGEX.test(pwd);
 		const v3 = CORREO_REGEX.test(email);
@@ -61,12 +61,9 @@ const Register = () => {
 			return;
 		}
 
-		try {			
+		try {
 			const response = await crearUsuario({ nombre: user, email, password: pwd });
 
-			//console.log(response?.status);
-			//console.log(response?.accessToken);
-			//console.log(JSON.stringify(response))
 			setSuccess(true);
 			setUser('');
 			setemail('');

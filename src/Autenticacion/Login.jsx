@@ -32,18 +32,16 @@ const Login = () => {
                 }
             );
 
-            //console.log(JSON.stringify(response?.data));
-            //console.log(JSON.stringify(response));
             const token = response?.data?.token;
             console.log(token);
             const roles = ''; //response?.data?.roles;           
-            setAuth({ email, pwd, roles, accessToken: token }); // produce error, faltan datos
+            setAuth({ email, pwd, roles, accessToken: token });
             setUser('');
             setPwd('');
             setSuccess(true);
         } catch (err) {
             if (!err?.response) {
-                setErrMsg('No responde el servidor ' +  err);
+                setErrMsg('No responde el servidor ' + err);
             } else if (err.response?.status === 400) {
                 setErrMsg('Usuario o contraseña incorrectos');
             } else if (err.response?.status === 401) {
