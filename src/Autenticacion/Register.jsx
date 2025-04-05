@@ -60,18 +60,14 @@ const Register = () => {
 			setErrMsg("Invalid Entry");
 			return;
 		}
-		try {
-			console.info(`${API_URL}/${URL_USUARIOS}`);
-			console.info(`${user} - ${email} - ${pwd}`);
 
-			await crearUsuario({ user, email, pwd });
+		try {			
+			const response = await crearUsuario({ nombre: user, email, password: pwd });
 
-			console.log(response?.data);
-			console.log(response?.accessToken);
-			console.log(JSON.stringify(response))
+			//console.log(response?.status);
+			//console.log(response?.accessToken);
+			//console.log(JSON.stringify(response))
 			setSuccess(true);
-			// //clear state and controlled inputs
-			// //need value attrib on inputs for this
 			setUser('');
 			setemail('');
 			setPwd('');
@@ -91,7 +87,7 @@ const Register = () => {
 	async function crearUsuario({ nombre, email, password }) {
 		const usuario = { nombre, email, password };
 
-		const response = await fetch(`${API_URL}/usuarios`, {
+		const response = await fetch(`${API_URL}${URL_USUARIOS}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
