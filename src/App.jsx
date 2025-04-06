@@ -1,14 +1,46 @@
 
-import { useState } from 'react'
 import './App.css'
 import Register from './Autenticacion/Register.jsx';
 import Login from './Autenticacion/Login.jsx';
+import Home from './Principal/Home.jsx';
+import { Routes, Route } from 'react-router-dom';
+import RequireAuth from './Autenticacion/RequireAuth.jsx';
+import Layout from './Layout';
+import Missing from './componentes/Missing.jsx';
+import Admin from './componentes/Admin.jsx';
+import Unauthorized from './componentes/Unauthorized.jsx';
+import LinkPage from './componentes/LinkPage.jsx';
+
+const ROLES = { 'User': 100, 'Vendedor': 200, 'Admin': 300 }
 
 function App() {
   return (
-    <main className="App">
-      <Login />
-    </main>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        {/* Rutas publicas */}
+        <Route path="ingresar" element={<Login />} />
+        <Route path="registrarse" element={<Register />} />
+        <Route path="linkpage" element={<LinkPage />} />
+        <Route path="sinAutorizacion" element={<Unauthorized />} />
+
+        {/* Rutas protegidas */}
+        <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+          <Route path="/" element={<Home />} />
+        </Route>
+        {/*<Route element={<RequireAuth allowedRoles={[ROLES.Vendedor]} />}>
+          <Route path="editarRoles" element={<Vendedor />} />
+        </Route>*/}
+        <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
+          <Route path="admin" element={<Admin />} />
+        </Route>
+        {/*<Route element={<RequireAuth allowedRoles={[ROLES.Vendedor, ROLES.Admin]} />}>
+          <Route path="principal" element={<Lounge />} />
+        </Route> */}
+
+        {/* cualquier otra ruta no especificada*/}
+        <Route path="*" element={<Missing />} />
+      </Route>
+    </Routes>
   )
 }
 

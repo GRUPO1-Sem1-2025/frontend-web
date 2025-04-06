@@ -194,10 +194,9 @@ const Register = () => {
 						</button>
 					</form>
 					<p>
-						Ya estas registrado?<br />
+						¿Ya estas registrado?<br />
 						<span className="line">
-							{/*put router link here*/}
-							<a href="#">Ingresar</a>
+							<a href="/ingresar">Ingresar</a>
 						</span>
 					</p>
 				</section>
