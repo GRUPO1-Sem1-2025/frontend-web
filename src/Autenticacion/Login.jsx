@@ -1,17 +1,22 @@
 import { useRef, useState, useEffect, useContext } from 'react';
-import AuthContext from "../context/AuthProvider.jsx";
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import useAuth from '../hooks/useAuth.jsx';
+
 import axios from '../Configuraciones/axios';
 const LOGIN_URL = '/usuarios';
 
 const Login = () => {
-    const { setAuth } = useContext(AuthContext);
+    const { setAuth } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
+
     const userRef = useRef();
     const errRef = useRef();
 
     const [email, setUser] = useState('');
     const [pwd, setPwd] = useState('');
     const [errMsg, setErrMsg] = useState('');
-    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         userRef.current.focus();
@@ -33,12 +38,12 @@ const Login = () => {
             );
 
             const token = response?.data?.token;
-            console.log(token);
-            const roles = ''; //response?.data?.roles;           
-            setAuth({ email, pwd, roles, accessToken: token });
+            //console.log(token);
+            const roles = [100];//response?.data?.roles;
+            setAuth({ email, roles, accessToken: token });
             setUser('');
             setPwd('');
-            setSuccess(true);
+            navigate(from, { replace: true });
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('No responde el servidor ' + err);
@@ -54,51 +59,38 @@ const Login = () => {
     }
 
     return (
-        <>
-            {success ? (
-                <section>
-                    <h1>Ingreso exitoso</h1>
-                    <br />
-                    <p>
-                        <a href="#">Ir al dashboard</a>
-                    </p>
-                </section>
-            ) : (
-                <section>
-                    <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-                    <h1>Ingresar</h1>
-                    <form onSubmit={handleSubmit}>
-                        <label htmlFor="username">Correo:</label>
-                        <input
-                            type="text"
-                            id="Correo"
-                            ref={userRef}
-                            autoComplete="off"
-                            onChange={(e) => setUser(e.target.value)}
-                            value={email}
-                            required
-                        />
+        <section>
+            <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+            <h1>Ingresar</h1>
+            <form onSubmit={handleSubmit}>
+                <label htmlFor="username">Correo:</label>
+                <input
+                    type="text"
+                    id="Correo"
+                    ref={userRef}
+                    autoComplete="off"
+                    onChange={(e) => setUser(e.target.value)}
+                    value={email}
+                    required
+                />
 
-                        <label htmlFor="password">Contraseña:</label>
-                        <input
-                            type="password"
-                            id="password"
-                            onChange={(e) => setPwd(e.target.value)}
-                            value={pwd}
-                            required
-                        />
-                        <button>Ingresar</button>
-                    </form>
-                    <p>
-                        ¿Necesitas una cuenta?<br />
-                        <span className="line">
-                            {/*put router link here*/}
-                            <a href="#">Registrarse</a>
-                        </span>
-                    </p>
-                </section>
-            )}
-        </>
+                <label htmlFor="password">Contraseña:</label>
+                <input
+                    type="password"
+                    id="password"
+                    onChange={(e) => setPwd(e.target.value)}
+                    value={pwd}
+                    required
+                />
+                <button>Ingresar</button>
+            </form>
+            <p>
+                ¿Necesitas una cuenta?<br />
+                <span className="line">
+                    <Link to="/registrarse">Registrarse</Link>
+                </span>
+            </p>
+        </section>
     )
 }
 
