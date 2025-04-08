@@ -101,7 +101,7 @@ const Register = () => {
 				<section>
 					<h1>Correcto!</h1>
 					<p>
-						<a href="#">Registrarse</a>
+						<a href="/registrarse">Registrarse</a>
 					</p>
 				</section>
 			) : (
