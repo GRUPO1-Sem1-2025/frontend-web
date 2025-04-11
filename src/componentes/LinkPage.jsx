@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom"
 import ExportarUsuarios from './ExportarUsuariosCSV.jsx';
+import useAuth from "../hooks/useAuth.jsx";
 
 const LinkPage = () => {
+    const { auth } = useAuth();
 
     return (
         <section>
-            <h1>Links</h1>
+            <h1>Bienvenido, {auth.nombre} </h1>
             <br />
             <h2>Public</h2>
             <Link to="/ingresar">Login</Link>

@@ -10,6 +10,7 @@ import Missing from './componentes/Missing.jsx';
 import Admin from './componentes/Admin.jsx';
 import Unauthorized from './componentes/Unauthorized.jsx';
 import LinkPage from './componentes/LinkPage.jsx';
+import EditarRol from './componentes/EditarRol.jsx';
 
 const ROLES = { 'User': 100, 'Vendedor': 200, 'Admin': 300 }
 
@@ -20,16 +21,16 @@ function App() {
         {/* Rutas publicas */}
         <Route path="/ingresar" element={<Login />} />
         <Route path="/registrarse" element={<Register />} />
-        <Route path="linkpage" element={<LinkPage />} />
+        <Route path="/linkpage" element={<LinkPage />} />
         <Route path="sinAutorizacion" element={<Unauthorized />} />
+        <Route path="/editarRoles" element={<EditarRol />} />
 
         {/* Rutas protegidas */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+        <Route element={<RequireAuth allowedRoles={[ROLES.User, ROLES.Admin]} />}>
           <Route path="/" element={<Home />} />
         </Route>
-        {/*<Route element={<RequireAuth allowedRoles={[ROLES.Vendedor]} />}>
-          <Route path="editarRoles" element={<Vendedor />} />
-        </Route>*/}
+       
+        
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
           <Route path="admin" element={<Admin />} />
         </Route>

@@ -3,10 +3,17 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.jsx';
 
 import axios from '../Configuraciones/axios';
-const LOGIN_URL = '/usuarios';
+const CONTROLLER_URL = '/usuarios';
 
 const Login = () => {
+    const ROLES = {
+        'User': 100,
+        'Vendedor': 200,
+        'Admin': 300
+      };
     const { setAuth } = useAuth();
+    const { auth } = useAuth();
+
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from?.pathname || "/";
@@ -14,13 +21,17 @@ const Login = () => {
     const userRef = useRef();
     const errRef = useRef();
 
-    const [email, setUser] = useState('');
-    const [pwd, setPwd] = useState('');
+    let [email, setUser] = useState('');
+    let [pwd, setPwd] = useState('');
     const [errMsg, setErrMsg] = useState('');
+
+    email = "test@gmail.com";
+    pwd = "123456Aa@";
 
     useEffect(() => {
         userRef.current.focus();
     }, [])
+
 
     useEffect(() => {
         setErrMsg('');
@@ -30,17 +41,36 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(`${LOGIN_URL}/login`,
+            const responseLogin = await axios.post(`${CONTROLLER_URL}/login`,
                 JSON.stringify({ email, password: pwd }),
                 {
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
+            const token = responseLogin?.data?.token;
+            //const roles = 300;//response?.data?.rol;
 
-            const token = response?.data?.token;
-            //console.log(token);
-            const roles = [100];//response?.data?.roles;
-            setAuth({ email, roles, accessToken: token });
+            try {
+                const response = await fetch(`http://localhost:8080${CONTROLLER_URL}/email/${encodeURIComponent(email)}`);
+                if (response.ok) {
+                    const json = await response.json();
+                    //console.log("Login: ", json);
+
+                    if (json?.roles == null) {
+                        console.error("json?.roles es NULL o UNDEFINED:", auth?.roles);
+                        //json.roles = 300;
+                    }
+
+                    //Guardar credenciales
+                    setAuth({ email: json.email, nombre: json.nombre, roles: json.roles, accessToken: token });
+                    console.log(auth);
+                } else {
+                    console.error('Error al obtener los usuarios');
+                }
+            } catch (error) {
+                console.error('Error al hacer la solicitud:', error);
+            }
+
             setUser('');
             setPwd('');
             navigate(from, { replace: true });
