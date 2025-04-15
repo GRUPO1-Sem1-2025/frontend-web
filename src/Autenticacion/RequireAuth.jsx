@@ -4,7 +4,7 @@ import useAuth from "../hooks/useAuth.jsx";
 const RequireAuth = ({ allowedRoles }) => {
     const { auth } = useAuth();
     const location = useLocation();
-    
+
     if (auth?.roles == null) {
         console.error("AllowedRoles role es NULL o UNDEFINED:", auth?.roles);
     }

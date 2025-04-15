@@ -6,11 +6,11 @@ import Home from './Principal/Home.jsx';
 import { Routes, Route } from 'react-router-dom';
 import RequireAuth from './Autenticacion/RequireAuth.jsx';
 import Layout from './Layout';
-import Missing from './componentes/Missing.jsx';
-import Admin from './componentes/Admin.jsx';
-import Unauthorized from './componentes/Unauthorized.jsx';
-import LinkPage from './componentes/LinkPage.jsx';
-import EditarRol from './componentes/EditarRol.jsx';
+import Missing from './Componentes/Missing.jsx';
+import Admin from './Componentes/Admin.jsx';
+import Unauthorized from './Componentes/Unauthorized.jsx';
+import LinkPage from './Componentes/LinkPage.jsx';
+import EditarRol from './Componentes/EditarRol.jsx';
 
 const ROLES = { 'User': 100, 'Vendedor': 200, 'Admin': 300 }
 
@@ -30,7 +30,6 @@ function App() {
           <Route path="/" element={<Home />} />
         </Route>
        
-        
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
           <Route path="admin" element={<Admin />} />
         </Route>

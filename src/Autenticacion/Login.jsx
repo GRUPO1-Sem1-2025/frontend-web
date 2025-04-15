@@ -10,7 +10,7 @@ const Login = () => {
         'User': 100,
         'Vendedor': 200,
         'Admin': 300
-      };
+    };
     const { setAuth } = useAuth();
     const { auth } = useAuth();
 
