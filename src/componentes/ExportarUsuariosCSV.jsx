@@ -4,7 +4,8 @@ import { CSVLink } from "react-csv";
 const headers = [
     { label: "Nombre", key: "nombre" },
     { label: "Email", key: "email" },
-    { label: "Activo", key: "estado" }
+    { label: "Activo", key: "estado" },
+    { label: "Rol", key: "rol" }
 ];
 
 const ExportarUsuarios = () => {

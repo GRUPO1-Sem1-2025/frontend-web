@@ -5,13 +5,19 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState(() => {
         const stored = localStorage.getItem("auth");
-        return stored ? JSON.parse(stored) : {};
+        return stored
+            ? JSON.parse(stored)
+            : {
+                  accessToken: null,
+                  nombre: "",
+                  email: "",
+                  roles: 0
+              };
     });
 
     useEffect(() => {
         if (auth?.accessToken) {
             localStorage.setItem("auth", JSON.stringify(auth));
-            //console.log("Auth guardado:", JSON.parse(localStorage.getItem("auth")));
         } else {
             localStorage.removeItem("auth");
         }
