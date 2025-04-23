@@ -10,7 +10,7 @@ const Home = () => {
         // if used in more components, this should be in context 
         // axios to /logout endpoint 
         setAuth({});
-        navigate('/linkpage');
+        navigate('/links');
     }
 
     return (
@@ -25,7 +25,7 @@ const Home = () => {
             <br />
             <Link to="/principal">área principal</Link>
             <br />
-            <Link to="/linkpage">Go to the link page</Link>
+            <Link to="/links">Go to the link page</Link>
             <div className="flexGrow">
                 <button onClick={logout}>Cerrar sesión</button>
             </div>

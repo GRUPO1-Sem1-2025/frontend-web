@@ -1,25 +1,26 @@
 import { Link } from "react-router-dom"
 import ExportarUsuarios from './ExportarUsuariosCSV.jsx';
 import useAuth from "../hooks/useAuth.jsx";
+//PrimeReact
+import { Card } from 'primereact/card';
 
 const LinkPage = () => {
     const { auth } = useAuth();
 
     return (
-        <section>
-            <h1>Bienvenido, {auth.nombre} </h1>
-            <br />
-            <h2>Public</h2>
-            <Link to="/ingresar">Login</Link>
-            <Link to="/registrarse">Registrarse</Link>
-            <ExportarUsuarios />
+            <Card title="Pruebas de ruteo" className="cardCentrada">
+                <br></br>
+                <h3>Rutas públicas</h3>
+                <Link to="/ingresar">Login</Link><br></br>
+                <Link to="/registrarse">Registrarse</Link><br></br>
+                {/* <ExportarUsuarios /> */}
 
-            <br />
-            <h2>Private</h2>
-            <Link to="/">Principal</Link>
-            <Link to="/editarRoles">Editar roles</Link>
-            <Link to="/admin">Sección admin</Link>
-        </section>
+                <br></br>
+                <h3>Rutas privadas</h3>
+                <Link to="/">Principal</Link><br></br>
+                <Link to="/editarRoles">Editar roles</Link><br></br>
+                <Link to="/admin">Sección admin</Link><br></br>
+            </Card>
     )
 }
 

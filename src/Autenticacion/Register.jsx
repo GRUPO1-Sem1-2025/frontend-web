@@ -1,6 +1,9 @@
 import { useRef, useState, useEffect } from "react";
 import { API_URL } from "../Configuraciones/Constantes.ts";
 import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "./Validaciones.ts";
+import { Link } from "react-router-dom"
+//PrimeReact
+import { Card } from "primereact/card";
 
 const URL_USUARIOS = '/usuarios';
 
@@ -105,9 +108,8 @@ const Register = () => {
 					</p>
 				</section>
 			) : (
-				<section>
+				<Card title="Registrarse" className="cardCentrada">
 					<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-					<h1>Register</h1>
 					<form onSubmit={handleSubmit}>
 						<label htmlFor="nombre">
 							Nombre de usuario:
@@ -193,13 +195,13 @@ const Register = () => {
 							Registrarse
 						</button>
 					</form>
-					<p>
+					<p style={{textAlign: 'center'}}>
 						¿Ya estas registrado?<br />
 						<span className="line">
-							<a href="/ingresar">Ingresar</a>
+				<Link to="/ingresar">Login</Link>
 						</span>
 					</p>
-				</section>
+				</Card>
 			)}
 		</>
 	)

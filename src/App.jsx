@@ -21,7 +21,7 @@ function App() {
         {/* Rutas publicas */}
         <Route path="/ingresar" element={<Login />} />
         <Route path="/registrarse" element={<Register />} />
-        <Route path="/linkpage" element={<LinkPage />} />
+        <Route path="/links" element={<LinkPage />} />
         <Route path="sinAutorizacion" element={<Unauthorized />} />
         <Route path="/editarRoles" element={<EditarRol />} />
 

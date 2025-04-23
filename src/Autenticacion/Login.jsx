@@ -1,9 +1,13 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.jsx';
+//PrimeReact
+import { Card } from 'primereact/card';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 
-import axios from '../Configuraciones/axios';
 const CONTROLLER_URL = '/usuarios';
+import axios from '../Configuraciones/axios';
 
 const Login = () => {
     const ROLES = {
@@ -11,6 +15,21 @@ const Login = () => {
         'Vendedor': 200,
         'Admin': 300
     };
+    const toast = useRef(null);
+
+    const showWarn = (message) => {
+        toast.current.show({
+            severity: 'warn',
+            summary: 'Error',
+            detail: message,
+            life: 3000
+        });
+    };
+
+    const showError = () => {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+    }
+
     const { setAuth } = useAuth();
     const { auth } = useAuth();
 
@@ -36,6 +55,7 @@ const Login = () => {
     useEffect(() => {
         setErrMsg('');
     }, [email, pwd])
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -70,29 +90,56 @@ const Login = () => {
             } catch (error) {
                 console.error('Error al hacer la solicitud:', error);
             }
-
             setUser('');
             setPwd('');
             navigate(from, { replace: true });
         } catch (err) {
+            let msg = '';
+
             if (!err?.response) {
-                setErrMsg('No responde el servidor ' + err);
+                msg = 'No responde el servidor:\n' + err;
             } else if (err.response?.status === 400) {
-                setErrMsg('Usuario o contraseña incorrectos');
+                msg = 'Usuario o contraseña incorrectos';
             } else if (err.response?.status === 401) {
-                setErrMsg('Sin autorización');
+                msg = 'Sin autorización';
             } else {
-                setErrMsg('Error al ingresar');
+                msg = 'Error al ingresar';
             }
+
+            showWarn(msg);
             errRef.current.focus();
         }
     }
-
+    const header = (
+        <img
+            alt="Card"
+            src="/tecnobus.png"
+            style={{
+                width: '100%',
+                maxWidth: '500px',
+                minWidth: '400px',
+                height: '250px',         // Altura fija para forma rectangular
+                objectFit: 'cover',      // Rellena y recorta lo que sobra
+                display: 'block',
+                borderRadius: '1%'
+            }}
+        />
+    );
+    const footer = (
+        <>
+            <p style={{ marginBottom: '1rem' }}>
+                ¿Necesitas una cuenta? <br />
+                <span >
+                    <Link to="/registrarse">Registrarse</Link>
+                </span>
+            </p>
+        </>
+    );
     return (
-        <section>
-            <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-            <h1>Ingresar</h1>
-            <form onSubmit={handleSubmit}>
+        <Card title="Ingresar" footer={footer} header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
+            <Toast ref={toast} />
+            {/* <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p> */}
+            <form onSubmit={handleSubmit} style={{ marginLeft: '1rem', marginRight: '1rem' }}>
                 <label htmlFor="username">Correo:</label>
                 <input
                     type="text"
@@ -103,7 +150,6 @@ const Login = () => {
                     value={email}
                     required
                 />
-
                 <label htmlFor="password">Contraseña:</label>
                 <input
                     type="password"
@@ -112,15 +158,12 @@ const Login = () => {
                     value={pwd}
                     required
                 />
-                <button>Ingresar</button>
+                <p>
+                    <Button label="Ingresar" type="submit"/>
+                    <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" style={{ marginLeft: '0.5em' }} />
+                </p>
             </form>
-            <p>
-                ¿Necesitas una cuenta?<br />
-                <span className="line">
-                    <Link to="/registrarse">Registrarse</Link>
-                </span>
-            </p>
-        </section>
+        </Card>
     )
 }
 
