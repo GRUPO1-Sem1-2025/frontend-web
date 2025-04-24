@@ -8,6 +8,7 @@ const LinkPage = () => {
     const { auth } = useAuth();
 
     return (
+        <div className='rectangulo-centrado'>
             <Card title="Pruebas de ruteo" className="cardCentrada">
                 <br></br>
                 <h3>Rutas públicas</h3>
@@ -17,10 +18,13 @@ const LinkPage = () => {
 
                 <br></br>
                 <h3>Rutas privadas</h3>
+                <Link to="/Dashboard">Dashboard</Link><br></br>
+                <hr></hr>
                 <Link to="/">Principal</Link><br></br>
                 <Link to="/editarRoles">Editar roles</Link><br></br>
                 <Link to="/admin">Sección admin</Link><br></br>
             </Card>
+        </div>
     )
 }
 

@@ -99,7 +99,7 @@ const Register = () => {
 	}
 
 	return (
-		<>
+        <div className='rectangulo-centrado'>
 			{success ? (
 				<section>
 					<h1>Correcto!</h1>
@@ -203,7 +203,7 @@ const Register = () => {
 					</p>
 				</Card>
 			)}
-		</>
+		</div>
 	)
 }
 

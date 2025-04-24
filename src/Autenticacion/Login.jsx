@@ -55,7 +55,7 @@ const Login = () => {
     useEffect(() => {
         setErrMsg('');
     }, [email, pwd])
-    
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -136,34 +136,36 @@ const Login = () => {
         </>
     );
     return (
-        <Card title="Ingresar" footer={footer} header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
-            <Toast ref={toast} />
-            {/* <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p> */}
-            <form onSubmit={handleSubmit} style={{ marginLeft: '1rem', marginRight: '1rem' }}>
-                <label htmlFor="username">Correo:</label>
-                <input
-                    type="text"
-                    id="Correo"
-                    ref={userRef}
-                    autoComplete="off"
-                    onChange={(e) => setUser(e.target.value)}
-                    value={email}
-                    required
-                />
-                <label htmlFor="password">Contraseña:</label>
-                <input
-                    type="password"
-                    id="password"
-                    onChange={(e) => setPwd(e.target.value)}
-                    value={pwd}
-                    required
-                />
-                <p>
-                    <Button label="Ingresar" type="submit"/>
-                    <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" style={{ marginLeft: '0.5em' }} />
-                </p>
-            </form>
-        </Card>
+        <div className='rectangulo-centrado'>
+            <Card title="Ingresar" footer={footer} header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
+                <Toast ref={toast} />
+                {/* <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p> */}
+                <form onSubmit={handleSubmit} style={{ marginLeft: '1rem', marginRight: '1rem' }}>
+                    <label htmlFor="username">Correo:</label>
+                    <input
+                        type="text"
+                        id="Correo"
+                        ref={userRef}
+                        autoComplete="off"
+                        onChange={(e) => setUser(e.target.value)}
+                        value={email}
+                        required
+                    />
+                    <label htmlFor="password">Contraseña:</label>
+                    <input
+                        type="password"
+                        id="password"
+                        onChange={(e) => setPwd(e.target.value)}
+                        value={pwd}
+                        required
+                    />
+                    <p>
+                        <Button label="Ingresar" type="submit" />
+                        <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" style={{ marginLeft: '0.5em' }} />
+                    </p>
+                </form>
+            </Card>
+        </div>
     )
 }
 

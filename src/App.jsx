@@ -3,6 +3,7 @@ import './App.css'
 import Register from './Autenticacion/Register.jsx';
 import Login from './Autenticacion/Login.jsx';
 import Home from './Principal/Home.jsx';
+import Dashboard from './Principal/Dashboard.jsx';
 import { Routes, Route } from 'react-router-dom';
 import RequireAuth from './Autenticacion/RequireAuth.jsx';
 import Layout from './Layout';
@@ -29,7 +30,8 @@ function App() {
         <Route element={<RequireAuth allowedRoles={[ROLES.User, ROLES.Admin]} />}>
           <Route path="/" element={<Home />} />
         </Route>
-       
+        <Route path="/Dashboard" element={<Dashboard />} />
+
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
           <Route path="admin" element={<Admin />} />
         </Route>
