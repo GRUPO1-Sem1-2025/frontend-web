@@ -25,13 +25,10 @@ function App() {
         <Route path="/links" element={<LinkPage />} />
         <Route path="sinAutorizacion" element={<Unauthorized />} />
         <Route path="/editarRoles" element={<EditarRol />} />
+        <Route path="/" element={<Home />} />
 
         {/* Rutas protegidas */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.User, ROLES.Admin]} />}>
-          <Route path="/" element={<Home />} />
-        </Route>
         <Route path="/Dashboard" element={<Dashboard />} />
-
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
           <Route path="admin" element={<Admin />} />
         </Route>

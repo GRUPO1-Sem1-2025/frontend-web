@@ -125,22 +125,13 @@ const Login = () => {
             }}
         />
     );
-    const footer = (
-        <>
-            <p style={{ marginBottom: '1rem' }}>
-                ¿Necesitas una cuenta? <br />
-                <span >
-                    <Link to="/registrarse">Registrarse</Link>
-                </span>
-            </p>
-        </>
-    );
+
     return (
-        <div className='rectangulo-centrado'>
-            <Card title="Ingresar" footer={footer} header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
+        <div className='rectangulo-centrado' style={{ padding: "0px" }}>
+            <Card title="Iniciar sesión" header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
                 <Toast ref={toast} />
                 {/* <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p> */}
-                <form onSubmit={handleSubmit} style={{ marginLeft: '1rem', marginRight: '1rem' }}>
+                <form onSubmit={handleSubmit} >
                     <label htmlFor="username">Correo:</label>
                     <input
                         type="text"
@@ -151,7 +142,8 @@ const Login = () => {
                         value={email}
                         required
                     />
-                    <label htmlFor="password">Contraseña:</label>
+
+                    <label htmlFor="password" style={{ marginTop: "10px" }}>Contraseña:</label>
                     <input
                         type="password"
                         id="password"
@@ -159,11 +151,17 @@ const Login = () => {
                         value={pwd}
                         required
                     />
-                    <p>
+                    <p style={{ marginTop: "10px" }}>
                         <Button label="Ingresar" type="submit" />
                         <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" style={{ marginLeft: '0.5em' }} />
                     </p>
                 </form>
+                <p>
+                    ¿Necesitas una cuenta? <br />
+                    <span >
+                        <Link to="/registrarse">Registrarse</Link>
+                    </span>
+                </p>
             </Card>
         </div>
     )

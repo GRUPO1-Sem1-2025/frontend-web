@@ -12,6 +12,7 @@ const LinkPage = () => {
             <Card title="Pruebas de ruteo" className="cardCentrada">
                 <br></br>
                 <h3>Rutas públicas</h3>
+                <Link to="/">Principal</Link><br></br>
                 <Link to="/ingresar">Login</Link><br></br>
                 <Link to="/registrarse">Registrarse</Link><br></br>
                 {/* <ExportarUsuarios /> */}
@@ -20,7 +21,6 @@ const LinkPage = () => {
                 <h3>Rutas privadas</h3>
                 <Link to="/Dashboard">Dashboard</Link><br></br>
                 <hr></hr>
-                <Link to="/">Principal</Link><br></br>
                 <Link to="/editarRoles">Editar roles</Link><br></br>
                 <Link to="/admin">Sección admin</Link><br></br>
             </Card>

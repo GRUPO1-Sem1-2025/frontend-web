@@ -133,7 +133,7 @@ const Register = () => {
 							Se permiten letras, números, guiones bajos y guiones.
 						</p>
 
-						<label htmlFor="correo">
+						<label htmlFor="correo" style={{ marginTop: "15px" }}>
 							Correo:
 						</label>
 						<input
@@ -153,7 +153,7 @@ const Register = () => {
 							Correo con formato válido xxxx@gmail.com
 						</p>
 
-						<label htmlFor="password">
+						<label htmlFor="password" style={{ marginTop: "15px" }}>
 							Contraseña:
 						</label>
 						<input
@@ -173,7 +173,7 @@ const Register = () => {
 							Caracteres especiales permitidos: <span aria-label="exclamation mark">!</span> <span aria-label="at symbol">@</span> <span aria-label="hashtag">#</span> <span aria-label="dollar sign">$</span> <span aria-label="percent">%</span>
 						</p>
 
-						<label htmlFor="confirm_pwd">
+						<label htmlFor="confirm_pwd" style={{ marginTop: "15px" }}>
 							Confirmar contraseña:
 						</label>
 						<input
@@ -191,7 +191,7 @@ const Register = () => {
 							Debe coincidir con el primer campo de contraseña.
 						</p>
 
-						<button disabled={!validName || !validPwd || !validMatch ? true : false}>
+						<button disabled={!validName || !validPwd || !validMatch ? true : false} style={{ marginTop: "15px" }}>
 							Registrarse
 						</button>
 					</form>
