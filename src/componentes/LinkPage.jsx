@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom"
 import ExportarUsuarios from './ExportarUsuariosCSV.jsx';
 import useAuth from "../hooks/useAuth.jsx";
+import NavBar from '../Componentes/NavBar.jsx';
+
 //PrimeReact
 import { Card } from 'primereact/card';
 
@@ -8,6 +10,8 @@ const LinkPage = () => {
     const { auth } = useAuth();
 
     return (
+        <>
+        <NavBar />
         <div className='rectangulo-centrado'>
             <Card title="Pruebas de ruteo" className="cardCentrada">
                 <br></br>
@@ -25,6 +29,7 @@ const LinkPage = () => {
                 <Link to="/admin">Sección admin</Link><br></br>
             </Card>
         </div>
+        </>
     )
 }
 
