@@ -1,6 +1,9 @@
 import { useRef, useState, useEffect } from "react";
 import { API_URL } from "../Configuraciones/Constantes.ts";
 import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "./Validaciones.ts";
+import { Link } from "react-router-dom"
+//PrimeReact
+import { Card } from "primereact/card";
 
 const URL_USUARIOS = '/usuarios';
 
@@ -96,7 +99,7 @@ const Register = () => {
 	}
 
 	return (
-		<>
+        <div className='rectangulo-centrado'>
 			{success ? (
 				<section>
 					<h1>Correcto!</h1>
@@ -105,9 +108,8 @@ const Register = () => {
 					</p>
 				</section>
 			) : (
-				<section>
+				<Card title="Registrarse" className="cardCentrada">
 					<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-					<h1>Register</h1>
 					<form onSubmit={handleSubmit}>
 						<label htmlFor="nombre">
 							Nombre de usuario:
@@ -131,7 +133,7 @@ const Register = () => {
 							Se permiten letras, números, guiones bajos y guiones.
 						</p>
 
-						<label htmlFor="correo">
+						<label htmlFor="correo" style={{ marginTop: "15px" }}>
 							Correo:
 						</label>
 						<input
@@ -151,7 +153,7 @@ const Register = () => {
 							Correo con formato válido xxxx@gmail.com
 						</p>
 
-						<label htmlFor="password">
+						<label htmlFor="password" style={{ marginTop: "15px" }}>
 							Contraseña:
 						</label>
 						<input
@@ -171,7 +173,7 @@ const Register = () => {
 							Caracteres especiales permitidos: <span aria-label="exclamation mark">!</span> <span aria-label="at symbol">@</span> <span aria-label="hashtag">#</span> <span aria-label="dollar sign">$</span> <span aria-label="percent">%</span>
 						</p>
 
-						<label htmlFor="confirm_pwd">
+						<label htmlFor="confirm_pwd" style={{ marginTop: "15px" }}>
 							Confirmar contraseña:
 						</label>
 						<input
@@ -189,19 +191,19 @@ const Register = () => {
 							Debe coincidir con el primer campo de contraseña.
 						</p>
 
-						<button disabled={!validName || !validPwd || !validMatch ? true : false}>
+						<button disabled={!validName || !validPwd || !validMatch ? true : false} style={{ marginTop: "15px" }}>
 							Registrarse
 						</button>
 					</form>
-					<p>
+					<p style={{textAlign: 'center'}}>
 						¿Ya estas registrado?<br />
 						<span className="line">
-							<a href="/ingresar">Ingresar</a>
+				<Link to="/ingresar">Login</Link>
 						</span>
 					</p>
-				</section>
+				</Card>
 			)}
-		</>
+		</div>
 	)
 }
 
