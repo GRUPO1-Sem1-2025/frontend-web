@@ -5,19 +5,24 @@ import useAuth from '../hooks/useAuth.jsx';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import { InputOtp } from 'primereact/inputotp';
 //Conexion
 import axios from '../Configuraciones/axios';
 const URL_USUARIOSCONTROLLER = '/usuarios';
 
-const Login = () => {
+export default function TwoFA() {
     const [usuario, setUsuario] = useState({
+        nombre: '',
+        apellido: '',
         email: 'fedeacosta6@gmail.com',//fedeacosta6@gmail.com
         password: '123456Aa@', //Para test
+        codigo: 0,
     });
 
     //Variables
     const { setAuth } = useAuth();
     const { auth } = useAuth();
+    const [twoFA, setTwoFA] = useState();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -33,24 +38,24 @@ const Login = () => {
             severity: 'warn',
             summary: 'Error',
             detail: message,
-            life: 6000
+            life: 3000
         });
     };
 
     const showError = () => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 6000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
     }
 
     //Effects
-    useEffect(() => {
-        userRef.current.focus();
-    }, [])
+    //useEffect(() => {
+    //    userRef.current.focus();
+    //}, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(`${URL_USUARIOSCONTROLLER}/login`,
+            const response = await axios.post(`${URL_USUARIOSCONTROLLER}/verificarCodigo`,
                 JSON.stringify(usuario),
                 {
                     headers: { 'Content-Type': 'application/json' }
@@ -60,6 +65,8 @@ const Login = () => {
             console.log(response?.data);
             //setAuth({ email: json.email, nombre: json.nombre, roles: json.roles, accessToken: token });
 
+            setUser('');
+            setPwd('');
             navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
@@ -96,42 +103,21 @@ const Login = () => {
 
     return (
         <div className='rectangulo-centrado' style={{ padding: "0px" }}>
-            <Card title="Iniciar sesión" header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
+            <Card title="Autenticación en dos factores" header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
                 <Toast ref={toast} />
                 <form onSubmit={handleSubmit} >
-                    <label htmlFor="username">Correo</label>
-                    <input
-                        type="text"
-                        id="Correo"
-                        ref={userRef}
-                        autoComplete="off"
-                        onChange={(e) => setUser(e.target.value)}
-                        value={usuario.email}
-                        required
-                    />
-
-                    <label htmlFor="password" style={{ marginTop: "10px" }}>Contraseña</label>
-                    <input
-                        type="password"
-                        id="password"
-                        onChange={(e) => setPwd(e.target.value)}
-                        value={usuario.password}
-                        required
-                    />
-                    <p style={{ marginTop: "10px" }}>
-                        <Button label="Ingresar" type="submit" />
-                        <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" style={{ marginLeft: '0.5em' }} />
-                    </p>
+                    <label htmlFor="username">Código</label>
+                    <div className="card flex justify-content-center">
+                        <InputOtp value={twoFA} onChange={(e) => setTwoFA(e.value)} integerOnly style={{ justifyContent: "center", marginTop: "1rem" }}/>
+                    </div>
                 </form>
                 <p>
-                    ¿Necesitas una cuenta? <br />
+                    ¿Necesitas un nuevo código? <br />
                     <span >
-                        <Link to="/registrarse">Registrarse</Link>
+                        <Button style={{ marginTop: "1rem" }}>Enviar nuevo código</Button>
                     </span>
                 </p>
             </Card>
         </div>
     )
 }
-
-export default Login

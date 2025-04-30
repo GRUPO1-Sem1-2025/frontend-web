@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom"
 import { Card } from "primereact/card";
 //conexion
 import axios from '../Configuraciones/axios';
-const URL_USUARIOS = '/usuarios';
+const URL_USUARIOSCONTROLLER = '/usuarios';
 
 const Register = () => {
 	const [usuario, setUsuario] = useState({
@@ -79,7 +79,7 @@ const Register = () => {
 		console.log(usuario);
 
 		try {
-			const response = await axios.post(`${URL_USUARIOS}/registrarse`, usuario, {
+			const response = await axios.post(`${URL_USUARIOSCONTROLLER}/registrarse`, usuario, {
 				headers: {
 					'Content-Type': 'application/json'
 				}

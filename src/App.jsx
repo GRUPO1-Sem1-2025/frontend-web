@@ -6,6 +6,7 @@ import Home from './Principal/Home.jsx';
 import Dashboard from './Principal/Dashboard.jsx';
 import { Routes, Route } from 'react-router-dom';
 import RequireAuth from './Autenticacion/RequireAuth.jsx';
+import TwoFA from './Autenticacion/2FA.jsx';
 import Layout from './Layout';
 import Missing from './Componentes/Missing.jsx';
 import Admin from './Componentes/Admin.jsx';
@@ -26,6 +27,7 @@ function App() {
         <Route path="sinAutorizacion" element={<Unauthorized />} />
         <Route path="/editarRoles" element={<EditarRol />} />
         <Route path="/" element={<Home />} />
+        <Route path="/2FA" element={<TwoFA />} />
 
         {/* Rutas protegidas */}
         <Route path="/Dashboard" element={<Dashboard />} />
