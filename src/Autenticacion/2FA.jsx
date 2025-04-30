@@ -10,23 +10,24 @@ import { InputOtp } from 'primereact/inputotp';
 import axios from '../Configuraciones/axios';
 const URL_USUARIOSCONTROLLER = '/usuarios';
 
-export default function TwoFA() {
+export default function TwoFA({ email }) {
+    console.log(email);
     const [usuario, setUsuario] = useState({
         nombre: '',
         apellido: '',
-        email: 'fedeacosta6@gmail.com',//fedeacosta6@gmail.com
-        password: '123456Aa@', //Para test
-        codigo: 0,
+        email: '',
+        password: '',
+        codigo: '',
     });
 
     //Variables
     const { setAuth } = useAuth();
     const { auth } = useAuth();
-    const [twoFA, setTwoFA] = useState();
+    const [codigo2FA, setTokens] = useState();
 
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/2FA";
+    const from = location.state?.from?.pathname || "/";
 
     const userRef = useRef();
 
@@ -47,12 +48,33 @@ export default function TwoFA() {
     }
 
     //Effects
+    useEffect(() => {
+        if (location.state?.email) {
+            setUsuario(prev => ({ ...prev, email: location.state.email }));
+        }
+    }, [location.state?.email]);
+
+    // useEffect(() => {
+    //     if (!usuario.email) {
+    //       navigate("/ingresar");
+    //     }
+    //   }, [usuario.email]);
+
     //useEffect(() => {
     //    userRef.current.focus();
     //}, [])
 
+    console.log(usuario);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(usuario);
+        usuario.codigo = codigo2FA;
+
+        if (usuario.codigo.length !== 5) {
+            showWarn('El código debe tener 5 dígitos.');
+            return;
+        }
 
         try {
             const response = await axios.post(`${URL_USUARIOSCONTROLLER}/verificarCodigo`,
@@ -65,8 +87,6 @@ export default function TwoFA() {
             console.log(response?.data);
             //setAuth({ email: json.email, nombre: json.nombre, roles: json.roles, accessToken: token });
 
-            setUser('');
-            setPwd('');
             navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
@@ -103,13 +123,21 @@ export default function TwoFA() {
 
     return (
         <div className='rectangulo-centrado' style={{ padding: "0px" }}>
-            <Card title="Autenticación en dos factores" header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
+            <Card title="Autenticación de dos factores" header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
                 <Toast ref={toast} />
                 <form onSubmit={handleSubmit} >
                     <label htmlFor="username">Código</label>
                     <div className="card flex justify-content-center">
-                        <InputOtp value={twoFA} onChange={(e) => setTwoFA(e.value)} integerOnly style={{ justifyContent: "center", marginTop: "1rem" }}/>
+                        <InputOtp
+                            onChange={(e) => setTokens(e.value)}
+                            value={codigo2FA}
+                            length={5}
+                            integerOnly style={{ justifyContent: "center", marginTop: "1rem" }} />
                     </div>
+                    <p style={{ marginTop: "0.2em" }}>
+                        <Button label="Cancel" onClick={() => navigate('/ingresar')} severity="secondary" />
+                        <Button label="Validar" type="submit" style={{ marginLeft: '0.5em' }} />
+                    </p>
                 </form>
                 <p>
                     ¿Necesitas un nuevo código? <br />

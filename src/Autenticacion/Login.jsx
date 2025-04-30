@@ -11,8 +11,11 @@ const URL_USUARIOSCONTROLLER = '/usuarios';
 
 const Login = () => {
     const [usuario, setUsuario] = useState({
+        nombre: '',
+        apellido: '',
         email: 'fedeacosta6@gmail.com',//fedeacosta6@gmail.com
         password: '123456Aa@', //Para test
+        codigo: 0,
     });
 
     //Variables
@@ -58,9 +61,12 @@ const Login = () => {
             );
 
             console.log(response?.data);
-            //setAuth({ email: json.email, nombre: json.nombre, roles: json.roles, accessToken: token });
 
-            navigate(from, { replace: true });
+            navigate("/2FA", {
+                replace: true,
+                state: { email: usuario.email }
+              });
+            //navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
 
@@ -118,9 +124,9 @@ const Login = () => {
                         value={usuario.password}
                         required
                     />
-                    <p style={{ marginTop: "10px" }}>
-                        <Button label="Ingresar" type="submit" />
-                        <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" style={{ marginLeft: '0.5em' }} />
+                    <p style={{ marginTop: "0.2em" }}>
+                        <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" />
+                        <Button label="Ingresar" type="submit"  style={{ marginLeft: '0.5em' }}/>
                     </p>
                 </form>
                 <p>
