@@ -1,26 +1,34 @@
 import { useRef, useState, useEffect } from "react";
-import { API_URL } from "../Configuraciones/Constantes.ts";
 import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "./Validaciones.ts";
-import { Link } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 //PrimeReact
 import { Card } from "primereact/card";
-
+//conexion
+import axios from '../Configuraciones/axios';
 const URL_USUARIOS = '/usuarios';
 
 const Register = () => {
+	const [usuario, setUsuario] = useState({
+		nombre: '',
+		apellido: '',
+		email: '',
+		password: '',
+	});
+
+	const navigate = useNavigate();
+	const location = useLocation();
+	const from = location.state?.from?.pathname || "/";
+
 	const userRef = useRef();
 	const emailRef = useRef();
 	const errRef = useRef();
 
-	const [user, setUser] = useState('');
 	const [validName, setValidName] = useState(false);
 	const [userFocus, setUserFocus] = useState(false);
 
-	const [pwd, setPwd] = useState('');
 	const [validPwd, setValidPwd] = useState(false);
 	const [pwdFocus, setPwdFocus] = useState(false);
 
-	const [email, setemail] = useState('');
 	const [validemail, setValidemail] = useState(false);
 	const [emailFocus, setemailFocus] = useState(false);
 
@@ -36,45 +44,56 @@ const Register = () => {
 	}, [])
 
 	useEffect(() => {
-		setValidName(NOMBRE_REGEX.test(user));
-	}, [user])
+		setValidName(NOMBRE_REGEX.test(usuario.nombre));
+	}, [usuario.nombre])
 
 	useEffect(() => {
-		setValidemail(CORREO_REGEX.test(email));
-	}, [email])
+		setValidName(NOMBRE_REGEX.test(usuario.apellido));
+	}, [usuario.apellido])
 
 	useEffect(() => {
-		setValidPwd(PASSWORD_REGEX.test(pwd));
-		setValidMatch(pwd === matchPwd);
-	}, [pwd, matchPwd])
+		setValidemail(CORREO_REGEX.test(usuario.email));
+	}, [usuario.email])
+
+	useEffect(() => {
+		setValidPwd(PASSWORD_REGEX.test(usuario.password));
+		setValidMatch(usuario.password === matchPwd);
+	}, [usuario.password, matchPwd])
 
 	useEffect(() => {
 		setErrMsg('');
-	}, [user, pwd, matchPwd])
+	}, [usuario.nombre, usuario.password, matchPwd])
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		const v1 = NOMBRE_REGEX.test(user);
-		const v2 = PASSWORD_REGEX.test(pwd);
-		const v3 = CORREO_REGEX.test(email);
+		const v1 = NOMBRE_REGEX.test(usuario.nombre);
+		const v2 = NOMBRE_REGEX.test(usuario.apellido);
+		const v3 = PASSWORD_REGEX.test(usuario.password);
+		const v4 = CORREO_REGEX.test(usuario.email);
 
-		if (!v1 || !v2 || !v3) {
+		if (!v1 || !v2 || !v3 || !v4) {
 			setErrMsg("Invalid Entry");
 			return;
 		}
+		console.log(usuario);
 
 		try {
-			const response = await crearUsuario({ nombre: user, email, password: pwd });
+			const response = await axios.post(`${URL_USUARIOS}/registrarse`, usuario, {
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			console.log(response.data);
 
 			setSuccess(true);
-			setUser('');
-			setemail('');
-			setPwd('');
+			setUsuario({});
 			setMatchPwd('');
+			navigate(from, { replace: true });
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg('Error al conectar con el servidor');
+				setErrMsg('Error al conectar con el servidor ' + err);
 			} else if (err.response?.status === 409) {
 				setErrMsg('Nombre de usuario ya existe');
 			} else {
@@ -84,27 +103,13 @@ const Register = () => {
 		}
 	}
 
-	async function crearUsuario({ nombre, email, password }) {
-		const usuario = { nombre, email, password };
-
-		const response = await fetch(`${API_URL}${URL_USUARIOS}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(usuario)
-		});
-
-		return response.json();
-	}
-
 	return (
-        <div className='rectangulo-centrado'>
+		<div className='rectangulo-centrado'>
 			{success ? (
 				<section>
 					<h1>Correcto!</h1>
 					<p>
-						<a href="/registrarse">Registrarse</a>
+						<a href="/ingresar">Ingresar</a>
 					</p>
 				</section>
 			) : (
@@ -112,37 +117,65 @@ const Register = () => {
 					<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
 					<form onSubmit={handleSubmit}>
 						<label htmlFor="nombre">
-							Nombre de usuario:
+							Nombre
 						</label>
 						<input
 							type="text"
 							id="nombre"
 							ref={userRef}
 							autoComplete="off"
-							onChange={(e) => setUser(e.target.value)}
-							value={user}
+							onChange={(e) =>
+								setUsuario(prev => ({ ...prev, nombre: e.target.value }))
+							}
+							value={usuario.nombre}
 							required
 							aria-invalid={validName ? "false" : "true"}
-							aria-describedby="uidnote"
+							aria-describedby="nomnote"
 							onFocus={() => setUserFocus(true)}
 							onBlur={() => setUserFocus(false)}
 						/>
-						<p id="uidnote" className={userFocus && user && !validName ? "instructions" : "offscreen"}>
+						<p id="nomnote" className={userFocus && usuario.nombre && !validName ? "instructions" : "offscreen"}>
+							De 4 a 24 caracteres.<br />
+							Debe comenzar con una letra.<br />
+							Se permiten letras, números, guiones bajos y guiones.
+						</p>
+
+						<label htmlFor="apellido" style={{ marginTop: "15px" }}>
+							Apellido
+						</label>
+						<input
+							type="text"
+							id="apellido"
+							ref={userRef}
+							autoComplete="off"
+							onChange={(e) =>
+								setUsuario(prev => ({ ...prev, apellido: e.target.value }))
+							}
+							value={usuario.apellido}
+							required
+							aria-invalid={validName ? "false" : "true"}
+							aria-describedby="apenote"
+							onFocus={() => setUserFocus(true)}
+							onBlur={() => setUserFocus(false)}
+						/>
+						<p id="apenote" className={userFocus && usuario.apellido && !validName ? "instructions" : "offscreen"}>
 							De 4 a 24 caracteres.<br />
 							Debe comenzar con una letra.<br />
 							Se permiten letras, números, guiones bajos y guiones.
 						</p>
 
 						<label htmlFor="correo" style={{ marginTop: "15px" }}>
-							Correo:
+							Correo
 						</label>
 						<input
 							type="text"
 							id="correo"
 							ref={emailRef}
 							autoComplete="off"
-							onChange={(e) => setemail(e.target.value)}
-							value={email}
+							onChange={(e) =>
+								setUsuario(prev => ({ ...prev, email: e.target.value }))
+							}
+							value={usuario.email}
 							required
 							aria-invalid={validemail ? "false" : "true"}
 							aria-describedby="emailnote"
@@ -154,13 +187,15 @@ const Register = () => {
 						</p>
 
 						<label htmlFor="password" style={{ marginTop: "15px" }}>
-							Contraseña:
+							Contraseña
 						</label>
 						<input
 							type="password"
 							id="password"
-							onChange={(e) => setPwd(e.target.value)}
-							value={pwd}
+							onChange={(e) =>
+								setUsuario(prev => ({ ...prev, password: e.target.value }))
+							}
+							value={usuario.password}
 							required
 							aria-invalid={validPwd ? "false" : "true"}
 							aria-describedby="pwdnote"
@@ -195,10 +230,10 @@ const Register = () => {
 							Registrarse
 						</button>
 					</form>
-					<p style={{textAlign: 'center'}}>
+					<p style={{ textAlign: 'center' }}>
 						¿Ya estas registrado?<br />
 						<span className="line">
-				<Link to="/ingresar">Login</Link>
+							<Link to="/ingresar">Login</Link>
 						</span>
 					</p>
 				</Card>
