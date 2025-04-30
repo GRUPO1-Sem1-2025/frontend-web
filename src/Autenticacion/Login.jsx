@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useContext } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.jsx';
 //PrimeReact
@@ -30,6 +30,13 @@ const Login = () => {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
     }
 
+    let Usuario = {
+        NOMBRE: 'nombre',
+        APELLIDO: 'apellido',
+        EMAIL: 'email',
+        PASSWORD: 'password',
+    };
+
     const { setAuth } = useAuth();
     const { auth } = useAuth();
 
@@ -44,7 +51,7 @@ const Login = () => {
     let [pwd, setPwd] = useState('');
     const [errMsg, setErrMsg] = useState('');
 
-    email = "test@gmail.com";
+    //email = "fedeacosta6@gmail.com";
     pwd = "123456Aa@";
 
     useEffect(() => {
@@ -107,7 +114,7 @@ const Login = () => {
             }
 
             showWarn(msg);
-            errRef.current.focus();
+            //errRef.current.focus();
         }
     }
     const header = (
