@@ -42,17 +42,3 @@ export class Usuario {
     this.rol = rol;
   }
 }
-
-/**
- * Crea un objeto plano con solo los campos necesarios para el registro.
- * @param {{ nombre: string, email: string, password: string }} datos
- * @returns {Object}
- */
-export function crearUsuarioBasico({ nombre, apellido, email, password }) {
-  return {
-    nombre,
-    apellido,
-    email,
-    password
-  };
-}
