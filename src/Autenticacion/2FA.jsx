@@ -43,8 +43,8 @@ export default function TwoFA({ email }) {
         });
     };
 
-    const showError = () => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+    const showError = (message) => {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 6000 });
     }
 
     //Effects
@@ -64,11 +64,10 @@ export default function TwoFA({ email }) {
     //    userRef.current.focus();
     //}, [])
 
-    console.log(usuario);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(usuario);
+        //console.log(usuario);
         usuario.codigo = codigo2FA;
 
         if (usuario.codigo.length !== 5) {
@@ -83,10 +82,8 @@ export default function TwoFA({ email }) {
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
-
-            console.log(response?.data);
-            //setAuth({ email: json.email, nombre: json.nombre, roles: json.roles, accessToken: token });
-
+            
+            guardarTokenEnAuth(response?.data);
             navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
@@ -101,10 +98,49 @@ export default function TwoFA({ email }) {
                 msg = 'Error al ingresar';
             }
 
-            showWarn(msg);
+            showError(msg);
             //errRef.current.focus();
         }
     }
+
+    const guardarTokenEnAuth = (token) => {
+        try {
+          const payloadBase64 = token.split('.')[1];
+          const payloadJson = atob(payloadBase64);
+          const payload = JSON.parse(payloadJson);
+      
+          setAuth({
+            email: payload.sub || '',
+            rol: payload.rol || '',
+            emision: payload.iat || '',
+            expira: payload.exp || '',
+          });
+          console.log(auth);
+
+        } catch (error) {
+          console.error('Token inválido:', error);
+        }
+      };
+      
+    const reenviarCodigo = async () => {
+        try {
+            const response = await axios.post(
+                `${URL_USUARIOSCONTROLLER}/reenviarCodigo?email=${encodeURIComponent(usuario.email)}`
+              );
+
+            toast.current.show({
+                severity: 'success',
+                summary: 'Código reenviado',
+                detail: 'Revisa tu correo electrónico',
+                life: 5000
+            });
+
+            console.log(response.data);
+        } catch (err) {
+            console.error(err);
+            showError('No se pudo reenviar el código');
+        }
+    };
 
     //Variables componentes
     const header = (
@@ -142,7 +178,7 @@ export default function TwoFA({ email }) {
                 <p>
                     ¿Necesitas un nuevo código? <br />
                     <span >
-                        <Button style={{ marginTop: "1rem" }}>Enviar nuevo código</Button>
+                        <Button onClick={reenviarCodigo} style={{ marginTop: "1rem" }}>Enviar nuevo código</Button>
                     </span>
                 </p>
             </Card>
