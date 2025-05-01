@@ -45,8 +45,8 @@ const NavBar = () => {
     }, [location.pathname]); // Se actualiza cada vez que cambia la URL
 
     const links = (
-        <div>
-            <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => {
+        <div >
+            <TabMenu style={{ maxHeight: "90px", maxWidth: "auto" }} model={items} activeIndex={activeIndex} onTabChange={(e) => {
                 setActiveIndex(e.index);
                 navigate(items[e.index].url); // Navegar al hacer clic
             }} />
@@ -63,8 +63,8 @@ const NavBar = () => {
     );
 
     return (
-        <div className="card">
-            <Toolbar start={logoIzq} center={links} end={menuUsuario} style={{ padding: "15px" }} />
+        <div className="card" >
+            <Toolbar start={logoIzq} center={links} end={menuUsuario} style={{ paddingTop: "7px", paddingLeft: "15px", paddingRight: "15px", paddingBottom: "1px" }} />
         </div>
     );
 }

@@ -90,7 +90,7 @@ const Register = () => {
 			setSuccess(true);
 			setUsuario({});
 			setMatchPwd('');
-			navigate(from, { replace: true });
+			navigate("/ingresar", { replace: true });
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg('Error al conectar con el servidor ' + err);
