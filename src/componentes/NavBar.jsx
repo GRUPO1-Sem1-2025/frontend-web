@@ -1,6 +1,6 @@
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
-import AuthContext from "../context/AuthProvider.jsx";
+import AuthContext from "../Context/AuthProvider.jsx";
 // PrimeReact
 import { Button } from 'primereact/button';
 import { Toolbar } from 'primereact/toolbar';
@@ -23,7 +23,7 @@ const NavBar = () => {
 
     const logoIzq = (
         <div>
-            <Image src="/tecnobus.png" alt="Image" width="40" className="mr-2" />
+            <Image src="/tecnobus.png" alt="Image" width="70" className="mr-2" />
         </div>
     );
 
@@ -57,7 +57,7 @@ const NavBar = () => {
         <Button onClick={() => navigate('/ingresar')} icon="pi pi-sign-in" />
     ) : (
         <Avatar className="p-overlay-badge" icon="pi pi-sign-out" size="medium" onClick={logout}>
-            <Badge value="4" />
+            <Badge value="4"/>
             {/* No borrar comentairo <Button onClick={logout} icon="pi pi-sign-out" />icon="pi pi-user"  */}
         </Avatar>
     );

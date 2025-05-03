@@ -1,12 +1,12 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import useAuth from '../hooks/useAuth.jsx';
+import useAuth from '../../Hooks/useAuth.jsx';
 //PrimeReact
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 //Conexion
-import axios from '../Configuraciones/axios';
+import axios from '../../Configuraciones/axios.js';
 const URL_USUARIOSCONTROLLER = '/usuarios';
 
 const Login = () => {

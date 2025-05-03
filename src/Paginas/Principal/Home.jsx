@@ -1,14 +1,15 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useContext, useState } from "react";
-import AuthContext from "../context/AuthProvider.jsx";
-import NavBar from '../Componentes/NavBar.jsx';
+import AuthContext from "../../Context/AuthProvider.jsx";
+import NavBar from '../../Componentes/NavBar.jsx';
+import Footer from "../../Componentes/Footer.jsx";
+
 //PrimeReact
 import { Image } from 'primereact/image';
 import { InputNumber } from 'primereact/inputnumber';
 import { Calendar } from 'primereact/calendar';
 import { CascadeSelect } from 'primereact/cascadeselect';
 import { FloatLabel } from 'primereact/floatlabel';
-import Footer from "../Componentes/Footer.jsx";
 import { ToggleButton } from 'primereact/togglebutton';
 
 const Home = () => {
