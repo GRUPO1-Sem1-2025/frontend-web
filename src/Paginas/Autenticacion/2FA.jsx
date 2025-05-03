@@ -68,7 +68,7 @@ export default function TwoFA({ email }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         //console.log(usuario);
-        usuario.codigo = codigo2FA;
+        usuario.codigo = codigo2FA.trim();
 
         if (usuario.codigo.length !== 5) {
             showWarn('El código debe tener 5 dígitos.');
@@ -91,7 +91,7 @@ export default function TwoFA({ email }) {
             if (!err?.response) {
                 msg = 'No responde el servidor:\n' + err;
             } else if (err.response?.status === 400) {
-                msg = 'Usuario o contraseña incorrectos';
+                msg = 'Codigo incorrecto';
             } else if (err.response?.status === 401) {
                 msg = 'Sin autorización';
             } else {
