@@ -1,16 +1,17 @@
 
 import './App.css'
-import Register from './Autenticacion/Register.jsx';
-import Login from './Autenticacion/Login.jsx';
-import Home from './Principal/Home.jsx';
+import Register from './Paginas/Autenticacion/Register.jsx';
+import Login from './Paginas/Autenticacion/Login.jsx';
+import Home from './Paginas/Principal/Home.jsx';
+import Dashboard from './Paginas/Principal/Dashboard.jsx';
 import { Routes, Route } from 'react-router-dom';
-import RequireAuth from './Autenticacion/RequireAuth.jsx';
+import { useState } from 'react';
+import RequireAuth from './Hooks/RequireAuth.jsx';
+import TwoFA from './Paginas/Autenticacion/2FA.jsx';
 import Layout from './Layout';
-import Missing from './Componentes/Missing.jsx';
-import Admin from './Componentes/Admin.jsx';
-import Unauthorized from './Componentes/Unauthorized.jsx';
-import LinkPage from './Componentes/LinkPage.jsx';
-import EditarRol from './Componentes/EditarRol.jsx';
+import Missing from './Paginas/Basicas/Missing.jsx';
+import Unauthorized from './Paginas/Basicas/Unauthorized.jsx';
+import LinkPage from './Paginas/Testing/LinkPage.jsx';
 
 const ROLES = { 'User': 100, 'Vendedor': 200, 'Admin': 300 }
 
@@ -19,21 +20,21 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* Rutas publicas */}
-        <Route path="/ingresar" element={<Login />} />
+        <Route path="/" element={<Home />} />
         <Route path="/registrarse" element={<Register />} />
-        <Route path="/linkpage" element={<LinkPage />} />
-        <Route path="sinAutorizacion" element={<Unauthorized />} />
-        <Route path="/editarRoles" element={<EditarRol />} />
+        <Route path="/ingresar" element={<Login />} />
+        <Route path="/2FA" element={<TwoFA email='' />} />
+
+        <Route path="/sinAutorizacion" element={<Unauthorized />} />
 
         {/* Rutas protegidas */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.User, ROLES.Admin]} />}>
-          <Route path="/" element={<Home />} />
-        </Route>
-       
+        <Route path="/links" element={<LinkPage />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
+
+        {/*
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-          <Route path="admin" element={<Admin />} />
         </Route>
-        {/*<Route element={<RequireAuth allowedRoles={[ROLES.Vendedor, ROLES.Admin]} />}>
+        <Route element={<RequireAuth allowedRoles={[ROLES.Vendedor, ROLES.Admin]} />}>
           <Route path="principal" element={<Lounge />} />
         </Route> */}
 

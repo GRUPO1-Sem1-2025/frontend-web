@@ -1,0 +1,33 @@
+import { Link } from "react-router-dom"
+import ExportarUsuarios from '../../Componentes/ExportarUsuariosCSV.jsx';
+import useAuth from "../../Hooks/useAuth.jsx";
+import NavBar from '../../Componentes/NavBar.jsx';
+
+//PrimeReact
+import { Card } from 'primereact/card';
+
+const LinkPage = () => {
+    const { auth } = useAuth();
+
+    return (
+        <>
+            <NavBar />
+            <div className='rectangulo-centrado'>
+                <Card title="Pruebas de ruteo" className="cardCentrada">
+                    <br></br>
+                    <h3>Rutas públicas</h3>
+                    <Link to="/">Principal</Link><br></br>
+                    <Link to="/ingresar">Login</Link><br></br>
+                    <Link to="/registrarse">Registrarse</Link><br></br>
+                    {/* <ExportarUsuarios /> */}
+
+                    <br></br>
+                    <h3>Rutas privadas</h3>
+                    <Link to="/Dashboard">Dashboard</Link><br></br>
+                </Card>
+            </div>
+        </>
+    )
+}
+
+export default LinkPage
