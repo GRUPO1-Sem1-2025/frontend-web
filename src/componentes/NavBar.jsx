@@ -1,4 +1,4 @@
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useContext, useState, useEffect } from "react";
 import AuthContext from "../Context/AuthProvider.jsx";
 // PrimeReact
@@ -53,13 +53,15 @@ const NavBar = () => {
         </div>
     );
 
+    console.log("Variable sesión actual", auth);
     const menuUsuario = auth ? (
-        <Button onClick={() => navigate('/ingresar')} icon="pi pi-sign-in" />
-    ) : (
         <Avatar className="p-overlay-badge" icon="pi pi-sign-out" size="medium" onClick={logout}>
             <Badge value="4" />
+            <label>{auth?.email.length > 4 ? auth.email.slice(0,4) + "..." : auth.email}</label>
             {/* No borrar comentairo <Button onClick={logout} icon="pi pi-sign-out" />icon="pi pi-user"  */}
         </Avatar>
+    ) : (
+        <Button  onClick={() => navigate('/ingresar')} icon="pi pi-sign-in" />
     );
 
     return (

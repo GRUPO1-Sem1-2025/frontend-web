@@ -83,7 +83,7 @@ export default function TwoFA({ email }) {
                 }
             );
 
-            guardarTokenEnAuth(response?.data);
+            guardarTokenEnAuth(response?.data.token);
             navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
@@ -112,10 +112,10 @@ export default function TwoFA({ email }) {
             setAuth({
                 email: payload.sub || '',
                 rol: payload.rol || '',
-                emision: payload.iat || '',
-                expira: payload.exp || '',
+                emision: new Date(payload.iat * 1000),
+                expira: new Date(payload.exp * 1000),
             });
-            console.log(auth);
+            console.log("Variable sesión guardada", auth);
 
         } catch (error) {
             console.error('Token inválido:', error);
