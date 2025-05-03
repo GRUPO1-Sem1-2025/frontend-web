@@ -11,21 +11,21 @@ const LinkPage = () => {
 
     return (
         <>
-        <NavBar />
-        <div className='rectangulo-centrado'>
-            <Card title="Pruebas de ruteo" className="cardCentrada">
-                <br></br>
-                <h3>Rutas públicas</h3>
-                <Link to="/">Principal</Link><br></br>
-                <Link to="/ingresar">Login</Link><br></br>
-                <Link to="/registrarse">Registrarse</Link><br></br>
-                {/* <ExportarUsuarios /> */}
+            <NavBar />
+            <div className='rectangulo-centrado'>
+                <Card title="Pruebas de ruteo" className="cardCentrada">
+                    <br></br>
+                    <h3>Rutas públicas</h3>
+                    <Link to="/">Principal</Link><br></br>
+                    <Link to="/ingresar">Login</Link><br></br>
+                    <Link to="/registrarse">Registrarse</Link><br></br>
+                    {/* <ExportarUsuarios /> */}
 
-                <br></br>
-                <h3>Rutas privadas</h3>
-                <Link to="/Dashboard">Dashboard</Link><br></br>
-            </Card>
-        </div>
+                    <br></br>
+                    <h3>Rutas privadas</h3>
+                    <Link to="/Dashboard">Dashboard</Link><br></br>
+                </Card>
+            </div>
         </>
     )
 }

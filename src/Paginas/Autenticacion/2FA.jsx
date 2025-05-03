@@ -82,7 +82,7 @@ export default function TwoFA({ email }) {
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
-            
+
             guardarTokenEnAuth(response?.data);
             navigate(from, { replace: true });
         } catch (err) {
@@ -105,28 +105,28 @@ export default function TwoFA({ email }) {
 
     const guardarTokenEnAuth = (token) => {
         try {
-          const payloadBase64 = token.split('.')[1];
-          const payloadJson = atob(payloadBase64);
-          const payload = JSON.parse(payloadJson);
-      
-          setAuth({
-            email: payload.sub || '',
-            rol: payload.rol || '',
-            emision: payload.iat || '',
-            expira: payload.exp || '',
-          });
-          console.log(auth);
+            const payloadBase64 = token.split('.')[1];
+            const payloadJson = atob(payloadBase64);
+            const payload = JSON.parse(payloadJson);
+
+            setAuth({
+                email: payload.sub || '',
+                rol: payload.rol || '',
+                emision: payload.iat || '',
+                expira: payload.exp || '',
+            });
+            console.log(auth);
 
         } catch (error) {
-          console.error('Token inválido:', error);
+            console.error('Token inválido:', error);
         }
-      };
-      
+    };
+
     const reenviarCodigo = async () => {
         try {
             const response = await axios.post(
                 `${URL_USUARIOSCONTROLLER}/reenviarCodigo?email=${encodeURIComponent(usuario.email)}`
-              );
+            );
 
             toast.current.show({
                 severity: 'success',

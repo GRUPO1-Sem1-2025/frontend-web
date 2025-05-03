@@ -65,7 +65,7 @@ const Login = () => {
             navigate("/2FA", {
                 replace: true,
                 state: { email: usuario.email }
-              });
+            });
             //navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
@@ -126,7 +126,7 @@ const Login = () => {
                     />
                     <p style={{ marginTop: "0.2em" }}>
                         <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" />
-                        <Button label="Ingresar" type="submit"  style={{ marginLeft: '0.5em' }}/>
+                        <Button label="Ingresar" type="submit" style={{ marginLeft: '0.5em' }} />
                     </p>
                 </form>
                 <p>

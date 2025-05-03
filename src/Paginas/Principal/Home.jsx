@@ -131,7 +131,7 @@ const Home = () => {
                                 checked={esIdaVuelta}
                                 onChange={(e) => setChecked(e.value)}
                             />
-                            
+
                             <label htmlFor="minmax-buttons" className="font-bold block mb-2">Pasajes</label>
                             <InputNumber inputId="minmax-buttons" value={pasajes} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={5} />
 
