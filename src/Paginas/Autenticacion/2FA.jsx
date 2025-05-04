@@ -104,12 +104,15 @@ export default function TwoFA({ email }) {
     }
 
     const guardarTokenEnAuth = (token) => {
+        if (typeof token !== 'string') throw new Error("Token inválido");
+        
         try {
             const payloadBase64 = token.split('.')[1];
             const payloadJson = atob(payloadBase64);
             const payload = JSON.parse(payloadJson);
 
             setAuth({
+                accessToken: token,
                 email: payload.sub || '',
                 rol: payload.rol || '',
                 emision: new Date(payload.iat * 1000),
