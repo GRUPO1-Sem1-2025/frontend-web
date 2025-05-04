@@ -24,6 +24,8 @@ const LinkPage = () => {
                     <br></br>
                     <h3>Rutas privadas</h3>
                     <Link to="/Dashboard">Dashboard</Link><br></br>
+                    <Link to="/Omnibus/AltaOmibus">Alta Omnibus</Link><br></br>
+                    <Link to="/Omnibus/ListadoOmnibus">Listado Omnibus</Link><br></br>
                 </Card>
             </div>
         </>
