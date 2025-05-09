@@ -1,42 +1,42 @@
 import { useRef } from 'react';
 import { Toast } from 'primereact/toast';
 
-export default function ExportarUsuarios({ message }) {
+export default function Noti({ message, duracion}) {
     const toast = useRef(null);
 
-    const notiAdvertencia = (message) => {
+    const notiAdvertencia = (message, duracion = 6000) => {
         toast.current.show({
             severity: 'warn',
             summary: 'Advertencia',
             detail: message,
-            life: 6000
+            life: duracion
         });
     };
-
-    const notiError = (message) => {
+    
+    const notiError = (message, duracion = 6000) => {
         toast.current.show({
             severity: 'error',
             summary: 'Error',
             detail: message,
-            life: 6000
+            life: duracion
         });
     };
 
-    const notiInfo = (message) => {
+    const notiInfo = (message, duracion = 6000) => {
         toast.current.show({
             severity: 'info',
             summary: 'Información',
             detail: message,
-            life: 6000
+            life: duracion
         });
     };
 
-    const notiExito = (message) => {
+    const notiExito = (message, duracion = 6000) => {
         toast.current.show({
             severity: 'success',
             summary: 'Felicidades!',
             detail: message,
-            life: 6000
+            life: duracion
         });
     };
 

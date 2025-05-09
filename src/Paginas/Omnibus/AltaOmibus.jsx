@@ -5,9 +5,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom"
 //PrimeReact
 import { Card } from "primereact/card";
 import { Button } from 'primereact/button';
+import { FileUpload } from 'primereact/fileupload';
 //conexion
 import axios from '../../Configuraciones/axios.js';
-const URL_USUARIOSCONTROLLER = '/usuarios';
+const URL_OMNIBUSCONTROLLER = '/buses';
 
 export default function AltaOmibus() {
     const [omnibus, setUsuario] = useState({
@@ -71,7 +72,7 @@ export default function AltaOmibus() {
         console.log(omnibus);
 
         try {
-            // const response = await axios.post(`${URL_USUARIOSCONTROLLER}/registrarse`, usuario, {
+            // const response = await axios.post(`${URL_OMNIBUSCONTROLLER}/crearOmnibus`, usuario, {
             //     headers: {
             //         'Content-Type': 'application/json'
             //     }
@@ -80,7 +81,7 @@ export default function AltaOmibus() {
             console.log(response.data);
 
             setSuccess(true);
-            navigate("/ingresar", { replace: true });
+            navigate("/", { replace: true });
         } catch (err) {
             if (!err?.response) {
                 setErrMsg('Error al conectar con el servidor ' + err);
@@ -124,8 +125,17 @@ export default function AltaOmibus() {
 
     return (
         <div className='rectangulo-centrado'>
-            <Card title="Agregar ómnibus" className="cardCentrada">
+            <Card className="cardCentrada">
                 <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+                <h3>Agregar asientos</h3>
+                <form onSubmit={handleSubmit}>
+                    <FileUpload name="demo[]" url={'/api/upload'} accept=".csv, .xlsx, .txt" auto maxFileSize={5000000} emptyTemplate={
+                        <p className="m-0" style={{padding: "0.7rem"}}>Sube tus archvios aqui</p>
+                    } />
+
+                </form>
+
+                <h3>Agregar ómnibus</h3>
                 <form onSubmit={handleSubmit}>
                     <Input2
                         titulo={"Marca"}

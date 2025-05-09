@@ -17,7 +17,7 @@ const RequireAuth = ({ allowedRoles }) => {
         rolesArray.find(role => allowedRoles?.includes(role))
             ? <Outlet />
             : auth?.email
-                ? <Navigate to="sinAutorizacion" state={{ from: location }} replace />
+                ? <Navigate to="/sinAutorizacion" state={{ from: location }} replace />
                 : <Navigate to="/ingresar" state={{ from: location }} replace />
     );
 }
