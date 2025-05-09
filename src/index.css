@@ -65,6 +65,7 @@ form {
     justify-content: space-evenly;
     flex-grow: 1;
     padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
 }
 
 /* a,
@@ -83,13 +84,10 @@ textarea {
 }
 
 .instructions {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     border-radius: 0.5rem;
-    background: #c6eefc;
     color: #1f2c3a;
-    padding: 0.25rem;
     position: relative;
-    bottom: -10px;
 }
 
 .instructions>svg {

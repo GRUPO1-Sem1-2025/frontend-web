@@ -83,7 +83,7 @@ export default function TwoFA({ email }) {
                 }
             );
 
-            guardarTokenEnAuth(response?.data);
+            guardarTokenEnAuth(response?.data.token);
             navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
@@ -104,18 +104,21 @@ export default function TwoFA({ email }) {
     }
 
     const guardarTokenEnAuth = (token) => {
+        if (typeof token !== 'string') throw new Error("Token inválido");
+        
         try {
             const payloadBase64 = token.split('.')[1];
             const payloadJson = atob(payloadBase64);
             const payload = JSON.parse(payloadJson);
 
             setAuth({
+                accessToken: token,
                 email: payload.sub || '',
                 rol: payload.rol || '',
-                emision: payload.iat || '',
-                expira: payload.exp || '',
+                emision: new Date(payload.iat * 1000),
+                expira: new Date(payload.exp * 1000),
             });
-            console.log(auth);
+            console.log("Variable sesión guardada", auth);
 
         } catch (error) {
             console.error('Token inválido:', error);

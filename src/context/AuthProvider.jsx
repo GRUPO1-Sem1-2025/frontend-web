@@ -5,9 +5,23 @@ const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
     const [auth, setAuth] = useState(() => {
         const stored = localStorage.getItem("auth");
-        return stored
-            ? JSON.parse(stored)
-            : null //{ accessToken: null, nombre: "", email: "", roles: 0 };
+        if (!stored) return null;
+
+        try {
+            const parsed = JSON.parse(stored);
+            const now = Date.now();
+
+            // Si hay fecha de expiración y ya expiró
+            if (parsed.expira && new Date(parsed.expira).getTime() < now) {
+                localStorage.removeItem("auth");
+                return null;
+            }
+
+            return parsed;
+        } catch {
+            localStorage.removeItem("auth");
+            return null;
+        }
     });
 
     useEffect(() => {

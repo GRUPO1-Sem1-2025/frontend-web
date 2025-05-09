@@ -19,12 +19,11 @@ const Login = () => {
     });
 
     //Variables
-    const { setAuth } = useAuth();
     const { auth } = useAuth();
 
     const navigate = useNavigate();
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/2FA";
+    //const from = location.state?.from?.pathname || "/2FA";
 
     const userRef = useRef();
 

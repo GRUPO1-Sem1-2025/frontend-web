@@ -17,6 +17,7 @@ const Home = () => {
     const [pasajes, setValue3] = useState(1);
     const [esIdaVuelta, setChecked] = useState(false);
     const [lugarElegido, setSelectedCity] = useState(null);
+    const [lugarElegido2, setSelectedCity2] = useState(null);
 
     const departamentos = [
         {
@@ -163,8 +164,8 @@ const Home = () => {
                             <FloatLabel>
                                 <CascadeSelect
                                     inputId="cs-city"
-                                    value={lugarElegido}
-                                    onChange={(e) => setSelectedCity(e.value)}
+                                    value={lugarElegido2}
+                                    onChange={(e) => setSelectedCity2(e.value)}
                                     options={departamentos}
                                     optionLabel="cname"
                                     optionGroupLabel="name"
