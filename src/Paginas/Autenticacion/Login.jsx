@@ -13,7 +13,7 @@ const Login = () => {
     const [usuario, setUsuario] = useState({
         nombre: '',
         apellido: '',
-        email: 'fedeacosta6@gmail.com',//fedeacosta6@gmail.com
+        email: 'fedeacosta6@gmail.co',//fedeacosta6@gmail.com
         password: '123456Aa@', //Para test
         codigo: 0,
     });
@@ -58,7 +58,7 @@ const Login = () => {
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
-
+console.log(response);
             console.log(response?.data);
 
             navigate("/2FA", {
@@ -72,9 +72,9 @@ const Login = () => {
             if (!err?.response) {
                 msg = 'No responde el servidor:\n' + err;
             } else if (err.response?.status === 400) {
-                msg = 'Usuario o contraseña incorrectos';
+                msg = err.response?.data?.mensaje || 'Usuario o contraseña incorrectos';
             } else if (err.response?.status === 401) {
-                msg = 'Sin autorización';
+                msg = err.response?.data?.mensaje || 'No autorizado';
             } else {
                 msg = 'Error al ingresar';
             }
