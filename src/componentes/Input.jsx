@@ -15,11 +15,6 @@ const Input2 = ({
 }) => {
     const inputRef = useRef();
     const [inputValid, setInputValid] = useState(true);
-    const [inputFocus, setUserFocus] = useState(false);
-
-    useEffect(() => {
-        inputRef.current.focus();
-    }, []);
 
     useEffect(() => {
         let isValid = true;
@@ -50,14 +45,12 @@ const Input2 = ({
                     invalid={value && !inputValid}
                     aria-invalid={value && !inputValid}
                     aria-describedby="inputNote"
-                    onFocus={() => setUserFocus(true)}
-                    onBlur={() => setUserFocus(false)}
                     style={styles}
                     keyfilter={permitirTeclas}
                 />
 
                 {descripcion && (
-                    <small id="inputNote" className={inputFocus && value && !inputValid ? "instructions" : "offscreen"}>
+                    <small id="inputNote" className={ value && !inputValid ? "instructions" : "offscreen"}>
                         <ul style={{background: "#c6eefc", borderRadius: "0.5rem", marginTop: "0.30rem"}}>
                             {descripcion.split('\n').map((linea, idx) => (
                                 <li key={idx}>{linea}</li>
