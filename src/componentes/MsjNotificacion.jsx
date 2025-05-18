@@ -1,46 +1,46 @@
-import { useRef } from 'react';
+// Noti.js
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Toast } from 'primereact/toast';
 
-export default function Noti({ message, duracion}) {
+const Noti = forwardRef((props, ref) => {
     const toast = useRef(null);
 
-    const notiAdvertencia = (message, duracion = 6000) => {
-        toast.current.show({
-            severity: 'warn',
-            summary: 'Advertencia',
-            detail: message,
-            life: duracion
-        });
-    };
-    
-    const notiError = (message, duracion = 6000) => {
-        toast.current.show({
-            severity: 'error',
-            summary: 'Error',
-            detail: message,
-            life: duracion
-        });
-    };
+    useImperativeHandle(ref, () => ({
+        notiAdvertencia(message, duracion = 6000) {
+            toast.current.show({
+                severity: 'warn',
+                summary: 'Advertencia',
+                detail: message,
+                life: duracion
+            });
+        },
+        notiError(message, duracion = 6000) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: message,
+                life: duracion
+            });
+        },
+        notiInfo(message, duracion = 6000) {
+            toast.current.show({
+                severity: 'info',
+                summary: 'Información',
+                detail: message,
+                life: duracion
+            });
+        },
+        notiExito(message, duracion = 6000) {
+            toast.current.show({
+                severity: 'success',
+                summary: 'Felicidades!',
+                detail: message,
+                life: duracion
+            });
+        }
+    }));
 
-    const notiInfo = (message, duracion = 6000) => {
-        toast.current.show({
-            severity: 'info',
-            summary: 'Información',
-            detail: message,
-            life: duracion
-        });
-    };
+    return <Toast ref={toast} />;
+});
 
-    const notiExito = (message, duracion = 6000) => {
-        toast.current.show({
-            severity: 'success',
-            summary: 'Felicidades!',
-            detail: message,
-            life: duracion
-        });
-    };
-
-    return (
-        <Toast ref={toast} />
-    );
-};
+export default Noti;
