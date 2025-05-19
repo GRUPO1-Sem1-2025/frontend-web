@@ -12,12 +12,18 @@ import { Dropdown } from 'primereact/dropdown';
 import axios, { URL_LOCALIDADESCONTROLLER, URL_VIAJESCONTROLLER } from '../../Configuraciones/axios.js';
 
 export default function AltaOmibus() {
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
     const [viaje, setViaje] = useState({
         precio: 0,
-        fechaInicio: null,
-        fechaFin: null,
-        horaInicio: null,
-        horaFin: null
+        fechaInicio: today,
+        fechaFin: tomorrow,
+        horaInicio: "00:00:00",
+        horaFin: "00:00:00",
+        idLocalidadOrigen: 0,
+        idLocalidadDestino: 0
     });
 
     //Fix fechas para Java
@@ -111,10 +117,12 @@ export default function AltaOmibus() {
 
             setViaje({
                 precio: 0,
-                fechaInicio: null,
-                fechaFin: null,
-                horaInicio: null,
-                horaFin: null
+                fechaInicio: today,
+                fechaFin: tomorrow,
+                horaInicio: "00:00:00",
+                horaFin: "00:00:00",
+                idLocalidadOrigen: 0,
+                idLocalidadDestino: 0
             });
             setSelectOrigen(null);
             setSelectDestino(null);
@@ -142,11 +150,39 @@ export default function AltaOmibus() {
                         <label htmlFor="currency-uy" className="font-bold block mb-2">Precio</label>
                     </FloatLabel>
 
-                    <Calendar value={viaje.fechaInicio} dateFormat="dd/mm/yy" showIcon style={{ width: "100%", paddingBottom: "15px" }}
-                        onChange={(e) => setViaje(prev => ({ ...prev, fechaInicio: e.value }))} />
+                    <Calendar
+                        value={viaje.fechaInicio}
+                        dateFormat="dd/mm/yy"
+                        showIcon
+                        style={{ width: "100%", paddingBottom: "15px" }}
+                        minDate={today}
+                        onChange={(e) => {
+                            const nuevaFechaInicio = e.value;
+                            const nuevaFechaFin = new Date(nuevaFechaInicio);
+                            nuevaFechaFin.setDate(nuevaFechaInicio.getDate() + 1);
 
-                    <Calendar value={viaje.fechaFin} dateFormat="dd/mm/yy" showIcon style={{ width: "100%", paddingBottom: "15px" }}
-                        onChange={(e) => setViaje(prev => ({ ...prev, fechaFin: e.value }))} />
+                            setViaje(prev => ({
+                                ...prev,
+                                fechaInicio: nuevaFechaInicio,
+                                // Ajustamos fechaFin si quedó fuera del rango permitido
+                                fechaFin: prev.fechaFin <= nuevaFechaInicio ? nuevaFechaFin : prev.fechaFin
+                            }));
+                        }}
+                    />
+                    <Calendar
+                        value={viaje.fechaFin}
+                        dateFormat="dd/mm/yy"
+                        showIcon
+                        style={{ width: "100%", paddingBottom: "15px" }}
+                        minDate={viaje.fechaInicio}
+                        maxDate={viaje.fechaInicio ? new Date(viaje.fechaInicio.getTime() + 24 * 60 * 60 * 1000) : null}
+                        onChange={(e) => {
+                            setViaje(prev => ({
+                                ...prev,
+                                fechaFin: e.value
+                            }));
+                        }}
+                    />
 
                     <Calendar value={viaje.horaInicio} showIcon timeOnly icon={() => <i className="pi pi-clock" />} style={{ width: "100%", paddingBottom: "15px" }}
                         onChange={(e) => setViaje(prev => ({ ...prev, horaInicio: e.value }))} />
@@ -155,26 +191,28 @@ export default function AltaOmibus() {
                         onChange={(e) => setViaje(prev => ({ ...prev, horaFin: e.value }))} />
 
                     <FloatLabel style={{ paddingBottom: "20px" }}>
-                        <Dropdown value={selectOrigen} onChange={(e) => {
-                            const localidad = e.value;
-                            setSelectOrigen(localidad);
-                            setViaje(prev => ({ ...prev, idLocalidadOrigen: localidad.id }));
-                        }}
+                        <Dropdown value={selectOrigen}
                             options={localidades} optionLabel="label"
                             optionGroupLabel="label" optionGroupChildren="items"
-                            filter loading={false} style={{ width: "100%" }} />
+                            filter loading={false} style={{ width: "100%" }}
+                            onChange={(e) => {
+                                const localidad = e.value;
+                                setSelectOrigen(localidad);
+                                setViaje(prev => ({ ...prev, idLocalidadOrigen: localidad.id }));
+                            }} />
                         <label htmlFor="dd-city">Origen</label>
                     </FloatLabel>
 
                     <FloatLabel style={{ paddingBottom: "20px" }}>
-                        <Dropdown value={selectDestino} onChange={(e) => {
-                            const localidad = e.value;
-                            setSelectDestino(localidad);
-                            setViaje(prev => ({ ...prev, idLocalidadDestino: localidad.id }));
-                        }}
+                        <Dropdown value={selectDestino}
                             options={localidades} optionLabel="label"
                             optionGroupLabel="label" optionGroupChildren="items"
-                            filter loading={false} style={{ width: "100%" }} />
+                            filter loading={false} style={{ width: "100%" }}
+                            onChange={(e) => {
+                                const localidad = e.value;
+                                setSelectDestino(localidad);
+                                setViaje(prev => ({ ...prev, idLocalidadDestino: localidad.id }));
+                            }} />
                         <label htmlFor="dd-city">Destino</label>
                     </FloatLabel>
 
