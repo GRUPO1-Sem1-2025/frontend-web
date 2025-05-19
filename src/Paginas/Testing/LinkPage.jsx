@@ -26,6 +26,8 @@ const LinkPage = () => {
                     <Link to="/Dashboard">Dashboard</Link><br></br>
                     <Link to="/Omnibus/AltaOmibus">Alta Omnibus</Link><br></br>
                     <Link to="/Omnibus/ListadoOmnibus">Listado Omnibus</Link><br></br>
+                    <Link to="/Viaje/AltaViaje">Alta Viaje</Link><br></br>
+
                 </Card>
             </div>
         </>

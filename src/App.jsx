@@ -16,6 +16,7 @@ import Missing from './Paginas/Basicas/Missing.jsx';
 import Unauthorized from './Paginas/Basicas/Unauthorized.jsx';
 import AltaOmibus from './Paginas/Omnibus/AltaOmibus.jsx';
 import ListadoOmnibus from './Paginas/Omnibus/ListadoOmnibus.jsx';
+import AltaViaje from './Paginas/Viaje/AltaViaje.jsx';
 
 const ROLES = { 'User': 100, 'Vendedor': 200, 'Admin': 300 }
 
@@ -36,6 +37,7 @@ function App() {
         <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/Omnibus/AltaOmibus" element={<AltaOmibus />} />
         <Route path="/Omnibus/ListadoOmnibus" element={<ListadoOmnibus />} />
+        <Route path="/Viaje/AltaViaje" element={<AltaViaje />} />
 
         {/*
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
