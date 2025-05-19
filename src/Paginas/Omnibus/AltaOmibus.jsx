@@ -106,7 +106,7 @@ export default function AltaOmibus() {
                     <Button
                         disabled={!marcaValido || !matriculaValido || !asientosValido}
                         loading={loading}
-                        label="Ingresar"
+                        label="Crear ómnibus"
                         type="submit"
                         style={{ marginTop: "1rem" }}
                     />
