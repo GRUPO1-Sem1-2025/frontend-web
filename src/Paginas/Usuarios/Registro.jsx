@@ -1,13 +1,16 @@
 import { useRef, useState, useEffect } from "react";
-import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "../../Configuraciones/Validaciones.js";
 import { Link, useNavigate, useLocation } from "react-router-dom"
+import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "../../Configuraciones/Validaciones.js";
+import CargaMasivaUsuarios from "../../Componentes/CargaMasivaUsuarios.jsx";
+import Noti from '../../Componentes/MsjNotificacion.jsx';
+
 //PrimeReact
 import { Card } from "primereact/card";
 //conexion
 import axios from '../../Configuraciones/axios.js';
 const URL_USUARIOSCONTROLLER = '/usuarios';
 
-const Register = () => {
+const Registro = () => {
 	const [usuario, setUsuario] = useState({
 		nombre: '',
 		apellido: '',
@@ -15,13 +18,13 @@ const Register = () => {
 		password: '',
 	});
 
+    const toastRef = useRef();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location.state?.from?.pathname || "/";
 
 	const userRef = useRef();
 	const emailRef = useRef();
-	const errRef = useRef();
 
 	const [validName, setValidName] = useState(false);
 	const [userFocus, setUserFocus] = useState(false);
@@ -99,14 +102,15 @@ const Register = () => {
 			} else {
 				setErrMsg('Error al registrar');
 			}
-			errRef.current.focus();
 		}
 	}
 
 	return (
 		<div className='rectangulo-centrado'>
-			<Card title="Registrarse" className="cardCentrada">
-				<p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+			<Card className="cardCentrada">
+				<Noti ref={toastRef} />
+
+				<h3>Registrarse</h3>
 				<form onSubmit={handleSubmit}>
 					<label htmlFor="nombre">
 						Nombre
@@ -233,4 +237,4 @@ const Register = () => {
 	)
 }
 
-export default Register
+export default Registro

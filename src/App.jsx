@@ -6,7 +6,7 @@ import RequireAuth from './Hooks/RequireAuth.jsx';
 
 //Paginas
 import LinkPage from './Paginas/Testing/LinkPage.jsx';
-import Register from './Paginas/Autenticacion/Register.jsx';
+import Registro from './Paginas/Usuarios/Registro.jsx';
 import Login from './Paginas/Autenticacion/Login.jsx';
 import Home from './Paginas/Principal/Home.jsx';
 import Dashboard from './Paginas/Principal/Dashboard.jsx';
@@ -26,7 +26,7 @@ function App() {
       <Route path="/" element={<Layout />}>
         {/* Rutas publicas */}
         <Route path="/" element={<Home />} />
-        <Route path="/registrarse" element={<Register />} />
+        <Route path="/registrarse" element={<Registro />} />
         <Route path="/ingresar" element={<Login />} />
         <Route path="/2FA" element={<TwoFA email='' />} />
 
