@@ -1,9 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "../../Configuraciones/Validaciones.js";
-import CargaMasivaUsuarios from "../../Componentes/CargaMasivaUsuarios.jsx";
 import Noti from '../../Componentes/MsjNotificacion.jsx';
-
 //PrimeReact
 import { Card } from "primereact/card";
 //conexion

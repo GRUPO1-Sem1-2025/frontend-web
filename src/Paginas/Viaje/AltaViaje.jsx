@@ -179,6 +179,7 @@ export default function AltaOmibus() {
                             }));
                         }}
                     />
+                    
                     <Calendar
                         value={viaje.fechaFin}
                         dateFormat="dd/mm/yy"
