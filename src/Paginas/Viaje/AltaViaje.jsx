@@ -49,6 +49,16 @@ export default function AltaOmibus() {
             .then(response => {
                 const data = response.data;
 
+                data.sort((a, b) => {
+                    if (a.departamento < b.departamento) {
+                        return -1;
+                    }
+                    if (a.departamento > b.departamento) {
+                        return 1;
+                    }
+                    return 0;
+                });
+                
                 const departamentosMap = {};
 
                 data.forEach(localidad => {
