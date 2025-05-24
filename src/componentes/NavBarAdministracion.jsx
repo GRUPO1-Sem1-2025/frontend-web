@@ -122,7 +122,7 @@ export default function NavBarAdministracion() {
                         {
                             label: 'Alta usuario',
                             icon: 'pi pi-user-plus',
-                            url: '/links',
+                            url: '/Usuarios/AltaUsuario',
 
                         },
                         {

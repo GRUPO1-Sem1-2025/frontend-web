@@ -3,3 +3,4 @@ export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{
 export const CORREO_REGEX = /^[a-zA-Z0-9.*%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/;
 export const SOLODIGITOS_REGEX = /^\d+$/;
 export const NOTNULL_REGEX = /.+/;
+export const CEDULA_REGEX = /^\d{1}\.\d{3}\.\d{3}\-\d{1}$/;

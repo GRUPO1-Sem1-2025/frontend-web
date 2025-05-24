@@ -8,6 +8,8 @@ import { InputNumber } from 'primereact/inputnumber';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+import { useNavigate } from "react-router-dom";
+
 //conexion
 import axios, { URL_LOCALIDADESCONTROLLER, URL_VIAJESCONTROLLER } from '../../Configuraciones/axios.js';
 
@@ -43,6 +45,7 @@ export default function AltaOmibus() {
     const [loading, setLoading] = useState(false);
     const [localidades, setLocalidades] = useState([]);
     const toastRef = useRef();
+	const navigate = useNavigate();
 
     useEffect(() => {
         axios.get(`${URL_LOCALIDADESCONTROLLER}/obtenerLocalidadesActivas`)
@@ -58,7 +61,7 @@ export default function AltaOmibus() {
                     }
                     return 0;
                 });
-                
+
                 const departamentosMap = {};
 
                 data.forEach(localidad => {
@@ -153,7 +156,7 @@ export default function AltaOmibus() {
                     <br />
 
                     <FloatLabel>
-                        <InputNumber inputId="currency-uy" value={viaje.precio} mode="currency" currency="UYU" locale="es-UY" style={{ width: "100%", paddingBottom: "15px" }}
+                        <InputNumber inputId="currency-uy" value={viaje.precio} mode="currency" currency="UYU" locale="es-UY" style={{ width: "100%" }}
                             onValueChange={(e) => {
                                 setViaje(prev => ({ ...prev, precio: e.value }));
                             }} />
@@ -164,7 +167,7 @@ export default function AltaOmibus() {
                         value={viaje.fechaInicio}
                         dateFormat="dd/mm/yy"
                         showIcon
-                        style={{ width: "100%", paddingBottom: "15px" }}
+                        style={{ width: "100%", marginTop: "1rem" }}
                         minDate={today}
                         onChange={(e) => {
                             const nuevaFechaInicio = e.value;
@@ -179,12 +182,12 @@ export default function AltaOmibus() {
                             }));
                         }}
                     />
-                    
+
                     <Calendar
                         value={viaje.fechaFin}
                         dateFormat="dd/mm/yy"
                         showIcon
-                        style={{ width: "100%", paddingBottom: "15px" }}
+                        style={{ width: "100%",  marginTop: "1rem" }}
                         minDate={viaje.fechaInicio}
                         maxDate={viaje.fechaInicio ? new Date(viaje.fechaInicio.getTime() + 24 * 60 * 60 * 1000) : null}
                         onChange={(e) => {
@@ -195,17 +198,18 @@ export default function AltaOmibus() {
                         }}
                     />
 
-                    <Calendar value={viaje.horaInicio} showIcon timeOnly icon={() => <i className="pi pi-clock" />} style={{ width: "100%", paddingBottom: "15px" }}
+                    <Calendar value={viaje.horaInicio} showIcon timeOnly icon={() => <i className="pi pi-clock" />} style={{ width: "100%", marginTop: "1rem"}}
                         onChange={(e) => setViaje(prev => ({ ...prev, horaInicio: e.value }))} />
 
-                    <Calendar value={viaje.horaFin} showIcon timeOnly icon={() => <i className="pi pi-clock" />} style={{ width: "100%", paddingBottom: "15px" }}
+                    <Calendar value={viaje.horaFin} showIcon timeOnly icon={() => <i className="pi pi-clock" />} style={{ width: "100%", marginTop: "1rem" }}
                         onChange={(e) => setViaje(prev => ({ ...prev, horaFin: e.value }))} />
 
-                    <FloatLabel style={{ paddingBottom: "20px" }}>
+                    <FloatLabel >
                         <Dropdown value={selectOrigen}
                             options={localidades} optionLabel="label"
                             optionGroupLabel="label" optionGroupChildren="items"
-                            filter loading={false} style={{ width: "100%" }}
+                            filter loading={false} 
+                            style={{ width: "100%", marginTop: "1rem" }}
                             onChange={(e) => {
                                 const localidad = e.value;
                                 setSelectOrigen(localidad);
@@ -214,11 +218,11 @@ export default function AltaOmibus() {
                         <label htmlFor="dd-city">Origen</label>
                     </FloatLabel>
 
-                    <FloatLabel style={{ paddingBottom: "20px" }}>
+                    <FloatLabel >
                         <Dropdown value={selectDestino}
                             options={localidades} optionLabel="label"
                             optionGroupLabel="label" optionGroupChildren="items"
-                            filter loading={false} style={{ width: "100%" }}
+                            filter loading={false} style={{ width: "100%", marginTop: "1rem" }}
                             onChange={(e) => {
                                 const localidad = e.value;
                                 setSelectDestino(localidad);
@@ -234,6 +238,8 @@ export default function AltaOmibus() {
                         type="submit"
                         style={{ marginTop: "1rem" }}
                     />
+
+                    <Button label="Cancelar" onClick={() => navigate('/Dashboard')} severity="secondary" style={{ marginTop: "1rem" }} />
                 </form>
             </Card>
         </div>

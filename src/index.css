@@ -19,14 +19,14 @@
   box-sizing: border-box;
 }
 
-html {
+/* html {
   font-family: 'Nunito', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   color: #1f2c3a;
-}
+} */
 
 body {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   background-color: #69c8f1;
 }
 
@@ -48,7 +48,7 @@ body {
   padding: 1rem 0.5rem;
 }
 
-section {
+/* section {
   width: 100%;
   max-width: 420px;
   min-height: 400px;
@@ -57,7 +57,7 @@ section {
   justify-content: flex-start;
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.4);
-}
+} */
 
 form {
   display: flex;
@@ -73,18 +73,17 @@ a:visited {
     color: #fff;
 } */
 
-input[type="text"],
+/* input[type="text"],
 input[type="password"],
 button,
 textarea {
   font-family: 'Nunito', sans-serif;
-  font-size: 22px;
   padding: 0.25rem;
   border-radius: 0.5rem;
-}
+}  */
 
 .instructions {
-  font-size: 0.65rem;
+  font-size: 0.80rem;
   border-radius: 0.5rem;
   color: #1f2c3a;
   position: relative;

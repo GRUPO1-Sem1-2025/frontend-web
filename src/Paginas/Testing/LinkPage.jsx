@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom"
-import ExportarUsuarios from '../../Componentes/ExportarUsuariosCSV.jsx';
 import useAuth from "../../Hooks/useAuth.jsx";
 import NavBar from '../../Componentes/NavBar.jsx';
-
 //PrimeReact
 import { Card } from 'primereact/card';
 
@@ -27,6 +25,7 @@ const LinkPage = () => {
                     <Link to="/Omnibus/AltaOmibus">Alta Omnibus</Link><br></br>
                     <Link to="/Omnibus/ListadoOmnibus">Listado Omnibus</Link><br></br>
                     <Link to="/Viaje/AltaViaje">Alta Viaje</Link><br></br>
+                    <Link to="/Usuarios/AltaUsuario">Alta usuario</Link><br></br>
 
                 </Card>
             </div>

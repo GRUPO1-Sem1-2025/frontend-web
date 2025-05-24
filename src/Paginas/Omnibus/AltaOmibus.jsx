@@ -1,8 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { SOLODIGITOS_REGEX } from "../../Configuraciones/Validaciones.js";
 import Input2 from "../../Componentes/Input.jsx";
 import CargaMasivaAsientos from "../../Componentes/CargaMasivaAsientos.jsx";
 import Noti from '../../Componentes/MsjNotificacion.jsx';
+import { useNavigate } from 'react-router-dom';
+
 //PrimeReact
 import { Card } from "primereact/card";
 import { Button } from 'primereact/button';
@@ -16,18 +18,24 @@ export default function AltaOmibus() {
         matricula: ''
     });
 
+    const [formValido, setFormValido] = useState(false);
     const toastRef = useRef();
-    const [marcaValido, setMarcaValido] = useState(false);
-    const [matriculaValido, setMatriculaValido] = useState(false);
-    const [asientosValido, setAsientosValido] = useState(false);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const valido =
+            omnibus.marca &&
+            SOLODIGITOS_REGEX.test(omnibus.cant_asientos) &&
+            omnibus.cant_asientos > 0 &&
+            omnibus.matricula
+        setFormValido(valido);
+    }, [omnibus]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { marca, cant_asientos, matricula } = omnibus;
-
-        if (!marca || !matricula || !SOLODIGITOS_REGEX.test(cant_asientos)) {
+        if (!formValido) {
             toastRef.current?.notiError("Verifique los campos antes de enviar");
             return;
         }
@@ -39,10 +47,11 @@ export default function AltaOmibus() {
             });
 
             toastRef.current?.notiExito("Ómnibus ingresado correctamente");
-            setOmnibus({ marca: '', cant_asientos: '', matricula: '' });
-            setMarcaValido(false);
-            setMatriculaValido(false);
-            setAsientosValido(false);
+            setOmnibus({
+                marca: '',
+                cant_asientos: '',
+                matricula: ''
+            });
         } catch (error) {
             toastRef.current?.notiError("Error al registrar el ómnibus");
         } finally {
@@ -68,10 +77,8 @@ export default function AltaOmibus() {
                         onChange={(e) => {
                             const val = e.target.value;
                             setOmnibus(prev => ({ ...prev, marca: val }));
-                            setMarcaValido(val.trim() !== "");
                         }}
-                        onValidChange={setMarcaValido}
-                        required = {true}
+                        required={true}
                     />
 
                     <Input2
@@ -83,10 +90,8 @@ export default function AltaOmibus() {
                         onChange={(e) => {
                             const val = e.target.value;
                             setOmnibus(prev => ({ ...prev, cant_asientos: val }));
-                            setAsientosValido(SOLODIGITOS_REGEX.test(val));
                         }}
-                        onValidChange={setAsientosValido}
-                        required = {true}
+                        required={true}
                     />
 
                     <Input2
@@ -96,20 +101,19 @@ export default function AltaOmibus() {
                         onChange={(e) => {
                             const val = e.target.value;
                             setOmnibus(prev => ({ ...prev, matricula: val }));
-                            setMatriculaValido(val.trim() !== "");
                         }}
-                        onValidChange={setMatriculaValido}
                         permitirTeclas={"alphanum"}
-                        required = {true}
+                        required={true}
                     />
 
                     <Button
-                        disabled={!marcaValido || !matriculaValido || !asientosValido}
+                        disabled={!formValido}
                         loading={loading}
                         label="Crear ómnibus"
                         type="submit"
-                        style={{ marginTop: "1rem" }}
                     />
+
+                    <Button label="Cancelar" type="button" onClick={() => navigate('/Dashboard')} severity="secondary" style={{ marginTop: "1rem" }} />
                 </form>
             </Card>
         </div>

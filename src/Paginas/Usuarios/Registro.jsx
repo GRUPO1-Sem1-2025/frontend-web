@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "../../Configuraciones/Validaciones.js";
 import Noti from '../../Componentes/MsjNotificacion.jsx';
+import Input2 from "../../Componentes/Input.jsx";
+
 //PrimeReact
 import { Card } from "primereact/card";
 //conexion
@@ -16,7 +18,7 @@ const Registro = () => {
 		password: '',
 	});
 
-    const toastRef = useRef();
+	const toastRef = useRef();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location.state?.from?.pathname || "/";
@@ -110,75 +112,63 @@ const Registro = () => {
 
 				<h3>Registrarse</h3>
 				<form onSubmit={handleSubmit}>
-					<label htmlFor="nombre">
-						Nombre
-					</label>
-					<input
-						type="text"
-						id="nombre"
-						ref={userRef}
-						autoComplete="off"
-						onChange={(e) =>
-							setUsuario(prev => ({ ...prev, nombre: e.target.value }))
-						}
+
+					<Input2
+						titulo={"Nombre"}
 						value={usuario.nombre}
-						required
-						aria-invalid={validName ? "false" : "true"}
-						aria-describedby="nomnote"
-						onFocus={() => setUserFocus(true)}
-						onBlur={() => setUserFocus(false)}
+						descripcion={`De 4 a 24 caracteres.\n Debe comenzar con una letra.\n Se permiten letras, números, guiones bajos y guiones.`}
+						onChange={(e) => {
+							const val = e.target.value;
+							setUsuario(prev => ({ ...prev, nombre: val }));
+						}}
+						regex={NOMBRE_REGEX}
+						required={true}
 					/>
-					<p id="nomnote" className={userFocus && usuario.nombre && !validName ? "instructions" : "offscreen"}>
-						De 4 a 24 caracteres.<br />
-						Debe comenzar con una letra.<br />
-						Se permiten letras, números, guiones bajos y guiones.
-					</p>
 
-					<label htmlFor="apellido" style={{ marginTop: "15px" }}>
-						Apellido
-					</label>
-					<input
-						type="text"
-						id="apellido"
-						ref={userRef}
-						autoComplete="off"
-						onChange={(e) =>
-							setUsuario(prev => ({ ...prev, apellido: e.target.value }))
-						}
+					<Input2
+						titulo={"Apellido"}
 						value={usuario.apellido}
-						required
-						aria-invalid={validName ? "false" : "true"}
-						aria-describedby="apenote"
-						onFocus={() => setUserFocus(true)}
-						onBlur={() => setUserFocus(false)}
+						descripcion={`No puede estar vacío`}
+						onChange={(e) => {
+							const val = e.target.value;
+							setUsuario(prev => ({ ...prev, apellido: val }));
+						}}
+						required={true}
 					/>
-					<p id="apenote" className={userFocus && usuario.apellido && !validName ? "instructions" : "offscreen"}>
-						De 4 a 24 caracteres.<br />
-						Debe comenzar con una letra.<br />
-						Se permiten letras, números, guiones bajos y guiones.
-					</p>
 
-					<label htmlFor="correo" style={{ marginTop: "15px" }}>
-						Correo
-					</label>
-					<input
-						type="text"
-						id="correo"
-						ref={emailRef}
-						autoComplete="off"
-						onChange={(e) =>
-							setUsuario(prev => ({ ...prev, email: e.target.value }))
-						}
+					<Input2
+						titulo={"Correo"}
 						value={usuario.email}
-						required
-						aria-invalid={validemail ? "false" : "true"}
-						aria-describedby="emailnote"
-						onFocus={() => setemailFocus(true)}
-						onBlur={() => setemailFocus(false)}
+						descripcion={`Correo con formato válido xxxx@gmail.com`}
+						regex={CORREO_REGEX}
+						onChange={(e) => {
+							const val = e.target.value;
+							setUsuario(prev => ({ ...prev, email: val }));
+						}}
+						required={true}
 					/>
-					<p id="emailnote" className={emailFocus && !validemail ? "instructions" : "offscreen"}>
-						Correo con formato válido xxxx@gmail.com
-					</p>
+
+                    <Input2
+                        type="password"
+                        titulo={"Contraseña"}
+                        value={usuario.password}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setUsuario(prev => ({ ...prev, password: val }));
+                        }}
+                        required={true}
+                    />
+
+                    <Input2
+                        type="password"
+                        titulo={"Confirmar contraseña"}
+                        value={usuario.password}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setUsuario(prev => ({ ...prev, password: val }));
+                        }}
+                        required={true}
+                    />
 
 					<label htmlFor="password" style={{ marginTop: "15px" }}>
 						Contraseña

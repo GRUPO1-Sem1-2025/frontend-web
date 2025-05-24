@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX } from "../../Configuraciones/Validaciones.js";
+import { useNavigate } from 'react-router-dom';
+import { NOMBRE_REGEX, CORREO_REGEX } from "../../Configuraciones/Validaciones.js";
 import Noti from '../../Componentes/MsjNotificacion.jsx';
 import CargaMasivaUsuarios from "../../Componentes/CargaMasivaUsuarios.jsx";
+import Input2 from "../../Componentes/Input.jsx";
+import InputCedula from "../../Componentes/InputCedula.jsx";
+import { ROLES } from '../../Configuraciones/Constantes.js';
+
 //PrimeReact
 import { Card } from "primereact/card";
 import { Button } from 'primereact/button';
-import { InputNumber } from 'primereact/inputnumber';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
@@ -14,15 +18,22 @@ import axios, { URL_USUARIOSCONTROLLER } from '../../Configuraciones/axios.js';
 
 export default function AltaUsuario() {
 	const today = new Date();
+	const fechaMenos17Anios = new Date(today);
+	fechaMenos17Anios.setFullYear(fechaMenos17Anios.getFullYear() - 17);
+
+	const rolesOrdenados = Object.entries(ROLES)
+		.filter(([label]) => label !== 'User')
+		.sort((a, b) => a[1] - b[1])
+		.map(([label]) => ({ label, value: label }));
 
 	const [cuenta, setCuenta] = useState({
 		nombre: "",
 		apellido: "",
 		email: "",
 		categoría: "",
-		ci: "",
-		fechaNac: today,
-		rol: 0
+		ci: null,
+		fechaNac: fechaMenos17Anios,
+		rol: null
 	});
 
 	//Fix fechas para Java
@@ -31,27 +42,25 @@ export default function AltaUsuario() {
 		return fechaDate.toISOString().split("T")[0]; // "yyyy-mm-dd"
 	};
 
-	const [selectOrigen, setSelectOrigen] = useState(null);
-	const [selectDestino, setSelectDestino] = useState(null);
+	//quitar caaracteres especiales de cedula
+	function limpiarNumeroDocumento(numero) {
+		return numero.replace(/[.-]/g, '');
+	}
 	const [formValido, setFormValido] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [localidades, setLocalidades] = useState([]);
 	const toastRef = useRef();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const valido =
-			cuenta.precio > 0 &&
-			cuenta.fechaInicio &&
-			cuenta.fechaFin &&
-			cuenta.horaInicio &&
-			cuenta.horaFin &&
-			selectOrigen &&
-			selectDestino &&
-			selectOrigen.id !== selectDestino.id;
-
+			cuenta.rol &&
+			cuenta.fechaNac &&
+			cuenta.nombre &&
+			cuenta.apellido &&
+			CORREO_REGEX.test(cuenta.email) &&
+			cuenta.ci
 		setFormValido(valido);
-	}, [cuenta, selectOrigen, selectDestino]);
-
+	}, [cuenta]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -65,16 +74,18 @@ export default function AltaUsuario() {
 		const cuentaFormateada = {
 			...cuenta,
 			fechaNac: formatearFecha(cuenta.fechaNac),
+			ci: limpiarNumeroDocumento(cuenta.ci)
 		};
 
 		console.log(cuentaFormateada);
 		setLoading(true);
+
 		try {
 			await axios.post(`${URL_USUARIOSCONTROLLER}/crearCuenta`, cuentaFormateada, {
 				headers: { 'Content-Type': 'application/json' }
 			});
 
-			toastRef.current?.notiExito("usuario ingresado correctamente");
+			toastRef.current?.notiExito("Usuario ingresado correctamente");
 
 			setCuenta({
 				nombre: "",
@@ -82,7 +93,7 @@ export default function AltaUsuario() {
 				email: "",
 				categoría: "",
 				ci: "",
-				fechaNac: today,
+				fechaNac: fechaMenos17Anios,
 				rol: 0
 			});
 		} catch (error) {
@@ -107,13 +118,12 @@ export default function AltaUsuario() {
 					<Input2
 						titulo={"Nombre"}
 						value={cuenta.nombre}
-						descripcion={`No puede estar vacío`}
+						descripcion={`Al menos 4 caracteres`}
 						onChange={(e) => {
 							const val = e.target.value;
 							setCuenta(prev => ({ ...prev, nombre: val }));
-							setMarcaValido(val.trim() !== "");
 						}}
-						onValidChange={setMarcaValido}
+						regex={NOMBRE_REGEX}
 						required={true}
 					/>
 
@@ -124,22 +134,19 @@ export default function AltaUsuario() {
 						onChange={(e) => {
 							const val = e.target.value;
 							setCuenta(prev => ({ ...prev, apellido: val }));
-							setMarcaValido(val.trim() !== "");
 						}}
-						onValidChange={setMarcaValido}
 						required={true}
 					/>
 
 					<Input2
 						titulo={"Correo"}
 						value={cuenta.email}
-						descripcion={`No puede estar vacío`}
+						descripcion={`Correo con formato válido xxxx@gmail.com`}
+						regex={CORREO_REGEX}
 						onChange={(e) => {
 							const val = e.target.value;
 							setCuenta(prev => ({ ...prev, email: val }));
-							setMarcaValido(val.trim() !== "");
 						}}
-						onValidChange={setMarcaValido}
 						required={true}
 					/>
 
@@ -150,22 +157,17 @@ export default function AltaUsuario() {
 						onChange={(e) => {
 							const val = e.target.value;
 							setCuenta(prev => ({ ...prev, categoría: val }));
-							setMarcaValido(val.trim() !== "");
 						}}
-						onValidChange={setMarcaValido}
 						required={true}
 					/>
 
-					<Input2
-						titulo={"Cedula"}
+					<InputCedula
 						value={cuenta.ci}
 						descripcion={`No puede estar vacío`}
 						onChange={(e) => {
 							const val = e.target.value;
 							setCuenta(prev => ({ ...prev, ci: val }));
-							setMarcaValido(val.trim() !== "");
 						}}
-						onValidChange={setMarcaValido}
 						required={true}
 					/>
 
@@ -174,32 +176,29 @@ export default function AltaUsuario() {
 						dateFormat="dd/mm/yy"
 						showIcon
 						style={{ width: "100%", paddingBottom: "15px" }}
-						minDate={today}
+						maxDate={fechaMenos17Anios}
 						onChange={(e) => {
 							const nuevaFechaNac = e.value;
-							// const nuevaFechaFin = new Date(nuevaFechaNac);
-							// nuevaFechaFin.setDate(nuevaFechaNac.getDate() + 1);
-
 							setCuenta(prev => ({
 								...prev,
 								fechaNac: nuevaFechaNac,
-								// Ajustamos fechaFin si quedó fuera del rango permitido
-								// fechaFin: prev.fechaFin <= nuevaFechaNac ? nuevaFechaFin : prev.fechaFin
 							}));
 						}}
+						required={true}
 					/>
 
-					<FloatLabel style={{ paddingBottom: "20px" }}>
-						<Dropdown value={selectDestino}
-							options={localidades} optionLabel="label"
-							optionGroupLabel="label" optionGroupChildren="items"
-							filter loading={false} style={{ width: "100%" }}
-							onChange={(e) => {
-								const localidad = e.value;
-								setSelectDestino(localidad);
-								setCuenta(prev => ({ ...prev, idLocalidadDestino: localidad.id }));
-							}} />
-						<label htmlFor="dd-city">Rol</label>
+					<FloatLabel>
+						<Dropdown
+							value={cuenta.rol}
+							options={rolesOrdenados}
+							optionLabel="label"
+							placeholder="Seleccione un rol"
+							style={{ width: "100%" }}
+							clearIcon={true}
+							required={true}
+							onChange={(e) => setCuenta(prev => ({ ...prev, rol: e.value }))}
+						/>
+						<label htmlFor="rol">Rol</label>
 					</FloatLabel>
 
 					<Button
@@ -209,6 +208,8 @@ export default function AltaUsuario() {
 						type="submit"
 						style={{ marginTop: "1rem" }}
 					/>
+
+					<Button label="Cancelar" type="button" onClick={() => navigate('/Dashboard')} severity="secondary" style={{ marginTop: "1rem" }} />
 				</form>
 			</Card>
 		</div>
