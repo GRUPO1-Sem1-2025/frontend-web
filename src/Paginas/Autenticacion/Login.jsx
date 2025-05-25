@@ -1,10 +1,12 @@
-import { useRef, useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import useAuth from '../../Hooks/useAuth.jsx';
+import { useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Input2 from "../../Componentes/Input.jsx";
+import { CORREO_REGEX } from '../../Configuraciones/Validaciones.js';
+import Noti from '../../Componentes/MsjNotificacion.jsx';
 //PrimeReact
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
+import { Divider } from 'primereact/divider';
 //Conexion
 import axios from '../../Configuraciones/axios.js';
 const URL_USUARIOSCONTROLLER = '/usuarios';
@@ -13,76 +15,13 @@ const Login = () => {
     const [usuario, setUsuario] = useState({
         nombre: '',
         apellido: '',
-        email: 'fedeacosta6@gmail.com',//fedeacosta6@gmail.com
-        password: '123456Aa@', //Para test
+        email: '',//
+        password: '', //Para test 123456Aa@
         codigo: 0,
     });
 
-    //Variables
-    const { auth } = useAuth();
-
+    const toastRef = useRef();
     const navigate = useNavigate();
-    const location = useLocation();
-    //const from = location.state?.from?.pathname || "/2FA";
-
-    const userRef = useRef();
-
-    //Notificaciones
-    const toast = useRef(null);
-
-    const showWarn = (message) => {
-        toast.current.show({
-            severity: 'warn',
-            summary: 'Error',
-            detail: message,
-            life: 6000
-        });
-    };
-
-    const showError = () => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 6000 });
-    }
-
-    //Effects
-    useEffect(() => {
-        userRef.current.focus();
-    }, [])
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            const response = await axios.post(`${URL_USUARIOSCONTROLLER}/login`,
-                JSON.stringify(usuario),
-                {
-                    headers: { 'Content-Type': 'application/json' }
-                }
-            );
-            console.log(response);
-            console.log(response?.data);
-
-            navigate("/2FA", {
-                replace: true,
-                state: { email: usuario.email }
-            });
-            //navigate(from, { replace: true });
-        } catch (err) {
-            let msg = '';
-
-            if (!err?.response) {
-                msg = 'No responde el servidor:\n' + err;
-            } else if (err.response?.status === 400) {
-                msg = err.response?.data?.mensaje || 'Usuario o contraseña incorrectos';
-            } else if (err.response?.status === 401) {
-                msg = err.response?.data?.mensaje || 'No autorizado';
-            } else {
-                msg = 'Error al ingresar';
-            }
-
-            showWarn(msg);
-            //errRef.current.focus();
-        }
-    }
 
     //Variables componentes
     const header = (
@@ -99,40 +38,78 @@ const Login = () => {
         />
     );
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post(`${URL_USUARIOSCONTROLLER}/login`,
+                JSON.stringify(usuario),
+                {
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            console.log(response?.data);
+
+            navigate("/2FA", {
+                replace: true,
+                state: { email: usuario.email }
+            });
+        } catch (err) {
+            let msg = '';
+
+            if (!err?.response) {
+                msg = 'No responde el servidor:\n' + err;
+            } else if (err.response?.status === 400) {
+                msg = err.response?.data?.mensaje || 'Usuario o contraseña incorrectos';
+            } else if (err.response?.status === 401) {
+                msg = err.response?.data?.mensaje || 'No autorizado';
+            } else {
+                msg = 'Error al ingresar';
+            }
+
+            toastRef.current?.notiError(msg);
+        }
+    }
+
     return (
         <div className='rectangulo-centrado' style={{ padding: "0px" }}>
             <Card title="Iniciar sesión" header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
-                <Toast ref={toast} />
+                <Noti ref={toastRef} />
+
                 <form onSubmit={handleSubmit} >
-                    <label htmlFor="username">Correo</label>
-                    <input
-                        type="text"
-                        id="Correo"
-                        ref={userRef}
-                        autoComplete="off"
-                        onChange={(e) => setUser(e.target.value)}
+                    <Input2
+                        titulo={"Correo"}
                         value={usuario.email}
-                        required
+                        regex={CORREO_REGEX}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setUsuario(prev => ({ ...prev, email: val }));
+                        }}
+                        required={true}
                     />
 
-                    <label htmlFor="password" style={{ marginTop: "10px" }}>Contraseña</label>
-                    <input
+                    <Input2
                         type="password"
-                        id="password"
-                        onChange={(e) => setPwd(e.target.value)}
+                        titulo={"Contraseña"}
                         value={usuario.password}
-                        required
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setUsuario(prev => ({ ...prev, password: val }));
+                        }}
+                        required={true}
                     />
-                    <p style={{ marginTop: "0.2em" }}>
-                        <Button label="Cancel" onClick={() => navigate('/links')} severity="secondary" />
+
+                    <p>
+                        <Button label="Cancelar" onClick={() => navigate('/links')} severity="secondary" />
                         <Button label="Ingresar" type="submit" style={{ marginLeft: '0.5em' }} />
                     </p>
                 </form>
-                <p>
-                    ¿Necesitas una cuenta? <br />
-                    <span >
-                        <Link to="/registrarse">Registrarse</Link>
-                    </span>
+                <Divider />
+
+                <p style={{ marginTop: '0.5em' }} >
+                    ¿Necesitas una cuenta?
+                    <br />
+                    <Link to="/registrarse">Registrarse</Link>
                 </p>
             </Card>
         </div>

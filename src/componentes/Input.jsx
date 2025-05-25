@@ -11,7 +11,8 @@ const Input2 = ({
     regex,
     styles = { width: "100%" },
     onValidChange,
-    permitirTeclas
+    permitirTeclas,
+    type="text"
 }) => {
     const inputRef = useRef();
     const [inputValid, setInputValid] = useState(true);
@@ -35,7 +36,7 @@ const Input2 = ({
                     {titulo}
                 </label>
                 <InputText
-                    type="text"
+                    type={type}
                     id="inputComponente"
                     ref={inputRef}
                     autoComplete="off"
