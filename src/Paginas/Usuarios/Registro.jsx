@@ -8,81 +8,83 @@ import Input2 from "../../Componentes/Input.jsx";
 import { Card } from "primereact/card";
 //conexion
 import axios from '../../Configuraciones/axios.js';
+import { Calendar } from "primereact/calendar";
+import { Button } from 'primereact/button';
+
+import InputCedula from "../../Componentes/InputCedula.jsx";
 const URL_USUARIOSCONTROLLER = '/usuarios';
 
 const Registro = () => {
+	const today = new Date();
+	const fechaMenos9Anios = new Date(today);
+	fechaMenos9Anios.setFullYear(fechaMenos9Anios.getFullYear() - 9);
+
 	const [usuario, setUsuario] = useState({
 		nombre: '',
 		apellido: '',
 		email: '',
 		password: '',
+		ci: null,
+		fechaNac: fechaMenos9Anios,
 	});
+
+	//###### Fixs para Java ######
+	const formatearFecha = (fechaDate) => {
+		if (!fechaDate) return "";
+		return fechaDate.toISOString().split("T")[0]; // "yyyy-mm-dd"
+	};
+
+	//Quitar caaracteres especiales de cedula
+	function limpiarNumeroDocumento(numero) {
+		return numero.replace(/[.-]/g, '');
+	}
+
+	const [formValido, setFormValido] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const toastRef = useRef();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location.state?.from?.pathname || "/";
 
-	const userRef = useRef();
-	const emailRef = useRef();
-
-	const [validName, setValidName] = useState(false);
-	const [userFocus, setUserFocus] = useState(false);
-
-	const [validPwd, setValidPwd] = useState(false);
-	const [pwdFocus, setPwdFocus] = useState(false);
-
-	const [validemail, setValidemail] = useState(false);
-	const [emailFocus, setemailFocus] = useState(false);
-
 	const [matchPwd, setMatchPwd] = useState('');
-	const [validMatch, setValidMatch] = useState(false);
-	const [matchFocus, setMatchFocus] = useState(false);
 
 	const [errMsg, setErrMsg] = useState('');
-	const [success, setSuccess] = useState(false);
 
 	useEffect(() => {
-		userRef.current.focus();
-	}, [])
-
-	useEffect(() => {
-		setValidName(NOMBRE_REGEX.test(usuario.nombre));
-	}, [usuario.nombre])
-
-	useEffect(() => {
-		setValidName(NOMBRE_REGEX.test(usuario.apellido));
-	}, [usuario.apellido])
-
-	useEffect(() => {
-		setValidemail(CORREO_REGEX.test(usuario.email));
-	}, [usuario.email])
-
-	useEffect(() => {
-		setValidPwd(PASSWORD_REGEX.test(usuario.password));
-		setValidMatch(usuario.password === matchPwd);
-	}, [usuario.password, matchPwd])
-
-	useEffect(() => {
-		setErrMsg('');
-	}, [usuario.nombre, usuario.password, matchPwd])
+		const valido =
+			usuario.fechaNac &&
+			NOMBRE_REGEX.test(usuario.nombre) &&
+			usuario.password &&
+			usuario.apellido &&
+			CORREO_REGEX.test(usuario.email) &&
+			usuario.ci &&
+			matchPwd &&
+			usuario.password === matchPwd;
+		setFormValido(valido);
+	}, [usuario, matchPwd]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		const v1 = NOMBRE_REGEX.test(usuario.nombre);
-		const v2 = NOMBRE_REGEX.test(usuario.apellido);
-		const v3 = PASSWORD_REGEX.test(usuario.password);
-		const v4 = CORREO_REGEX.test(usuario.email);
-
-		if (!v1 || !v2 || !v3 || !v4) {
-			setErrMsg("Invalid Entry");
+		if (!formValido) {
+			toastRef.current?.notiError("Verifique los campos antes de enviar");
 			return;
 		}
+
 		console.log(usuario);
+		setLoading(true);
+
+		//Fix fechas Java
+		const usuarioFormateado = {
+			...usuario,
+			fechaNac: formatearFecha(usuario.fechaNac),
+			ci: limpiarNumeroDocumento(usuario.ci),
+			categoria: "GENERAL"
+		};
 
 		try {
-			const response = await axios.post(`${URL_USUARIOSCONTROLLER}/registrarse`, usuario, {
+			const response = await axios.post(`${URL_USUARIOSCONTROLLER}/registrarse`, usuarioFormateado, {
 				headers: {
 					'Content-Type': 'application/json'
 				}
@@ -90,19 +92,20 @@ const Registro = () => {
 
 			console.log(response.data);
 
-			setSuccess(true);
 			setUsuario({});
 			setMatchPwd('');
 			navigate("/ingresar", { replace: true });
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg('Error al conectar con el servidor ' + err);
+				toastRef.current?.notiError('Error al conectar con el servidor ' + err);
 			} else if (err.response?.status === 409) {
-				setErrMsg('Nombre de usuario ya existe');
+				toastRef.current?.notiError('Nombre de usuario ya existe');
 			} else {
-				setErrMsg('Error al registrar');
+				toastRef.current?.notiError('Error al registrar');
 			}
 		}
+
+		setLoading(false);
 	}
 
 	return (
@@ -135,11 +138,36 @@ const Registro = () => {
 						}}
 						required={true}
 					/>
+					<InputCedula
+						value={usuario.ci}
+						descripcion={`No puede estar vacío`}
+						onChange={(e) => {
+							const val = e.target.value;
+							setUsuario(prev => ({ ...prev, ci: val }));
+						}}
+						required={true}
+					/>
+
+					<Calendar
+						value={usuario.fechaNac}
+						dateFormat="dd/mm/yy"
+						showIcon
+						style={{ width: "100%", paddingBottom: "15px" }}
+						maxDate={fechaMenos9Anios}
+						onChange={(e) => {
+							const nuevaFechaNac = e.value;
+							setUsuario(prev => ({
+								...prev,
+								fechaNac: nuevaFechaNac,
+							}));
+						}}
+						required={true}
+					/>
 
 					<Input2
 						titulo={"Correo"}
 						value={usuario.email}
-						descripcion={`Correo con formato válido xxxx@gmail.com`}
+						descripcion={`Correo con formato válido xxxx@xxxxx.xx`}
 						regex={CORREO_REGEX}
 						onChange={(e) => {
 							const val = e.target.value;
@@ -148,72 +176,35 @@ const Registro = () => {
 						required={true}
 					/>
 
-                    <Input2
-                        type="password"
-                        titulo={"Contraseña"}
-                        value={usuario.password}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setUsuario(prev => ({ ...prev, password: val }));
-                        }}
-                        required={true}
-                    />
-
-                    <Input2
-                        type="password"
-                        titulo={"Confirmar contraseña"}
-                        value={usuario.password}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setUsuario(prev => ({ ...prev, password: val }));
-                        }}
-                        required={true}
-                    />
-
-					<label htmlFor="password" style={{ marginTop: "15px" }}>
-						Contraseña
-					</label>
-					<input
+					<Input2
 						type="password"
-						id="password"
-						onChange={(e) =>
-							setUsuario(prev => ({ ...prev, password: e.target.value }))
-						}
+						titulo={"Contraseña"}
 						value={usuario.password}
-						required
-						aria-invalid={validPwd ? "false" : "true"}
-						aria-describedby="pwdnote"
-						onFocus={() => setPwdFocus(true)}
-						onBlur={() => setPwdFocus(false)}
+						onChange={(e) => {
+							const val = e.target.value;
+							setUsuario(prev => ({ ...prev, password: val }));
+						}}
+						required={true}
 					/>
-					<p id="pwdnote" className={pwdFocus && !validPwd ? "instructions" : "offscreen"}>
-						De 8 a 24 caracteres<br />
-						Debe incluir letras mayúsculas y minúsculas, un número y un carácter especial.<br />
-						Caracteres especiales permitidos: <span aria-label="exclamation mark">!</span> <span aria-label="at symbol">@</span> <span aria-label="hashtag">#</span> <span aria-label="dollar sign">$</span> <span aria-label="percent">%</span>
-					</p>
 
-					<label htmlFor="confirm_pwd" style={{ marginTop: "15px" }}>
-						Confirmar contraseña:
-					</label>
-					<input
+					<Input2
 						type="password"
-						id="confirm_pwd"
-						onChange={(e) => setMatchPwd(e.target.value)}
+						titulo={"Confirmar contraseña"}
+						descripcion={"Debe coincidir con el primer campo de contraseña."}
 						value={matchPwd}
-						required
-						aria-invalid={validMatch ? "false" : "true"}
-						aria-describedby="confirmnote"
-						onFocus={() => setMatchFocus(true)}
-						onBlur={() => setMatchFocus(false)}
+						onChange={(e) => setMatchPwd(e.target.value)}
+						required={true}
 					/>
-					<p id="confirmnote" className={matchFocus && !validMatch ? "instructions" : "offscreen"}>
-						Debe coincidir con el primer campo de contraseña.
-					</p>
 
-					<button disabled={!validName || !validPwd || !validMatch ? true : false} style={{ marginTop: "15px" }}>
-						Registrarse
-					</button>
+					<Button
+						disabled={!formValido}
+						loading={loading}
+						label="Registrarse"
+						type="submit"
+						style={{ marginTop: "1rem" }}
+					/>
 				</form>
+
 				<p style={{ textAlign: 'center' }}>
 					¿Ya estas registrado?<br />
 					<span className="line">

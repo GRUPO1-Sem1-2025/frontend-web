@@ -30,22 +30,23 @@ export default function AltaUsuario() {
 		nombre: "",
 		apellido: "",
 		email: "",
-		categoría: "",
+		categoría: "GENERAL",
 		ci: null,
 		fechaNac: fechaMenos17Anios,
 		rol: null
 	});
 
-	//Fix fechas para Java
+	//###### Fixs para Java ######
 	const formatearFecha = (fechaDate) => {
 		if (!fechaDate) return "";
 		return fechaDate.toISOString().split("T")[0]; // "yyyy-mm-dd"
 	};
 
-	//quitar caaracteres especiales de cedula
+	//Quitar caaracteres especiales de cedula
 	function limpiarNumeroDocumento(numero) {
 		return numero.replace(/[.-]/g, '');
 	}
+
 	const [formValido, setFormValido] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const toastRef = useRef();
@@ -91,7 +92,7 @@ export default function AltaUsuario() {
 				nombre: "",
 				apellido: "",
 				email: "",
-				categoría: "",
+				categoría: "GENERAL",
 				ci: "",
 				fechaNac: fechaMenos17Anios,
 				rol: 0
@@ -150,7 +151,7 @@ export default function AltaUsuario() {
 						required={true}
 					/>
 
-					<Input2
+					<Input2 //Posiblemente se borra
 						titulo={"Categoria"}
 						value={cuenta.categoría}
 						descripcion={`No puede estar vacío`}
