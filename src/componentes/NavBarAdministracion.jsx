@@ -50,7 +50,7 @@ export default function NavBarAdministracion() {
                         {
                             label: 'Listado',
                             icon: 'pi pi-list',
-                            url: '/Omnibus/AltaOmibus',
+                            url: '/Omnibus/ListarOmnibus',
                         },
                         {
                             label: 'Cambiar estado',

@@ -15,7 +15,7 @@ import Layout from './Layout';
 import Missing from './Paginas/Basicas/Missing.jsx';
 import Unauthorized from './Paginas/Basicas/Unauthorized.jsx';
 import AltaOmibus from './Paginas/Omnibus/AltaOmibus.jsx';
-import ListadoOmnibus from './Paginas/Omnibus/ListadoOmnibus.jsx';
+import ListarOmnibus from './Paginas/Omnibus/ListarOmnibus.jsx';
 import AltaViaje from './Paginas/Viaje/AltaViaje.jsx';
 import AltaUsuario from './Paginas/Usuarios/AltaUsuario.jsx';
 import ListarUsuarios from './Paginas/Usuarios/ListarUsuarios.jsx';
@@ -43,7 +43,7 @@ export default function App() {
                 <Route path="/links" element={<LinkPage />} />
                 <Route path="/Dashboard" element={<Dashboard />} />
                 <Route path="/Omnibus/AltaOmibus" element={<AltaOmibus />} />
-                <Route path="/Omnibus/ListadoOmnibus" element={<ListadoOmnibus />} />
+                <Route path="/Omnibus/ListarOmnibus" element={<ListarOmnibus />} />
                 <Route path="/Viaje/AltaViaje" element={<AltaViaje />} />
                 <Route path="/Usuarios/AltaUsuario" element={<AltaUsuario />} />
                 <Route path="/Usuarios/ListarUsuarios" element={<ListarUsuarios />} />
