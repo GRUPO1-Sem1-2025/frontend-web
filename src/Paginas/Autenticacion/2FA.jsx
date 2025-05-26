@@ -83,6 +83,7 @@ export default function TwoFA({ email }) {
                 }
             );
 
+            console.log(response?.data.token);//para pruebas
             guardarTokenEnAuth(response?.data.token);
             navigate(from, { replace: true });
         } catch (err) {
@@ -112,7 +113,7 @@ export default function TwoFA({ email }) {
             const payload = JSON.parse(payloadJson);
 
             setAuth({
-                accessToken: token,
+                token,
                 email: payload.sub || '',
                 rol: payload.rol || '',
                 emision: new Date(payload.iat * 1000),

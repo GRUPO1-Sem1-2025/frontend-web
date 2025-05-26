@@ -116,7 +116,7 @@ export default function NavBarAdministracion() {
                         {
                             label: 'Listado de usuarios',
                             icon: 'pi pi-users',
-                            url: '/links',
+                            url: '/Usuarios/ListarUsuarios',
 
                         },
                         {
