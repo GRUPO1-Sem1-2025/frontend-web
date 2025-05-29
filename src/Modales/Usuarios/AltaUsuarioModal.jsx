@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { NOMBRE_REGEX, CORREO_REGEX } from "../Configuraciones/Validaciones.js";
-import Noti from '../Componentes/MsjNotificacion.jsx';
-import Input2 from "../Componentes/Input.jsx";
-import InputCedula from "../Componentes/InputCedula.jsx";
-import { ROLES } from '../Configuraciones/Constantes.js';
-import axios, { URL_USUARIOSCONTROLLER } from '../Configuraciones/axios.js';
+import { NOMBRE_REGEX, CORREO_REGEX } from "../../Configuraciones/Validaciones.js";
+import Noti from '../../Componentes/MsjNotificacion.jsx';
+import Input2 from "../../Componentes/Input.jsx";
+import InputCedula from "../../Componentes/InputCedula.jsx";
+import { ROLES } from '../../Configuraciones/Constantes.js';
+import axios, { URL_USUARIOSCONTROLLER } from '../../Configuraciones/axios.js';
 
 // PrimeReact
 import { Dialog } from 'primereact/dialog';

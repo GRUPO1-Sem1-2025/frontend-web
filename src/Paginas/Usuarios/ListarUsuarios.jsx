@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import useAuth from '../../Hooks/useAuth.jsx';
 import { UsuariosServicio } from "../../Servicios/UsuariosServicio.js";
 import NavBarAdministracion from "../../Componentes/NavBarAdministracion.jsx";
-import CargaMasivaModal from "../../Modales/CargaMasivaModal.jsx";
-import AltaUsuarioModal from "../../Modales/AltaUsuarioModal.jsx";
+import CargaMasivaModal from "../../Modales/Usuarios/CargaMasivaModal.jsx";
+import AltaUsuarioModal from "../../Modales/Usuarios/AltaUsuarioModal.jsx";
 import { ROLES_VISUAL } from '../../Configuraciones/Constantes.js';
 
 // PrimeReact
@@ -103,8 +103,9 @@ export default function ListarUsuarios() {
     return (
         <>
             <NavBarAdministracion />
-
             <Card style={{ marginTop: '1rem' }}>
+                <h4>Listado de usuarios</h4>
+
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginBottom: '1rem' }}>
                     <Button
                         label="Agregar usuario"
