@@ -2,6 +2,7 @@ import { useState, useEffect, forwardRef, useRef } from "react";
 import Input2 from "../../Componentes/Input.jsx";
 import Noti from '../../Componentes/MsjNotificacion.jsx';
 import axios, { URL_LOCALIDADESCONTROLLER } from '../../Configuraciones/axios.js';
+import { NOMBRE_REGEX } from "../../Configuraciones/Validaciones.js";
 
 //PrimeReact
 import { Dropdown } from 'primereact/dropdown';
@@ -103,8 +104,9 @@ const AltaLocalidadModal = forwardRef(({ visible, onHide, onSuccess }, ref) => {
                 <Input2
                     titulo={"Nombre"}
                     value={localidad.nombre}
-                    descripcion={`No puede estar vacío`}
+                    descripcion={`Al menos 4 caracteres`}
                     permitirTeclas={"alphanum"}
+                    regex={NOMBRE_REGEX}
                     onChange={(e) => setLocalidad(prev => ({ ...prev, nombre: e.target.value }))}
                     required={true}
                 />
