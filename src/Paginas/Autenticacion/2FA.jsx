@@ -83,6 +83,7 @@ export default function TwoFA({ email }) {
                 }
             );
 
+            console.log(response?.data.token);//para pruebas
             guardarTokenEnAuth(response?.data.token);
             navigate(from, { replace: true });
         } catch (err) {
@@ -112,7 +113,7 @@ export default function TwoFA({ email }) {
             const payload = JSON.parse(payloadJson);
 
             setAuth({
-                accessToken: token,
+                token,
                 email: payload.sub || '',
                 rol: payload.rol || '',
                 emision: new Date(payload.iat * 1000),
@@ -174,7 +175,7 @@ export default function TwoFA({ email }) {
                             integerOnly style={{ justifyContent: "center", marginTop: "1rem" }} />
                     </div>
                     <p style={{ marginTop: "0.2em" }}>
-                        <Button label="Cancel" onClick={() => navigate('/ingresar')} severity="secondary" />
+                        <Button label="Cancel" type="button" onClick={() => navigate('/ingresar')} severity="secondary" />
                         <Button label="Validar" type="submit" style={{ marginLeft: '0.5em' }} />
                     </p>
                 </form>

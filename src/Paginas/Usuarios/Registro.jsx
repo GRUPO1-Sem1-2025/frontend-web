@@ -25,7 +25,7 @@ const Registro = () => {
 		email: '',
 		password: '',
 		ci: null,
-		fechaNac: fechaMenos9Anios,
+		fecha_nac: fechaMenos9Anios,
 	});
 
 	//###### Fixs para Java ######
@@ -53,7 +53,7 @@ const Registro = () => {
 
 	useEffect(() => {
 		const valido =
-			usuario.fechaNac &&
+			usuario.fecha_nac &&
 			NOMBRE_REGEX.test(usuario.nombre) &&
 			usuario.password &&
 			usuario.apellido &&
@@ -72,16 +72,16 @@ const Registro = () => {
 			return;
 		}
 
-		console.log(usuario);
 		setLoading(true);
 
 		//Fix fechas Java
 		const usuarioFormateado = {
 			...usuario,
-			fechaNac: formatearFecha(usuario.fechaNac),
-			ci: limpiarNumeroDocumento(usuario.ci),
-			categoria: "GENERAL"
+			fecha_Nac: formatearFecha(usuario.fecha_nac),
+			ci: limpiarNumeroDocumento(usuario.ci)
 		};
+
+		console.log(usuarioFormateado);
 
 		try {
 			const response = await axios.post(`${URL_USUARIOSCONTROLLER}/registrarse`, usuarioFormateado, {
@@ -94,7 +94,7 @@ const Registro = () => {
 
 			setUsuario({});
 			setMatchPwd('');
-			navigate("/ingresar", { replace: true });
+			navigate("/ingresar", { replace: true });//TO-DO Redirigir a 2FA y pasar el correo del usuario registrado
 		} catch (err) {
 			if (!err?.response) {
 				toastRef.current?.notiError('Error al conectar con el servidor ' + err);
@@ -149,7 +149,7 @@ const Registro = () => {
 					/>
 
 					<Calendar
-						value={usuario.fechaNac}
+						value={usuario.fecha_nac}
 						dateFormat="dd/mm/yy"
 						showIcon
 						style={{ width: "100%", paddingBottom: "15px" }}
@@ -158,7 +158,7 @@ const Registro = () => {
 							const nuevaFechaNac = e.value;
 							setUsuario(prev => ({
 								...prev,
-								fechaNac: nuevaFechaNac,
+								fecha_nac: nuevaFechaNac,
 							}));
 						}}
 						required={true}

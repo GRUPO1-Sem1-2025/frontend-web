@@ -27,11 +27,19 @@ const NavBar = () => {
         </div>
     );
 
-    const items = [
-        { label: 'Link', icon: 'pi pi-link', url: '/links' },
-        { label: 'Home', icon: 'pi pi-home', url: '/' },
-        { label: 'Dashboard', icon: 'pi pi-home', url: '/dashboard' }
-    ];
+
+    const items = [];
+    
+    items.push({ label: 'Home', icon: 'pi pi-home', url: '/' });
+    
+    if (auth?.rol === 100) {
+        //en caso de haber otros items de cliente
+    } else if (auth?.rol === 200 || auth?.rol === 300) {
+        items.push(
+            { label: 'Link', icon: 'pi pi-link', url: '/links' },
+            { label: 'Dashboard', icon: 'pi pi-home', url: '/dashboard' }
+        );
+    }
 
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -56,12 +64,11 @@ const NavBar = () => {
     console.log("Variable sesión actual", auth);
     const menuUsuario = auth ? (
         <Avatar className="p-overlay-badge" icon="pi pi-sign-out" size="medium" onClick={logout}>
-            <Badge value="4" />
-            <label>{auth?.email?.length > 4 ? auth?.email.slice(0,4) + "..." : auth?.email}</label>
+            <label>{auth?.email?.length > 4 ? auth?.email.slice(0, 4) + "..." : auth?.email}</label>
             {/* No borrar comentairo <Button onClick={logout} icon="pi pi-sign-out" />icon="pi pi-user"  */}
         </Avatar>
     ) : (
-        <Button  onClick={() => navigate('/ingresar')} icon="pi pi-sign-in" />
+        <Button onClick={() => navigate('/ingresar')} icon="pi pi-sign-in" />
     );
 
     return (
