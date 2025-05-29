@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import NavBarAdministracion from "../../Componentes/NavBarAdministracion.jsx";
-import { obtenerOmnibus } from "../../Servicios/OmnibusServicio.js";
+import { obtenerLocalidades } from "../../Servicios/LocalidadesServicio.js";
 import Noti from "../../Componentes/MsjNotificacion.jsx";
-import CargaMasivaAsientosModal from "../../Modales/Asientos/CargaMasivaAsientosModal.jsx";
-import AltaOmnibusModal from "../../Modales/Omnibus/AltaOmnibusModal.jsx";
+import CargaMasivaLocalidadesModal from "../../Modales/Localidades/CargaMasivaLocalidadesModal.jsx";
+import AltaLocalidadModal from "../../Modales/Localidades/AltaLocalidadModal.jsx";
 
 
 // PrimeReact
@@ -17,7 +17,7 @@ import { Tag } from 'primereact/tag';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 
 export default function ListarOmnibus() {
-    const [omnibus, setOmnibus] = useState([]);
+    const [localidades, setLocalidades] = useState([]);
     const toastRef = useRef();
     const [loading, setLoading] = useState(true);
     const [mostrarAlta, setMostrarAlta] = useState(false);
@@ -32,16 +32,16 @@ export default function ListarOmnibus() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        obtenerOmnibus().then(data => {
-            setOmnibus(data);
+        obtenerLocalidades().then(data => {
+            setLocalidades(data);
             setLoading(false);
         });
     }, []);
 
     const actualizarListaOmnibus = () => {
         setLoading(true);
-        obtenerOmnibus().then(data => {
-            setOmnibus(data);
+        obtenerLocalidades().then(data => {
+            setLocalidades(data);
             setLoading(false);
         });
     };
@@ -54,34 +54,34 @@ export default function ListarOmnibus() {
         return <TriStateCheckbox value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />;
     };
 
-    console.log(omnibus);
+    console.log(localidades);
     return (
         <>
             <NavBarAdministracion />
             <Card style={{ marginTop: '1rem' }}>
                 <Noti ref={toastRef} />
-
-                <h4>Listado de ómnibus</h4>
+                
+                <h4>Listado de localidades</h4>
                 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginBottom: '1rem' }}>
-                    <Button label="Alta Ómnibus" icon="pi pi-plus" onClick={() => setMostrarAlta(true)} />
-                    <Button label="Carga Masiva Asientos" icon="pi pi-upload" severity="success" onClick={() => setMostrarCargaMasiva(true)} style={{ marginLeft: '1rem' }} />
+
+                    <Button label="Alta localidad" icon="pi pi-plus" onClick={() => setMostrarAlta(true)} />
+                    <Button label="Carga Masiva localidades" icon="pi pi-upload" severity="success" onClick={() => setMostrarCargaMasiva(true)} style={{ marginLeft: '1rem' }} />
                 </div>
 
-                <DataTable value={omnibus} paginator rows={10} loading={loading}
+                <DataTable value={localidades} paginator rows={10} loading={loading}
                     rowsPerPageOptions={[10, 20, 50]} removableSort stripedRows
-                    filters={filters} filterDisplay="row" emptyMessage="No se encontraron ómnibus.">
+                    filters={filters} filterDisplay="row" emptyMessage="No se encontraron localidades.">
 
-                    <Column field="marca" header="Marca" sortable filter filterPlaceholder="Buscar marca" showFilterMenu={false} />
-                    <Column field="matricula" header="Matrícula" sortable filter filterPlaceholder="Buscar matrícula" showFilterMenu={false} />
-                    <Column field="cant_asientos" header="Asientos" sortable filter filterPlaceholder="Ej: 40" showFilterMenu={false} />
+                    <Column field="nombre" header="Nombre" sortable filter filterPlaceholder="Buscar nombre" showFilterMenu={false} />
+                    <Column field="departamento" header="Departamento" sortable filter filterPlaceholder="Buscar departamento" showFilterMenu={false} />
                     <Column field="activo" header="Activo" dataType="boolean" sortable body={(rowData) => mostrarActivo(rowData.activo)} showFilterMenu={false} filter filterElement={ActivoFiltro} />
                 </DataTable>
             </Card>
 
             {/* Modals */}
-            <AltaOmnibusModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} ref={toastRef} onSuccess={actualizarListaOmnibus} />
-            <CargaMasivaAsientosModal visible={mostrarCargaMasiva} onHide={() => setMostrarCargaMasiva(false)} />
+            <AltaLocalidadModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} ref={toastRef} onSuccess={actualizarListaOmnibus} />
+            <CargaMasivaLocalidadesModal visible={mostrarCargaMasiva} onHide={() => setMostrarCargaMasiva(false)} />
         </>
     );
 }

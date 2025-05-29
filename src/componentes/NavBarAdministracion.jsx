@@ -35,17 +35,17 @@ export default function NavBarAdministracion() {
                 {
                     label: 'Localidades',
                     icon: 'pi pi-map-marker',
-                    url: '/links'
+                    url: '/Localidades/ListarLocalidades'
                 },
                 {
                     label: 'Asientos',
                     icon: 'pi pi-th-large',
-                    url: '/links'
+                    url: ''
                 },
                 {
                     label: 'Ómnibus',
                     icon: 'pi pi-truck',
-                    url: '/links',
+                    url: '/Omnibus/ListarOmnibus',
                     items: [
                         {
                             label: 'Listado',
@@ -55,7 +55,7 @@ export default function NavBarAdministracion() {
                         {
                             label: 'Cambiar estado',
                             icon: 'pi pi-refresh',
-                            url: '/links',
+                            url: '',
                         }
                     ]
                 },
@@ -71,18 +71,18 @@ export default function NavBarAdministracion() {
                         {
                             label: 'Cerrar venta pasajes',
                             icon: 'pi pi-lock',
-                            url: '/links',
+                            url: '',
                         },
                         {
                             label: 'Devoluciones',
                             icon: 'pi pi-undo',
-                            url: '/links',
+                            url: '',
 
                         },
                         {
                             label: 'Reasignar',
                             icon: 'pi pi-user-edit',
-                            url: '/links',
+                            url: '',
 
                         }
                     ]
@@ -96,13 +96,13 @@ export default function NavBarAdministracion() {
                 {
                     label: 'Listado de...',
                     icon: 'pi pi-list',
-                    url: '/links',
+                    url: '',
 
                 },
                 {
                     label: 'Estadísticas',
                     icon: 'pi pi-chart-bar',
-                    url: '/links',
+                    url: '',
 
                 },
                 {
@@ -111,7 +111,7 @@ export default function NavBarAdministracion() {
                 {
                     label: 'Usuarios',
                     icon: 'pi pi-user',
-                    url: '/links',
+                    url: '',
                     items: [
                         {
                             label: 'Listado de usuarios',
@@ -123,13 +123,6 @@ export default function NavBarAdministracion() {
                             label: 'Alta usuario',
                             icon: 'pi pi-user-plus',
                             url: '/Usuarios/AltaUsuario',
-
-                        },
-                        {
-                            label: 'Baja usuario',
-                            icon: 'pi pi-user-minus',
-                            url: '/links',
-
                         }
                     ]
                 }
@@ -138,13 +131,18 @@ export default function NavBarAdministracion() {
         {
             label: 'Estadísticas',
             icon: 'pi pi-chart-line',
-            url: '/links'
+            url: ''
         },
         {
             label: 'Notificaciones',
             icon: 'pi pi-bell',
-            url: '/links',
-
+            url: '',
+        }
+        ,
+        {
+            label: 'Perfil',
+            icon: 'pi pi-star',
+            url: '',
         }
     ];
 
