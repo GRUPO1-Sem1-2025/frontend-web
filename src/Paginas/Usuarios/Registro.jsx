@@ -94,7 +94,7 @@ const Registro = () => {
 
 			setUsuario({});
 			setMatchPwd('');
-			navigate("/ingresar", { replace: true });
+			navigate("/ingresar", { replace: true });//TO-DO Redirigir a 2FA y pasar el correo del usuario registrado
 		} catch (err) {
 			if (!err?.response) {
 				toastRef.current?.notiError('Error al conectar con el servidor ' + err);

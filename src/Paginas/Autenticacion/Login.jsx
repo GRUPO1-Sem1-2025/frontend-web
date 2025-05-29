@@ -100,7 +100,7 @@ const Login = () => {
                     />
 
                     <p>
-                        <Button label="Cancelar" onClick={() => navigate('/links')} severity="secondary" />
+                        <Button label="Cancelar" type="button" onClick={() => navigate('/links')} severity="secondary" />
                         <Button label="Ingresar" type="submit" style={{ marginLeft: '0.5em' }} />
                     </p>
                 </form>

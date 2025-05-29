@@ -53,7 +53,19 @@ export default function AltaOmibus() {
                 matricula: ''
             });
         } catch (error) {
-            toastRef.current?.notiError("Error al registrar el ómnibus");
+            let msg = '';
+
+            if (!err?.response) {
+                msg = 'No responde el servidor:\n' + err;
+            } else if (err.response?.status === 406) {
+                msg = err.response?.data?.mensaje || 'N';
+            } else if (err.response?.status === 401) {
+                msg = err.response?.data?.mensaje || 'No es posible una respuesta existosa';
+            } else {
+                msg = 'Error al ingresar';
+            }
+
+            toastRef.current?.notiError(msg);
         } finally {
             setLoading(false);
         }

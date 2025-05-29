@@ -29,6 +29,12 @@ export default function ListarUsuarios() {
         }
     }, [auth]);
 
+    const actualizarListaUsuarios = () => {
+        setLoading(true);
+        UsuariosServicio.listarTodos(auth.token).then(data => setUsuarios(data));
+        setLoading(false);
+    };
+
     const formatearFecha = (fecha) => {
         if (!fecha) return "";
         const date = new Date(fecha);
@@ -128,7 +134,7 @@ export default function ListarUsuarios() {
             </Card>
 
             {/* Modals */}
-            <AltaUsuarioModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} />
+            <AltaUsuarioModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} onSuccess={actualizarListaUsuarios} />
             <CargaMasivaModal visible={mostrarCargaMasiva} onHide={() => setMostrarCargaMasiva(false)} />
         </>
     );

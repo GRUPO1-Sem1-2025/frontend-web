@@ -38,6 +38,14 @@ export default function ListarOmnibus() {
         });
     }, []);
 
+    const actualizarListaOmnibus = () => {
+        setLoading(true);
+        obtenerOmnibus().then(data => {
+            setOmnibus(data);
+            setLoading(false);
+        });
+    };
+
     const mostrarActivo = (activo) => {
         return <Tag value={activo ? "Sí" : "No"} severity={activo ? "success" : "danger"} />;
     };
@@ -70,7 +78,7 @@ export default function ListarOmnibus() {
             </Card>
 
             {/* Modals */}
-            <AltaOmnibusModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} ref={toastRef} />
+            <AltaOmnibusModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} ref={toastRef} onSuccess={actualizarListaOmnibus} />
             <CargaMasivaAsientosModal visible={mostrarCargaMasiva} onHide={() => setMostrarCargaMasiva(false)} />
         </>
     );

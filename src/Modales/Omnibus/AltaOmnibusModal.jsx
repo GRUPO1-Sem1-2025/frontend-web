@@ -1,12 +1,13 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect, forwardRef, useRef } from "react";
 import { SOLODIGITOS_REGEX } from "../../Configuraciones/Validaciones.js";
 import Input2 from "../../Componentes/Input.jsx";
 import Noti from '../../Componentes/MsjNotificacion.jsx';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import axios, { URL_OMNIBUSCONTROLLER } from '../../Configuraciones/axios.js';
+import { Messages } from 'primereact/messages';
 
-const AltaOmnibusModal = forwardRef(({ visible, onHide }, ref) => {
+const AltaOmnibusModal = forwardRef(({ visible, onHide, onSuccess }, ref) => {
     const [omnibus, setOmnibus] = useState({
         marca: '',
         cant_asientos: '',
@@ -16,6 +17,7 @@ const AltaOmnibusModal = forwardRef(({ visible, onHide }, ref) => {
     const [formValido, setFormValido] = useState(false);
     const [loading, setLoading] = useState(false);
     const toastRef = ref;
+    const mensaje = useRef(null);
 
     useEffect(() => {
         const valido =
@@ -42,9 +44,21 @@ const AltaOmnibusModal = forwardRef(({ visible, onHide }, ref) => {
 
             toastRef.current?.notiExito("Ómnibus ingresado correctamente");
             setOmnibus({ marca: '', cant_asientos: '', matricula: '' });
+            onSuccess?.(); // llama a actualizar la lista en el padre
             onHide(); // Cierra el modal
         } catch (error) {
-            toastRef.current?.notiError("Error al registrar el ómnibus");
+            let msg = '';
+
+            if (!error?.response) {
+                msg = 'No responde el servidor:\n' + error;
+            } else if (error.response?.status === 406) {
+                msg = error.response?.data?.mensaje || 'No es psoible una respuesta exitosa';
+                mensaje.current.show([{ sticky: true, severity: 'warn', detail: 'Debe cargar más asientos para poder crear este ómnibus', closable: true }]);
+            } else {
+                msg = 'Error al ingresar';
+            }
+
+            toastRef.current?.notiError(msg);
         } finally {
             setLoading(false);
         }
@@ -81,6 +95,8 @@ const AltaOmnibusModal = forwardRef(({ visible, onHide }, ref) => {
                     onChange={(e) => setOmnibus(prev => ({ ...prev, matricula: e.target.value }))}
                     required={true}
                 />
+
+                <Messages style={{ marginBottom: '1rem' }} ref={mensaje} />
 
                 <Button label="Crear" type="submit" loading={loading} disabled={!formValido} />
             </form>

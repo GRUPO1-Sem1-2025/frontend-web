@@ -13,7 +13,7 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 
-export default function AltaUsuarioModal({ visible, onHide }) {
+export default function AltaUsuarioModal({ visible, onHide, onSuccess }) {
 	const today = new Date();
 	const fechaMenos17Anios = new Date(today);
 	fechaMenos17Anios.setFullYear(fechaMenos17Anios.getFullYear() - 17);
@@ -27,7 +27,7 @@ export default function AltaUsuarioModal({ visible, onHide }) {
 		nombre: "",
 		apellido: "",
 		email: "",
-		categoría: "GENERAL",
+		categoría: "GENERAL", //Dato por defecto para el backend
 		ci: null,
 		fechaNac: fechaMenos17Anios,
 		rol: null
@@ -74,11 +74,12 @@ export default function AltaUsuarioModal({ visible, onHide }) {
 				nombre: "",
 				apellido: "",
 				email: "",
-				categoría: "GENERAL",
+				categoría: "GENERAL",//Dato por defecto para el backend
 				ci: "",
 				fechaNac: fechaMenos17Anios,
 				rol: 0
 			});
+			onSuccess?.(); // llama a actualizar la lista en el padre
 			onHide(); // cerrar modal
 		} catch (error) {
 			toastRef.current?.notiError("Error al registrar el usuario");
@@ -103,9 +104,6 @@ export default function AltaUsuarioModal({ visible, onHide }) {
 				<Input2 titulo="Correo" value={cuenta.email} regex={CORREO_REGEX} required
 					descripcion="Correo con formato válido"
 					onChange={(e) => setCuenta(prev => ({ ...prev, email: e.target.value }))} />
-
-				<Input2 titulo="Categoría" value={cuenta.categoría} required
-					onChange={(e) => setCuenta(prev => ({ ...prev, categoría: e.target.value }))} />
 
 				<InputCedula value={cuenta.ci} required
 					onChange={(e) => setCuenta(prev => ({ ...prev, ci: e.target.value }))} />

@@ -175,7 +175,7 @@ export default function TwoFA({ email }) {
                             integerOnly style={{ justifyContent: "center", marginTop: "1rem" }} />
                     </div>
                     <p style={{ marginTop: "0.2em" }}>
-                        <Button label="Cancel" onClick={() => navigate('/ingresar')} severity="secondary" />
+                        <Button label="Cancel" type="button" onClick={() => navigate('/ingresar')} severity="secondary" />
                         <Button label="Validar" type="submit" style={{ marginLeft: '0.5em' }} />
                     </p>
                 </form>
