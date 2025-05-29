@@ -52,7 +52,7 @@ const AltaOmnibusModal = forwardRef(({ visible, onHide, onSuccess }, ref) => {
             if (!error?.response) {
                 msg = 'No responde el servidor:\n' + error;
             } else if (error.response?.status === 406) {
-                msg = error.response?.data?.mensaje || 'No es psoible una respuesta exitosa';
+                msg = error.response?.data?.mensaje || 'No es posible una respuesta exitosa';
                 mensaje.current.show([{ sticky: true, severity: 'warn', detail: 'Debe cargar más asientos para poder crear este ómnibus', closable: true }]);
             } else {
                 msg = 'Error al ingresar';

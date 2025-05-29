@@ -4,7 +4,7 @@ import NavBarAdministracion from "../../Componentes/NavBarAdministracion.jsx";
 import { obtenerLocalidades } from "../../Servicios/LocalidadesServicio.js";
 import Noti from "../../Componentes/MsjNotificacion.jsx";
 import CargaMasivaLocalidadesModal from "../../Modales/Localidades/CargaMasivaLocalidadesModal.jsx";
-import AltaOmnibusModal from "../../Modales/Omnibus/AltaOmnibusModal.jsx";
+import AltaLocalidadModal from "../../Modales/Localidades/AltaLocalidadModal.jsx";
 
 
 // PrimeReact
@@ -80,7 +80,7 @@ export default function ListarOmnibus() {
             </Card>
 
             {/* Modals */}
-            <AltaOmnibusModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} ref={toastRef} onSuccess={actualizarListaOmnibus} />
+            <AltaLocalidadModal visible={mostrarAlta} onHide={() => setMostrarAlta(false)} ref={toastRef} onSuccess={actualizarListaOmnibus} />
             <CargaMasivaLocalidadesModal visible={mostrarCargaMasiva} onHide={() => setMostrarCargaMasiva(false)} />
         </>
     );
