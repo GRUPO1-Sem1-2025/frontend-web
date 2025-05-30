@@ -3,13 +3,12 @@ import { useContext, useState } from "react";
 import AuthContext from "../../Context/AuthProvider.jsx";
 import NavBar from '../../Componentes/NavBar.jsx';
 import Footer from "../../Componentes/Footer.jsx";
-//PrimeReact
+// PrimeReact
 import { Image } from 'primereact/image';
-import { InputNumber } from 'primereact/inputnumber';
 import { Calendar } from 'primereact/calendar';
 import { CascadeSelect } from 'primereact/cascadeselect';
 import { FloatLabel } from 'primereact/floatlabel';
-import { ToggleButton } from 'primereact/togglebutton';
+import { Button } from 'primereact/button';
 
 const Home = () => {
     const { auth } = useContext(AuthContext);
@@ -25,10 +24,11 @@ const Home = () => {
         );
     }
 
-    // Si está logueado, se renderiza el home actual
+    // Estado para fechas y selección de viaje
     const fechaActual = new Date().toISOString().split('T')[0];
-    const [pasajes, setValue3] = useState(1);
-    const [esIdaVuelta, setChecked] = useState(false);
+    const [tripType, setTripType] = useState("ida"); // "ida" o "ida y vuelta"
+    const [fechaIda, setFechaIda] = useState(fechaActual);
+    const [fechaVuelta, setFechaVuelta] = useState(fechaActual);
     const [lugarElegido, setSelectedCity] = useState(null);
     const [lugarElegido2, setSelectedCity2] = useState(null);
 
@@ -134,28 +134,11 @@ const Home = () => {
                         width: '90%',
                         maxWidth: '600px'
                     }}>
-                        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Elige tú pasaje soñado</h1>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-                            <ToggleButton
-                                onLabel="Ida y vuelta"
-                                offLabel="Pasaje ida"
-                                checked={esIdaVuelta}
-                                onChange={(e) => setChecked(e.value)}
-                            />
-
-                            <label htmlFor="minmax-buttons" className="font-bold block mb-2">Pasajes</label>
-                            <InputNumber inputId="minmax-buttons" value={pasajes} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={5} />
-
-                            <div>
-                                <Calendar value={fechaActual} onChange={(e) => setDate(e.value)} showIcon />
-                            </div>
-                            {esIdaVuelta && (
-                                <div>
-                                    <Calendar value={fechaActual} onChange={(e) => setDate(e.value)} showIcon />
-                                </div>
-                            )}
-
-                            <FloatLabel>
+                        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Buscar pasajes de ómnibus</h1>
+                        
+                        {/* Origen y Destino uno al lado del otro */}
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem' }}>
+                            <FloatLabel style={{ flex: 1 }}>
                                 <CascadeSelect
                                     inputId="cs-city1"
                                     value={lugarElegido}
@@ -168,10 +151,9 @@ const Home = () => {
                                     breakpoint="767px"
                                     style={{ minWidth: '14rem' }}
                                 />
-                                <label htmlFor="cs-city1">City</label>
+                                <label htmlFor="cs-city1">Origen</label>
                             </FloatLabel>
-
-                            <FloatLabel>
+                            <FloatLabel style={{ flex: 1 }}>
                                 <CascadeSelect
                                     inputId="cs-city"
                                     value={lugarElegido2}
@@ -184,8 +166,33 @@ const Home = () => {
                                     breakpoint="767px"
                                     style={{ minWidth: '14rem' }}
                                 />
-                                <label htmlFor="cs-city">City</label>
+                                <label htmlFor="cs-city">Destino</label>
                             </FloatLabel>
+                        </div>
+                        
+                        {/* Botones de tipo de viaje */}
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '1rem' }}>
+                            <Button label="Ida" onClick={() => setTripType("ida")}
+                                className={tripType === "ida" ? "p-button-warning" : "p-button-outlined"} />
+                            <Button label="Ida y Vuelta" onClick={() => setTripType("ida y vuelta")}
+                                className={tripType === "ida y vuelta" ? "p-button-warning" : "p-button-outlined"} />
+                        </div>
+                        
+                        {/* Fechas y botón de búsqueda */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
+                            <div>
+                                <Calendar value={fechaIda} onChange={(e) => setFechaIda(e.value)} showIcon />
+                                <label>Fecha de Salida</label>
+                            </div>
+                            
+                            {tripType === "ida y vuelta" && (
+                                <div>
+                                    <Calendar value={fechaVuelta} onChange={(e) => setFechaVuelta(e.value)} showIcon />
+                                    <label>Fecha de Regreso</label>
+                                </div>
+                            )}
+                            
+                            <Button label="Buscar pasajes" style={{ marginTop: '1rem' }} />
                         </div>
                     </div>
                 </div>
