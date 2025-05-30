@@ -15,10 +15,8 @@ const NavBar = () => {
     const location = useLocation(); // Para leer la URL actual
 
     const logout = async () => {
-        // if used in more components, this should be in context 
-        // axios to /logout endpoint 
         setAuth({});
-        navigate('/links');
+        navigate('/ingresar'); // Redirige al login/landing para usuarios no autenticados
     }
 
     const logoIzq = (

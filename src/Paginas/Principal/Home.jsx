@@ -3,7 +3,6 @@ import { useContext, useState } from "react";
 import AuthContext from "../../Context/AuthProvider.jsx";
 import NavBar from '../../Componentes/NavBar.jsx';
 import Footer from "../../Componentes/Footer.jsx";
-
 //PrimeReact
 import { Image } from 'primereact/image';
 import { InputNumber } from 'primereact/inputnumber';
@@ -13,6 +12,20 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { ToggleButton } from 'primereact/togglebutton';
 
 const Home = () => {
+    const { auth } = useContext(AuthContext);
+
+    // Si no está logueado, se renderiza la landing page
+    if (!auth || !auth.token) {
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '5rem' }}>
+                <h1>Bienvenido a nuestra aplicación</h1>
+                <p>Por favor, ingresa para continuar.</p>
+                <Link to="/ingresar">Ingresar</Link>
+            </div>
+        );
+    }
+
+    // Si está logueado, se renderiza el home actual
     const fechaActual = new Date().toISOString().split('T')[0];
     const [pasajes, setValue3] = useState(1);
     const [esIdaVuelta, setChecked] = useState(false);
@@ -38,8 +51,7 @@ const Home = () => {
                         { cname: 'Brisbane', code: 'A-BR' },
                         { cname: 'Townsville', code: 'A-TO' }
                     ]
-                },
-
+                }
             ]
         },
         {
@@ -59,8 +71,7 @@ const Home = () => {
                         { cname: 'Ottawa', code: 'C-OT' },
                         { cname: 'Toronto', code: 'C-TO' }
                     ]
-                },
-
+                }
             ]
         },
         {
@@ -124,7 +135,6 @@ const Home = () => {
                         maxWidth: '600px'
                     }}>
                         <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>Elige tú pasaje soñado</h1>
-
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
                             <ToggleButton
                                 onLabel="Ida y vuelta"
@@ -136,11 +146,11 @@ const Home = () => {
                             <label htmlFor="minmax-buttons" className="font-bold block mb-2">Pasajes</label>
                             <InputNumber inputId="minmax-buttons" value={pasajes} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={5} />
 
-                            <div >
+                            <div>
                                 <Calendar value={fechaActual} onChange={(e) => setDate(e.value)} showIcon />
                             </div>
                             {esIdaVuelta && (
-                                <div >
+                                <div>
                                     <Calendar value={fechaActual} onChange={(e) => setDate(e.value)} showIcon />
                                 </div>
                             )}
@@ -180,9 +190,9 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
+            {/* <Footer />  Footer deshabilitado */}
         </>
-    )
+    );
 }
 
-export default Home
+export default Home;

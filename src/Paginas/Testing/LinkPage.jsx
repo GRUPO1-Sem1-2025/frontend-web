@@ -19,6 +19,7 @@ const LinkPage = () => {
                     <Link to="/registrarse">Registrarse</Link><br></br>
                     {/* <ExportarUsuarios /> */}
 
+                    {/*
                     <br></br>
                     <h3>Rutas privadas</h3>
                     <Link to="/Dashboard">Dashboard</Link><br></br>
@@ -26,7 +27,8 @@ const LinkPage = () => {
                     <Link to="/Omnibus/ListadoOmnibus">Listado Omnibus</Link><br></br>
                     <Link to="/Viaje/AltaViaje">Alta Viaje</Link><br></br>
                     <Link to="/Usuarios/AltaUsuario">Alta usuario</Link><br></br>
-
+                    */}
+                    
                 </Card>
             </div>
         </>
