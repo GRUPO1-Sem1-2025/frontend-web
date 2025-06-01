@@ -1,35 +1,43 @@
-import { Link } from "react-router-dom"
-import ExportarUsuarios from '../../Componentes/ExportarUsuariosCSV.jsx';
+import { Link } from "react-router-dom";
+import ExportarUsuarios from "../../Componentes/ExportarUsuariosCSV.jsx";
 import useAuth from "../../Hooks/useAuth.jsx";
-import NavBar from '../../Componentes/NavBar.jsx';
+import NavBar from "../../Componentes/NavBar.jsx";
 
 //PrimeReact
-import { Card } from 'primereact/card';
+import { Card } from "primereact/card";
 
 const LinkPage = () => {
-    const { auth } = useAuth();
+  const { auth } = useAuth();
 
-    return (
-        <>
-            <NavBar />
-            <div className='rectangulo-centrado'>
-                <Card title="Pruebas de ruteo" className="cardCentrada">
-                    <br></br>
-                    <h3>Rutas públicas</h3>
-                    <Link to="/">Principal</Link><br></br>
-                    <Link to="/ingresar">Login</Link><br></br>
-                    <Link to="/registrarse">Registrarse</Link><br></br>
-                    {/* <ExportarUsuarios /> */}
+  return (
+    <>
+      <NavBar />
+      <div className="rectangulo-centrado">
+        <Card title="Pruebas de ruteo" className="cardCentrada">
+          <br></br>
+          <h3>Rutas públicas</h3>
+          <Link to="/">Principal</Link>
+          <br></br>
+          <Link to="/ingresar">Login</Link>
+          <br></br>
+          <Link to="/registrarse">Registrarse</Link>
+          <br></br>
+          {/* <ExportarUsuarios /> */}
 
-                    <br></br>
-                    <h3>Rutas privadas</h3>
-                    <Link to="/Dashboard">Dashboard</Link><br></br>
-                    <Link to="/Omnibus/AltaOmibus">Alta Omnibus</Link><br></br>
-                    <Link to="/Omnibus/ListadoOmnibus">Listado Omnibus</Link><br></br>
-                </Card>
-            </div>
-        </>
-    )
-}
+          <br></br>
+          <h3>Rutas privadas</h3>
+          <Link to="/Dashboard">Dashboard</Link>
+          <br></br>
+          <Link to="/Omnibus/AltaOmibus">Alta Omnibus</Link>
+          <br></br>
+          <Link to="/Omnibus/ListadoOmnibus">Listado Omnibus</Link>
+          <br></br>
+          <Link to="/Venta/VentaPasaje">Venta Pasaje</Link>
+          <br></br>
+        </Card>
+      </div>
+    </>
+  );
+};
 
-export default LinkPage
+export default LinkPage;

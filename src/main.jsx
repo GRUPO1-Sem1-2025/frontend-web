@@ -1,26 +1,26 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client'; // correcto para React 18+
-import './index.css';
-import App from './App.jsx';
-import { AuthProvider } from './context/AuthProvider';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom/client"; // correcto para React 18+
+import "./index.css";
+import App from "./App.jsx";
+import { AuthProvider } from "./Context/AuthProvider";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 //Estilos PrimeReact
-import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
+import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
-import 'primeicons/primeicons.css';
+import "primeicons/primeicons.css";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-    <React.StrictMode>
-        <PrimeReactProvider>
-            <BrowserRouter>
-                <AuthProvider>
-                    <Routes>
-                        <Route path="/*" element={<App />} />
-                    </Routes>
-                </AuthProvider>
-            </BrowserRouter>
-        </PrimeReactProvider>
-    </React.StrictMode>
+  <React.StrictMode>
+    <PrimeReactProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/*" element={<App />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </PrimeReactProvider>
+  </React.StrictMode>
 );
