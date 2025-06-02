@@ -16,12 +16,102 @@ const Home = () => {
     // Si no está logueado, se renderiza la landing page
     if (!auth || !auth.token) {
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '5rem' }}>
-                <h1>Bienvenido a nuestra aplicación</h1>
-                <p>Por favor, ingresa para continuar.</p>
-                <Link to="/ingresar">Ingresar</Link>
+    <div style={{
+        position: 'relative',
+        height: '100vh',
+        overflow: 'hidden',
+        fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`
+    }}>
+        {/* Fondo de video */}
+        <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                top: 0,
+                left: 0,
+                zIndex: -1
+            }}
+        >
+            <source src="buses1.mp4" type="video/mp4" />
+            Tu navegador no soporta el video.
+        </video>
+
+        {/* Contenido centrado con animación */}
+        <div style={{
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}>
+            <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.93)',
+                padding: '2.5rem 2rem',
+                borderRadius: '1.25rem',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+                textAlign: 'center',
+                animation: 'fadeInUp 1s ease-out',
+                maxWidth: '500px',
+                width: '90%'
+            }}>
+                {/* Logo */}
+                <img src="/tecnobus.png" alt="TecnoBus"
+                    style={{
+                        maxWidth: '150px',
+                        marginBottom: '1rem',
+                        borderRadius: '12px'
+                    }}
+                />
+                {/* Título */}
+                <h1 style={{
+                    fontSize: '2rem',
+                    fontWeight: 700,
+                    color: '#0B5394',
+                    marginBottom: '0.5rem'
+                }}>
+                    Tecnobus Uy
+                </h1>
+
+                {/* Subtítulo */}
+                <p style={{ color: '#444', marginBottom: '1.5rem' }}>
+                    Por favor, ingresa para continuar.
+                </p>
+
+                {/* Botón */}
+                <Link to="/ingresar">
+                    <Button
+                        label="Ingresar"
+                        icon="pi pi-sign-in"
+                        className="p-button-info"
+                        style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}
+                    />
+                </Link>
             </div>
-        );
+        </div>
+
+        {/* Animación CSS */}
+        <style>
+            {`
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            `}
+        </style>
+    </div>
+);
+
     }
 
     // Estado para fechas y selección de viaje
