@@ -1,0 +1,20 @@
+.p-stepper .p-stepper-number {
+  background-color: #69c8f1;
+  color: white;
+  border-radius: 50%;
+}
+
+.next-button {
+  background-color: #69c8f1;
+  border: 2px solid #c6eefc; /* Color del borde */
+  text-align: right;
+}
+
+/* Línea hacia el paso activo */
+.p-stepper .p-stepper-header.p-highlight + .p-stepper-separator {
+  background-color: #1f2c3a;
+}
+
+.p-stepper-nav {
+  background-color: #ffffff;
+}

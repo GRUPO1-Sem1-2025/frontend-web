@@ -1,7 +1,7 @@
 import { useNavigate, Link } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import AuthContext from "../../Context/AuthProvider.jsx";
-import NavBar from '../../Componentes/NavBar.jsx';
+import NavBar from "../../Componentes/NavBar.jsx";
 import Footer from "../../Componentes/Footer.jsx";
 // PrimeReact
 import { Image } from 'primereact/image';
@@ -164,34 +164,149 @@ const Home = () => {
                 }
             ]
         },
-        {
-            name: 'United States',
-            code: 'US',
-            states: [
-                {
-                    name: 'California',
-                    cities: [
-                        { cname: 'Los Angeles', code: 'US-LA' },
-                        { cname: 'San Diego', code: 'US-SD' },
-                        { cname: 'San Francisco', code: 'US-SF' }
-                    ]
-                },
-                {
-                    name: 'Florida',
-                    cities: [
-                        { cname: 'Jacksonville', code: 'US-JA' },
-                        { cname: 'Miami', code: 'US-MI' },
-                        { cname: 'Tampa', code: 'US-TA' },
-                        { cname: 'Orlando', code: 'US-OR' }
-                    ]
-                },
-                {
-                    name: 'Texas',
-                    cities: [
-                        { cname: 'Austin', code: 'US-AU' },
-                        { cname: 'Dallas', code: 'US-DA' },
-                        { cname: 'Houston', code: 'US-HO' }
-                    ]
+      });
+    } catch (err) {
+      setError("Error al cargar viajes");
+    }
+  };
+
+  return (
+    <>
+      <NavBar />
+      <Toast ref={toast} />
+      <div style={{ position: "relative", width: "100vw", overflow: "hidden" }}>
+        {/* Imagen de fondo */}
+        <div style={{ position: "relative", width: "100%", height: "100vh" }}>
+          <Image
+            // src="/paisajeHome.webp"
+            alt="Paisaje Home"
+            // style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+          />
+
+          {/* Contenido centrado dentro de la imagen */}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1,
+              textAlign: "center",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              padding: "2rem",
+              borderRadius: "1rem",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              width: "90%",
+              maxWidth: "600px",
+            }}
+          >
+            <h1
+              style={{
+                fontSize: "2rem",
+                fontWeight: "bold",
+                marginBottom: "2rem",
+              }}
+            >
+              Elige tú pasaje soñado
+            </h1>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                alignItems: "center",
+              }}
+            >
+              <ToggleButton
+                onLabel="Ida y vuelta"
+                offLabel="Pasaje ida"
+                checked={esIdaVuelta}
+                onChange={(e) => setChecked(e.value)}
+              />
+              {/*
+              <label htmlFor="minmax-buttons" className="font-bold block mb-2">
+                Pasajes
+              </label>
+              
+              <InputNumber
+                inputId="minmax-buttons"
+                value={pasajes}
+                onValueChange={(e) => setValue3(e.value)}
+                mode="decimal"
+                showButtons
+                min={0}
+                max={5}
+              />
+            */}
+              <FloatLabel>
+                <Calendar
+                  value={fechaIda}
+                  minDate={fechaActual}
+                  onChange={(e) => setFechaIda(e.value)}
+                  showIcon
+                  dateFormat="dd/mm/yy"
+                />
+                <label> Fecha Ida </label>
+              </FloatLabel>
+
+              {esIdaVuelta && (
+                <FloatLabel>
+                  <Calendar
+                    value={fechaVuelta}
+                    minDate={fechaIda}
+                    onChange={(e) => setFechaVuelta(e.value)}
+                    showIcon
+                    dateFormat="dd/mm/yy"
+                  />
+                  <label> Fecha Vuelta </label>
+                </FloatLabel>
+              )}
+
+              <FloatLabel>
+                <CascadeSelect
+                  inputId="cs-city1"
+                  value={locOrigen}
+                  onChange={(e) => setLocOrigen(e.value)}
+                  options={porDepartamento}
+                  optionLabel="cname"
+                  optionGroupLabel="name"
+                  optionGroupChildren={["items"]}
+                  className="w-full md:w-14rem"
+                  breakpoint="767px"
+                  style={{ minWidth: "14rem" }}
+                />
+                <label htmlFor="cs-city1">Origen</label>
+              </FloatLabel>
+
+              <FloatLabel>
+                <CascadeSelect
+                  inputId="cs-city"
+                  value={locDestino}
+                  onChange={(e) => setLocDestino(e.value)}
+                  options={porDepartamento}
+                  optionLabel="cname"
+                  optionGroupLabel="name"
+                  optionGroupChildren={["items"]}
+                  className="w-full md:w-14rem"
+                  breakpoint="767px"
+                  style={{ minWidth: "14rem" }}
+                />
+
+                <label htmlFor="cs-city">Destino</label>
+              </FloatLabel>
+              <Button
+                label="Continuar"
+                loading={loading}
+                onClick={() => {
+                  setLoading(true);
+                  fetchViajes();
+                }}
+                disabled={
+                  !locDestino ||
+                  !locOrigen ||
+                  !fechaIda ||
+                  (esIdaVuelta && !fechaVuelta)
                 }
             ]
         }
