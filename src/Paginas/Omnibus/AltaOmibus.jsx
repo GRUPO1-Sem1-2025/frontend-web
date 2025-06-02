@@ -1,171 +1,131 @@
-import { useRef, useState, useEffect } from "react";
-import { NOMBRE_REGEX, PASSWORD_REGEX, CORREO_REGEX, SOLODIGITOS_REGEX } from "../../Configuraciones/Validaciones.js";
+import { useState, useRef, useEffect } from "react";
+import { SOLODIGITOS_REGEX } from "../../Configuraciones/Validaciones.js";
 import Input2 from "../../Componentes/Input.jsx";
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import CargaMasivaAsientos from "../../Componentes/CargaMasivaAsientos.jsx";
+import Noti from '../../Componentes/MsjNotificacion.jsx';
+import { useNavigate } from 'react-router-dom';
+
 //PrimeReact
 import { Card } from "primereact/card";
 import { Button } from 'primereact/button';
-import { FileUpload } from 'primereact/fileupload';
 //conexion
-import axios from '../../Configuraciones/axios.js';
-const URL_OMNIBUSCONTROLLER = '/buses';
+import axios, { URL_OMNIBUSCONTROLLER } from '../../Configuraciones/axios.js';
 
 export default function AltaOmibus() {
-    const [omnibus, setUsuario] = useState({
+    const [omnibus, setOmnibus] = useState({
         marca: '',
-        cantidadAsientos: '',
-        matricula: '',
-        activo: '',
+        cant_asientos: '',
+        matricula: ''
     });
 
+    const [formValido, setFormValido] = useState(false);
+    const toastRef = useRef();
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
-
-    const errRef = useRef();
-    const [validName, setValidName] = useState(false);
-
-    const [validPwd, setValidPwd] = useState(false);
-
-    const [validemail, setValidemail] = useState(false);
-
-    const [matchPwd, setMatchPwd] = useState('');
-    const [validMatch, setValidMatch] = useState(false);
-    const [matchFocus, setMatchFocus] = useState(false);
-
-    const [errMsg, setErrMsg] = useState('');
-    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        setValidName(NOMBRE_REGEX.test(omnibus.nombre));
-    }, [omnibus.nombre])
-
-    useEffect(() => {
-        setValidName(NOMBRE_REGEX.test(omnibus.apellido));
-    }, [omnibus.apellido])
-
-    useEffect(() => {
-        setValidemail(CORREO_REGEX.test(omnibus.email));
-    }, [omnibus.email])
-
-    useEffect(() => {
-        setValidPwd(PASSWORD_REGEX.test(omnibus.password));
-        setValidMatch(omnibus.password === matchPwd);
-    }, [omnibus.password, matchPwd])
-
-    useEffect(() => {
-        setErrMsg('');
-    }, [omnibus.nombre, omnibus.password, matchPwd])
+        const valido =
+            omnibus.marca &&
+            SOLODIGITOS_REGEX.test(omnibus.cant_asientos) &&
+            omnibus.cant_asientos > 0 &&
+            omnibus.matricula
+        setFormValido(valido);
+    }, [omnibus]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const v1 = NOMBRE_REGEX.test(omnibus.nombre);
-        const v2 = NOMBRE_REGEX.test(omnibus.apellido);
-        const v3 = PASSWORD_REGEX.test(omnibus.password);
-        const v4 = CORREO_REGEX.test(omnibus.email);
-
-        if (!v1 || !v2 || !v3 || !v4) {
-            setErrMsg("Invalid Entry");
+        if (!formValido) {
+            toastRef.current?.notiError("Verifique los campos antes de enviar");
             return;
         }
-        console.log(omnibus);
 
-        try {
-            // const response = await axios.post(`${URL_OMNIBUSCONTROLLER}/crearOmnibus`, usuario, {
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     }
-            // });
-
-            console.log(response.data);
-
-            setSuccess(true);
-            navigate("/", { replace: true });
-        } catch (err) {
-            if (!err?.response) {
-                setErrMsg('Error al conectar con el servidor ' + err);
-            } else if (err.response?.status === 409) {
-                setErrMsg('Nombre de usuario ya existe');
-            } else {
-                setErrMsg('Error al registrar');
-            }
-            errRef.current.focus();
-        }
-    }
-
-    const [marcaValido, setMarcaValido] = useState(true);
-    const [matriculaValido, setMatriculaValido] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const [asientos, setAsientos] = useState(1);
-
-    const load = () => {
         setLoading(true);
+        try {
+            await axios.post(`${URL_OMNIBUSCONTROLLER}/crearOmnibus`, omnibus, {
+                headers: { 'Content-Type': 'application/json' }
+            });
 
-        setTimeout(() => {
+            toastRef.current?.notiExito("Ómnibus ingresado correctamente");
+            setOmnibus({
+                marca: '',
+                cant_asientos: '',
+                matricula: ''
+            });
+        } catch (error) {
+            let msg = '';
+
+            if (!err?.response) {
+                msg = 'No responde el servidor:\n' + err;
+            } else if (err.response?.status === 406) {
+                msg = err.response?.data?.mensaje || 'N';
+            } else if (err.response?.status === 401) {
+                msg = err.response?.data?.mensaje || 'No es posible una respuesta existosa';
+            } else {
+                msg = 'Error al ingresar';
+            }
+
+            toastRef.current?.notiError(msg);
+        } finally {
             setLoading(false);
-        }, 2000);
+        }
     };
-
-    //Notificaciones
-    const toast = useRef(null);
-
-    const showWarn = (message) => {
-        toast.current.show({
-            severity: 'warn',
-            summary: 'Error',
-            detail: message,
-            life: 6000
-        });
-    };
-
-    const showError = () => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 6000 });
-    }
 
     return (
         <div className='rectangulo-centrado'>
             <Card className="cardCentrada">
-                <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-                <h3>Agregar asientos</h3>
-                <form onSubmit={handleSubmit}>
-                    <FileUpload name="demo[]" url={'/api/upload'} accept=".csv, .xlsx, .txt" auto maxFileSize={5000000} emptyTemplate={
-                        <p className="m-0" style={{padding: "0.7rem"}}>Sube tus archvios aqui</p>
-                    } />
+                <Noti ref={toastRef} />
 
-                </form>
+                <h3>Agregar asientos</h3>
+                <CargaMasivaAsientos />
 
                 <h3>Agregar ómnibus</h3>
                 <form onSubmit={handleSubmit}>
+                    <br />
                     <Input2
                         titulo={"Marca"}
                         value={omnibus.marca}
-                        descripcion={`Debe tener al menos 3 caracteres.\nDebe comenzar con una letra.\nSolo letras, números y guiones.`}
-                        onChange={(e) => setUsuario(prev => ({ ...prev, marca: e.target.value }))}
-                        regex={NOMBRE_REGEX}
-                        onValidChange={setAsientos}
+                        descripcion={`No puede estar vacío`}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setOmnibus(prev => ({ ...prev, marca: val }));
+                        }}
+                        required={true}
                     />
 
                     <Input2
                         titulo={"Cantidad de asientos"}
-                        value={omnibus.cantidadAsientos}
+                        value={omnibus.cant_asientos}
                         descripcion={`Solo dígitos`}
-                        onChange={(e) => setUsuario(prev => ({ ...prev, cantidadAsientos: e.target.value }))}
                         regex={SOLODIGITOS_REGEX}
-                        onValidChange={setMarcaValido}
                         permitirTeclas={"int"}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setOmnibus(prev => ({ ...prev, cant_asientos: val }));
+                        }}
+                        required={true}
                     />
 
                     <Input2
                         titulo={"Matrícula"}
                         value={omnibus.matricula}
-                        descripcion={`Caracteres alfanuméricos`}
-                        onChange={(e) => setUsuario(prev => ({ ...prev, matricula: e.target.value }))}
-                        onValidChange={setMatriculaValido}
+                        descripcion={`No puede estar vacío`}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setOmnibus(prev => ({ ...prev, matricula: val }));
+                        }}
                         permitirTeclas={"alphanum"}
+                        required={true}
                     />
 
-                    <Button disabled={!marcaValido || !matriculaValido || !asientos ? true : false} loading={loading} onClick={load} label="Ingresar" />
+                    <Button
+                        disabled={!formValido}
+                        loading={loading}
+                        label="Crear ómnibus"
+                        type="submit"
+                    />
+
+                    <Button label="Cancelar" type="button" onClick={() => navigate('/Dashboard')} severity="secondary" style={{ marginTop: "1rem" }} />
                 </form>
             </Card>
         </div>

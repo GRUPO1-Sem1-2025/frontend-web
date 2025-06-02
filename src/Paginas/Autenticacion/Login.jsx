@@ -1,164 +1,183 @@
-import { useRef, useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import useAuth from "../../Hooks/useAuth.jsx";
-//PrimeReact
-import { Card } from "primereact/card";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-//Conexion
-import axios from "../../Configuraciones/axios.js";
-const URL_USUARIOSCONTROLLER = "/usuarios";
+import { useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Input2 from "../../Componentes/Input.jsx";
+import { CORREO_REGEX } from '../../Configuraciones/Validaciones.js';
+import Noti from '../../Componentes/MsjNotificacion.jsx';
+// PrimeReact
+import { Button } from 'primereact/button';
+import { Divider } from 'primereact/divider';
+// Conexión
+import axios from '../../Configuraciones/axios.js';
+
+const URL_USUARIOSCONTROLLER = '/usuarios';
 
 const Login = () => {
-  const [usuario, setUsuario] = useState({
-    nombre: "",
-    apellido: "",
-    email: "gabrielsf6@gmail.com", //fedeacosta6@gmail.com
-    password: "abcd123456", //Para test
-    codigo: 0,
-  });
-
-  //Variables
-  const { auth } = useAuth();
-
-  const navigate = useNavigate();
-  const location = useLocation();
-  //const from = location.state?.from?.pathname || "/2FA";
-
-  const userRef = useRef();
-
-  //Notificaciones
-  const toast = useRef(null);
-
-  const showWarn = (message) => {
-    toast.current.show({
-      severity: "warn",
-      summary: "Error",
-      detail: message,
-      life: 6000,
+    const [usuario, setUsuario] = useState({
+        nombre: '',
+        apellido: '',
+        email: '',
+        password: '',
+        codigo: 0,
     });
-  };
 
-  const showError = () => {
-    toast.current.show({
-      severity: "error",
-      summary: "Error",
-      detail: "Message Content",
-      life: 6000,
-    });
-  };
+    const toastRef = useRef();
+    const navigate = useNavigate();
 
-  //Effects
-  useEffect(() => {
-    userRef.current.focus();
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await axios.post(
-        `${URL_USUARIOSCONTROLLER}/login`,
-        JSON.stringify(usuario),
-        {
-          headers: { "Content-Type": "application/json" },
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(`${URL_USUARIOSCONTROLLER}/login`,
+                JSON.stringify(usuario),
+                {
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+            navigate("/2FA", {
+                replace: true,
+                state: { email: usuario.email }
+            });
+        } catch (err) {
+            let msg = '';
+            if (!err?.response) {
+                msg = 'No responde el servidor:\n' + err;
+            } else if (err.response?.status === 400) {
+                msg = err.response?.data?.mensaje || 'Usuario o contraseña incorrectos';
+            } else if (err.response?.status === 401) {
+                msg = err.response?.data?.mensaje || 'No autorizado';
+            } else {
+                msg = 'Error al ingresar';
+            }
+            toastRef.current?.notiError(msg);
         }
-      );
+    };
 
-      console.log(response?.data);
+    return (
+        <div style={{
+            position: 'relative',
+            height: '100vh',
+            overflow: 'hidden',
+            fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`
+        }}>
+            {/* Video de fondo */}
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    top: 0,
+                    left: 0,
+                    zIndex: -1
+                }}
+            >
+                <source src="/buses2.mp4" type="video/mp4" />
+                Tu navegador no soporta el video.
+            </video>
 
-      navigate("/2FA", {
-        replace: true,
-        state: { email: usuario.email },
-      });
-      //navigate(from, { replace: true });
-    } catch (err) {
-      let msg = "";
+            {/* Contenedor del login */}
+            <div style={{
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.93)',
+                    backdropFilter: 'blur(4px)',
+                    padding: '2.5rem 2rem',
+                    borderRadius: '1.5rem',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                    textAlign: 'center',
+                    animation: 'fadeInUp 1s ease-out',
+                    maxWidth: '500px',
+                    width: '90%'
+                }}>
+                    {/* Logo */}
+                    <img
+                        src="/tecnobus.png"
+                        alt="TecnoBus"
+                        style={{
+                            maxWidth: '150px',
+                            marginBottom: '1rem',
+                            borderRadius: '12px',
+                            backgroundColor: 'transparent',
+                            boxShadow: 'none'
+                        }}
+                    />
 
-      if (!err?.response) {
-        msg = "No responde el servidor:\n" + err;
-      } else if (err.response?.status === 400) {
-        msg = "Usuario o contraseña incorrectos";
-      } else if (err.response?.status === 401) {
-        msg = "Sin autorización";
-      } else {
-        msg = "Error al ingresar";
-      }
+                    {/* Título */}
+                    <h2 style={{
+                        fontWeight: 600,
+                        fontSize: '1.5rem',
+                        color: '#333',
+                        margin: '0 0 1.5rem 0'
+                    }}>
+                        Iniciar sesión
+                    </h2>
 
-      showWarn(msg);
-      //errRef.current.focus();
-    }
-  };
+                    <Noti ref={toastRef} />
 
-  //Variables componentes
-  const header = (
-    <img
-      alt="Card"
-      src="/tecnobus.png"
-      style={{
-        width: "100%",
-        maxWidth: "500px",
-        minWidth: "400px",
-        height: "250px", // Altura fija para forma rectangular
-        objectFit: "cover", // Rellena y recorta lo que sobra
-        display: "block",
-        borderRadius: "1%",
-      }}
-    />
-  );
+                    {/* Formulario */}
+                    <form onSubmit={handleSubmit}>
+                        <Input2
+                            titulo={"Correo"}
+                            value={usuario.email}
+                            regex={CORREO_REGEX}
+                            onChange={(e) => setUsuario(prev => ({ ...prev, email: e.target.value }))}
+                            required={true}
+                        />
 
-  return (
-    <div className="rectangulo-centrado" style={{ padding: "0px" }}>
-      <Card
-        title="Iniciar sesión"
-        header={header}
-        style={{ maxWidth: "420px", textAlign: "center" }}
-      >
-        <Toast ref={toast} />
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="username">Correo</label>
-          <input
-            type="text"
-            id="Correo"
-            ref={userRef}
-            autoComplete="off"
-            onChange={(e) => setUser(e.target.value)}
-            value={usuario.email}
-            required
-          />
+                        <Input2
+                            type="password"
+                            titulo={"Contraseña"}
+                            value={usuario.password}
+                            onChange={(e) => setUsuario(prev => ({ ...prev, password: e.target.value }))}
+                            required={true}
+                        />
 
-          <label htmlFor="password" style={{ marginTop: "10px" }}>
-            Contraseña
-          </label>
-          <input
-            type="password"
-            id="password"
-            onChange={(e) => setPwd(e.target.value)}
-            value={usuario.password}
-            required
-          />
-          <p style={{ marginTop: "0.2em" }}>
-            <Button
-              label="Cancel"
-              onClick={() => navigate("/links")}
-              severity="secondary"
-            />
-            <Button
-              label="Ingresar"
-              type="submit"
-              style={{ marginLeft: "0.5em" }}
-            />
-          </p>
-        </form>
-        <p>
-          ¿Necesitas una cuenta? <br />
-          <span>
-            <Link to="/registrarse">Registrarse</Link>
-          </span>
-        </p>
-      </Card>
-    </div>
-  );
+                        <p>
+                            <Button label="Cancelar" type="button" onClick={() => navigate('/links')} severity="secondary" />
+                            <Button label="Ingresar" type="submit" style={{ marginLeft: '0.5em' }} />
+                        </p>
+                    </form>
+
+                    <Divider />
+
+                    <p style={{ marginTop: '0.5em' }}>
+                        ¿Necesitas una cuenta?
+                        <br />
+                        <Link to="/registrarse">Registrarse</Link>
+                    </p>
+
+                    <p style={{ marginTop: '0.5em' }}>
+                        ¿Perdiste tu Contraseña?
+                        <br />
+                        <Link to="/recuperarpassword">Recuperar Contraseña</Link>
+                    </p>
+                </div>
+            </div>
+
+            {/* Animación */}
+            <style>
+                {`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                `}
+            </style>
+        </div>
+    );
 };
 
 export default Login;

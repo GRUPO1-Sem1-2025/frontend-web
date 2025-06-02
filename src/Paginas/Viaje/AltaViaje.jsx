@@ -1,0 +1,247 @@
+import { useState, useRef, useEffect } from "react";
+import { SOLODIGITOS_REGEX } from "../../Configuraciones/Validaciones.js";
+import Noti from '../../Componentes/MsjNotificacion.jsx';
+//PrimeReact
+import { Card } from "primereact/card";
+import { Button } from 'primereact/button';
+import { InputNumber } from 'primereact/inputnumber';
+import { FloatLabel } from 'primereact/floatlabel';
+import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
+import { useNavigate } from "react-router-dom";
+
+//conexion
+import axios, { URL_LOCALIDADESCONTROLLER, URL_VIAJESCONTROLLER } from '../../Configuraciones/axios.js';
+
+export default function AltaOmibus() {
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    const [viaje, setViaje] = useState({
+        precio: 0,
+        fechaInicio: today,
+        fechaFin: tomorrow,
+        horaInicio: "00:00:00",
+        horaFin: "00:00:00",
+        idLocalidadOrigen: 0,
+        idLocalidadDestino: 0
+    });
+
+    //Fix fechas para Java
+    const formatearFecha = (fechaDate) => {
+        if (!fechaDate) return "";
+        return fechaDate.toISOString().split("T")[0]; // "yyyy-mm-dd"
+    };
+
+    const formatearHora = (fechaDate) => {
+        if (!fechaDate) return "";
+        return fechaDate.toTimeString().split(" ")[0]; // "hh:mm:ss"
+    };
+
+    const [selectOrigen, setSelectOrigen] = useState(null);
+    const [selectDestino, setSelectDestino] = useState(null);
+    const [formValido, setFormValido] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [localidades, setLocalidades] = useState([]);
+    const toastRef = useRef();
+	const navigate = useNavigate();
+
+    useEffect(() => {
+        axios.get(`${URL_LOCALIDADESCONTROLLER}/obtenerLocalidadesActivas`)
+            .then(response => {
+                const data = response.data;
+
+                data.sort((a, b) => {
+                    if (a.departamento < b.departamento) {
+                        return -1;
+                    }
+                    if (a.departamento > b.departamento) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                const departamentosMap = {};
+
+                data.forEach(localidad => {
+                    const { id, nombre, departamento } = localidad;
+
+                    if (!departamentosMap[departamento]) {
+                        departamentosMap[departamento] = [];
+                    }
+
+                    departamentosMap[departamento].push({
+                        label: nombre,
+                        value: { id, nombre }
+                    });
+                });
+
+                const localidadesAgrupadas = Object.keys(departamentosMap).map(dep => ({
+                    label: dep,
+                    items: departamentosMap[dep]
+                }));
+
+                setLocalidades(localidadesAgrupadas);
+            })
+            .catch(error => {
+                console.error('Error al obtener localidades:', error);
+            });
+    }, []);
+
+    useEffect(() => {
+        const valido =
+            viaje.precio > 0 &&
+            viaje.fechaInicio &&
+            viaje.fechaFin &&
+            viaje.horaInicio &&
+            viaje.horaFin &&
+            selectOrigen &&
+            selectDestino &&
+            selectOrigen.id !== selectDestino.id;
+
+        setFormValido(valido);
+    }, [viaje, selectOrigen, selectDestino]);
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!formValido) {
+            toastRef.current?.notiError("Verifique los campos antes de enviar");
+            return;
+        }
+
+        //Fix fechas Java
+        const viajeFormateado = {
+            ...viaje,
+            fechaInicio: formatearFecha(viaje.fechaInicio),
+            fechaFin: formatearFecha(viaje.fechaFin),
+            horaInicio: formatearHora(viaje.horaInicio),
+            horaFin: formatearHora(viaje.horaFin)
+        };
+
+        console.log(viajeFormateado);
+        setLoading(true);
+        try {
+            await axios.post(`${URL_VIAJESCONTROLLER}/crearViaje`, viajeFormateado, {
+                headers: { 'Content-Type': 'application/json' }
+            }); toastRef.current?.notiExito("Viaje ingresado correctamente");
+
+            setViaje({
+                precio: 0,
+                fechaInicio: today,
+                fechaFin: tomorrow,
+                horaInicio: "00:00:00",
+                horaFin: "00:00:00",
+                idLocalidadOrigen: 0,
+                idLocalidadDestino: 0
+            });
+            setSelectOrigen(null);
+            setSelectDestino(null);
+        } catch (error) {
+            toastRef.current?.notiError("Error al registrar el viaje");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className='rectangulo-centrado'>
+            <Card className="cardCentrada">
+                <Noti ref={toastRef} />
+
+                <h3>Crear viaje</h3>
+                <form onSubmit={handleSubmit}>
+                    <br />
+
+                    <FloatLabel>
+                        <InputNumber inputId="currency-uy" value={viaje.precio} mode="currency" currency="UYU" locale="es-UY" style={{ width: "100%" }}
+                            onValueChange={(e) => {
+                                setViaje(prev => ({ ...prev, precio: e.value }));
+                            }} />
+                        <label htmlFor="currency-uy" className="font-bold block mb-2">Precio</label>
+                    </FloatLabel>
+
+                    <Calendar
+                        value={viaje.fechaInicio}
+                        dateFormat="dd/mm/yy"
+                        showIcon
+                        style={{ width: "100%", marginTop: "1rem" }}
+                        minDate={today}
+                        onChange={(e) => {
+                            const nuevaFechaInicio = e.value;
+                            const nuevaFechaFin = new Date(nuevaFechaInicio);
+                            nuevaFechaFin.setDate(nuevaFechaInicio.getDate() + 1);
+
+                            setViaje(prev => ({
+                                ...prev,
+                                fechaInicio: nuevaFechaInicio,
+                                // Ajustamos fechaFin si quedó fuera del rango permitido
+                                fechaFin: prev.fechaFin <= nuevaFechaInicio ? nuevaFechaFin : prev.fechaFin
+                            }));
+                        }}
+                    />
+
+                    <Calendar
+                        value={viaje.fechaFin}
+                        dateFormat="dd/mm/yy"
+                        showIcon
+                        style={{ width: "100%",  marginTop: "1rem" }}
+                        minDate={viaje.fechaInicio}
+                        maxDate={viaje.fechaInicio ? new Date(viaje.fechaInicio.getTime() + 24 * 60 * 60 * 1000) : null}
+                        onChange={(e) => {
+                            setViaje(prev => ({
+                                ...prev,
+                                fechaFin: e.value
+                            }));
+                        }}
+                    />
+
+                    <Calendar value={viaje.horaInicio} showIcon timeOnly icon={() => <i className="pi pi-clock" />} style={{ width: "100%", marginTop: "1rem"}}
+                        onChange={(e) => setViaje(prev => ({ ...prev, horaInicio: e.value }))} />
+
+                    <Calendar value={viaje.horaFin} showIcon timeOnly icon={() => <i className="pi pi-clock" />} style={{ width: "100%", marginTop: "1rem" }}
+                        onChange={(e) => setViaje(prev => ({ ...prev, horaFin: e.value }))} />
+
+                    <FloatLabel >
+                        <Dropdown value={selectOrigen}
+                            options={localidades} optionLabel="label"
+                            optionGroupLabel="label" optionGroupChildren="items"
+                            filter loading={false} 
+                            style={{ width: "100%", marginTop: "1rem" }}
+                            onChange={(e) => {
+                                const localidad = e.value;
+                                setSelectOrigen(localidad);
+                                setViaje(prev => ({ ...prev, idLocalidadOrigen: localidad.id }));
+                            }} />
+                        <label htmlFor="dd-city">Origen</label>
+                    </FloatLabel>
+
+                    <FloatLabel >
+                        <Dropdown value={selectDestino}
+                            options={localidades} optionLabel="label"
+                            optionGroupLabel="label" optionGroupChildren="items"
+                            filter loading={false} style={{ width: "100%", marginTop: "1rem" }}
+                            onChange={(e) => {
+                                const localidad = e.value;
+                                setSelectDestino(localidad);
+                                setViaje(prev => ({ ...prev, idLocalidadDestino: localidad.id }));
+                            }} />
+                        <label htmlFor="dd-city">Destino</label>
+                    </FloatLabel>
+
+                    <Button
+                        disabled={!formValido}
+                        loading={loading}
+                        label="Crear viaje"
+                        type="submit"
+                        style={{ marginTop: "1rem" }}
+                    />
+
+                    <Button label="Cancelar" onClick={() => navigate('/Dashboard')} severity="secondary" style={{ marginTop: "1rem" }} />
+                </form>
+            </Card>
+        </div>
+    );
+}
