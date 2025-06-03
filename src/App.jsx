@@ -5,7 +5,7 @@ import RequireAuth from "./Hooks/RequireAuth.jsx";
 
 //Paginas
 import LinkPage from "./Paginas/Testing/LinkPage.jsx";
-import Register from "./Paginas/Autenticacion/Register.jsx";
+//import Register from "./Paginas/Autenticacion/Register.jsx";
 import Login from "./Paginas/Autenticacion/Login.jsx";
 import Home from "./Paginas/Principal/Home.jsx";
 import Dashboard from "./Paginas/Principal/Dashboard.jsx";
@@ -14,7 +14,7 @@ import Layout from "./Layout";
 import Missing from "./Paginas/Basicas/Missing.jsx";
 import Unauthorized from "./Paginas/Basicas/Unauthorized.jsx";
 import AltaOmibus from "./Paginas/Omnibus/AltaOmibus.jsx";
-import ListadoOmnibus from "./Paginas/Omnibus/ListadoOmnibus.jsx";
+import ListadoOmnibus from "./Paginas/Omnibus/ListarOmnibus.jsx";
 import Venta from "./Paginas/Ventas/VentaPasaje.jsx";
 import CompraExitosa from "./Paginas/Ventas/CompraExitosa.jsx";
 import Stripe from "./Paginas/Ventas/Stripe.jsx";
@@ -27,7 +27,7 @@ function App() {
       <Route path="/" element={<Layout />}>
         {/* Rutas publicas */}
         <Route path="/" element={<Home />} />
-        <Route path="/registrarse" element={<Register />} />
+        {/*<Route path="/registrarse" element={<Registro />} />*/}
         <Route path="/ingresar" element={<Login />} />
         <Route path="/2FA" element={<TwoFA email="" />} />
 
