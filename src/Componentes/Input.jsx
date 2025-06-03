@@ -11,7 +11,8 @@ const Input2 = ({
     regex,
     styles = { width: "100%" },
     onValidChange,
-    permitirTeclas
+    permitirTeclas,
+    type = "text" // 👈 Nuevo prop con valor por defecto
 }) => {
     const inputRef = useRef();
     const [inputValid, setInputValid] = useState(true);
@@ -29,7 +30,7 @@ const Input2 = ({
         }
         setInputValid(isValid);
         if (onValidChange) {
-            onValidChange(isValid); // <-- Se notifica al componente padre
+            onValidChange(isValid);
         }
     }, [value, regex, onValidChange]);
 
@@ -40,7 +41,7 @@ const Input2 = ({
                     {titulo}
                 </label>
                 <InputText
-                    type="text"
+                    type={type} // 👈 Aquí se usa el tipo dinámicamente
                     id="inputComponente"
                     ref={inputRef}
                     autoComplete="off"
@@ -58,7 +59,7 @@ const Input2 = ({
 
                 {descripcion && (
                     <small id="inputNote" className={inputFocus && value && !inputValid ? "instructions" : "offscreen"}>
-                        <ul style={{background: "#c6eefc", borderRadius: "0.5rem", marginTop: "0.30rem"}}>
+                        <ul style={{ background: "#c6eefc", borderRadius: "0.5rem", marginTop: "0.30rem" }}>
                             {descripcion.split('\n').map((linea, idx) => (
                                 <li key={idx}>{linea}</li>
                             ))}

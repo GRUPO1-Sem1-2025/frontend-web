@@ -18,6 +18,7 @@ import ListadoOmnibus from "./Paginas/Omnibus/ListarOmnibus.jsx";
 import Venta from "./Paginas/Ventas/VentaPasaje.jsx";
 import CompraExitosa from "./Paginas/Ventas/CompraExitosa.jsx";
 import Stripe from "./Paginas/Ventas/Stripe.jsx";
+import RecuperarPassword from "./Paginas/Usuarios/RecuperarPassword.jsx";
 
 const ROLES = { User: 100, Vendedor: 200, Admin: 300 };
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/registrarse" element={<Registro />} />
         <Route path="/ingresar" element={<Login />} />
         <Route path="/2FA" element={<TwoFA email="" />} />
+        <Route path="/recuperarpassword" element={<RecuperarPassword />} />
 
         <Route path="/sinAutorizacion" element={<Unauthorized />} />
         <Route path="/Venta/VentaPasaje" element={<Venta />} />
