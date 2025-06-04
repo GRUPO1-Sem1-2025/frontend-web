@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../Componentes/NavBar.jsx";
-import Footer from "../../Componentes/Footer.jsx";
+//import Footer from "../../Componentes/Footer.jsx";
 import { useLocation } from "react-router-dom";
 import React, { useRef, useState, useEffect, use } from "react";
 import { Stepper } from "primereact/stepper";
@@ -46,12 +46,12 @@ export default function BasicDemo() {
 
   useEffect(() => {
     console.log("auth", auth);
-    console.log("mail", auth.email);
+    //console.log("mail", auth.email);
     axios
 
       .get(`${URL_USUARIOSCONTROLLER}/emails/`, {
         params: {
-          email: auth.email,
+          email: auth?.email,
         },
       })
       .then((response) => {
@@ -91,7 +91,8 @@ export default function BasicDemo() {
     origen: lugarOrigen,
     asientos: [],
     precio: "",
-    fechaSalida: fechaIda.toLocaleDateString(),
+    //fechaSalida: fechaIda.toLocaleDateString(),
+    fechaSalida: fechaIda,
     horaSalida: "",
     fechaArribo: "",
     horaArribo: "",
@@ -106,7 +107,8 @@ export default function BasicDemo() {
     origen: lugarDestino,
     asientos: "",
     precio: "",
-    fechaSalida: esIdaVuelta ? fechaVuelta.toLocaleDateString() : "",
+    //fechaSalida: esIdaVuelta ? fechaVuelta.toLocaleDateString() : "",
+    fechaSalida: esIdaVuelta,
     horaSalida: "",
     fechaArribo: "",
     horaArribo: "",
@@ -183,7 +185,7 @@ export default function BasicDemo() {
               <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
                 <h5>Origen: {lugarOrigen}</h5>
                 <h5>Destino: {lugarDestino}</h5>
-                <h5>Fecha:{fechaIda.toLocaleDateString()}</h5>
+                <h5>Fecha:{fechaIda}</h5>
                 <Divider />
               </div>
               <div className="card">
@@ -576,7 +578,7 @@ export default function BasicDemo() {
           </StepperPanel>
         </Stepper>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

@@ -35,7 +35,7 @@ export default function TwoFA({ email }) {
 
     const showError = (message) => {
         toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 6000 });
-    }
+    };
 
     useEffect(() => {
         if (location.state?.email) {
@@ -53,7 +53,8 @@ export default function TwoFA({ email }) {
         }
 
         try {
-            const response = await axios.post(`${URL_USUARIOSCONTROLLER}/verificarCodigo`,
+            const response = await axios.post(
+                `${URL_USUARIOSCONTROLLER}/verificarCodigo`,
                 JSON.stringify(usuario),
                 {
                     headers: { 'Content-Type': 'application/json' }
@@ -78,7 +79,7 @@ export default function TwoFA({ email }) {
 
             showError(msg);
         }
-    }
+    };
 
     const guardarTokenEnAuth = (token) => {
         if (typeof token !== 'string') throw new Error("Token inválido");
@@ -99,6 +100,27 @@ export default function TwoFA({ email }) {
             console.log("Variable sesión guardada", auth);
         } catch (error) {
             console.error('Token inválido:', error);
+        }
+    };
+
+    const reenviarCodigo = async () => {
+        try {
+            console.log("Reenviar codigo a ", usuario.email);
+            const response = await axios.post(
+                `${URL_USUARIOSCONTROLLER}/reenviarCodigo?email=${encodeURIComponent(usuario.email)}`
+            );
+
+            toast.current.show({
+                severity: 'success',
+                summary: 'Código reenviado',
+                detail: 'Revisa tu correo electrónico',
+                life: 5000
+            });
+
+            console.log(response.data);
+        } catch (err) {
+            console.error(err);
+            showError('No se pudo reenviar el código');
         }
     };
 
@@ -132,7 +154,6 @@ export default function TwoFA({ email }) {
                         />
                     </div>
 
-                    {/* Botones más abajo y centrados */}
                     <div style={{
                         marginTop: "2rem",
                         display: "flex",
@@ -144,8 +165,6 @@ export default function TwoFA({ email }) {
                     </div>
                 </form>
 
-                {/* Reenvío deshabilitado */}
-                {/* 
                 <p>
                     ¿Necesitas un nuevo código? <br />
                     <span>
@@ -154,7 +173,6 @@ export default function TwoFA({ email }) {
                         </Button>
                     </span>
                 </p> 
-                */}
             </Card>
         </div>
     );

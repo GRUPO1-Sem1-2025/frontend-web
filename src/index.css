@@ -120,13 +120,13 @@ textarea {
 }
 
 .cardCentrada {
-  text-align: 'center';
+  text-align: center;
   width: 100%;
   max-width: 420px;
   min-height: 400px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center; /* eje Y */
 }
 
 .p-card-content {

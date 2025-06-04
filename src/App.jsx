@@ -8,13 +8,10 @@ import LinkPage from "./Paginas/Testing/LinkPage.jsx";
 import Registro from "./Paginas/Usuarios/Registro.jsx";
 import Login from "./Paginas/Autenticacion/Login.jsx";
 import Home from "./Paginas/Principal/Home.jsx";
-import Dashboard from "./Paginas/Principal/Dashboard.jsx";
 import TwoFA from "./Paginas/Autenticacion/2FA.jsx";
 import Layout from "./Layout";
 import Missing from "./Paginas/Basicas/Missing.jsx";
 import Unauthorized from "./Paginas/Basicas/Unauthorized.jsx";
-import AltaOmibus from "./Paginas/Omnibus/AltaOmibus.jsx";
-import ListadoOmnibus from "./Paginas/Omnibus/ListarOmnibus.jsx";
 import Venta from "./Paginas/Ventas/VentaPasaje.jsx";
 import CompraExitosa from "./Paginas/Ventas/CompraExitosa.jsx";
 import Stripe from "./Paginas/Ventas/Stripe.jsx";
@@ -37,9 +34,6 @@ function App() {
         <Route path="/Venta/VentaPasaje" element={<Venta />} />
         {/* Rutas protegidas */}
         <Route path="/links" element={<LinkPage />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/Omnibus/AltaOmibus" element={<AltaOmibus />} />
-        <Route path="/Omnibus/ListadoOmnibus" element={<ListadoOmnibus />} />
         <Route path="/Venta/CompraExitosa" element={<CompraExitosa />} />
         <Route path="/Venta/Stripe" element={<Stripe />} />
 
