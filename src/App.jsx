@@ -2,6 +2,8 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import RequireAuth from "./Hooks/RequireAuth.jsx";
+import { ROLES } from './Configuraciones/Constantes.js';
+
 
 //Paginas
 import LinkPage from "./Paginas/Testing/LinkPage.jsx";
@@ -16,8 +18,11 @@ import Venta from "./Paginas/Ventas/VentaPasaje.jsx";
 import CompraExitosa from "./Paginas/Ventas/CompraExitosa.jsx";
 import Stripe from "./Paginas/Ventas/Stripe.jsx";
 import RecuperarPassword from "./Paginas/Usuarios/RecuperarPassword.jsx";
+import CambiarPassword from "./Componentes/CambiarPassword.jsx";
 
-const ROLES = { User: 100, Vendedor: 200, Admin: 300 };
+//const ROLES = { User: 100, Vendedor: 200, Admin: 300 };
+
+
 
 function App() {
   return (
@@ -28,21 +33,18 @@ function App() {
         <Route path="/registrarse" element={<Registro />} />
         <Route path="/ingresar" element={<Login />} />
         <Route path="/2FA" element={<TwoFA email="" />} />
-        <Route path="/recuperarpassword" element={<RecuperarPassword />} />
-
         <Route path="/sinAutorizacion" element={<Unauthorized />} />
+        <Route path="/recuperarpassword" element={<RecuperarPassword />} />
+        <Route path="/CambiarPassword" element={<CambiarPassword />} />
+
+        {/* RUTA PROTEGIDA PARA USUARIOS REGISTRADOS*/}
+        {/* <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}> */}
+
+        {/* OTRAS RUTAS */}
         <Route path="/Venta/VentaPasaje" element={<Venta />} />
-        {/* Rutas protegidas */}
         <Route path="/links" element={<LinkPage />} />
         <Route path="/Venta/CompraExitosa" element={<CompraExitosa />} />
         <Route path="/Venta/Stripe" element={<Stripe />} />
-
-        {/*
-        <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-        </Route>
-        <Route element={<RequireAuth allowedRoles={[ROLES.Vendedor, ROLES.Admin]} />}>
-          <Route path="principal" element={<Lounge />} />
-        </Route> */}
 
         {/* cualquier otra ruta no especificada*/}
         <Route path="*" element={<Missing />} />

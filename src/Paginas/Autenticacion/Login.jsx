@@ -4,11 +4,11 @@ import Input2 from "../../Componentes/Input.jsx";
 import { CORREO_REGEX } from '../../Configuraciones/Validaciones.js';
 import Noti from '../../Componentes/MsjNotificacion.jsx';
 // PrimeReact
+import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
 // Conexión
 import axios from '../../Configuraciones/axios.js';
-
 const URL_USUARIOSCONTROLLER = '/usuarios';
 
 const Login = () => {
@@ -22,6 +22,22 @@ const Login = () => {
 
     const toastRef = useRef();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
+    //Variables componentes
+    const header = (
+        <img alt="Card" src="/tecnobus.png"
+            style={{
+                width: '100%',
+                maxWidth: '500px',
+                minWidth: '300px',
+                height: '250px',         // Altura fija para forma rectangular
+                objectFit: 'cover',      // Rellena y recorta lo que sobra
+                display: 'block',
+                borderRadius: '1%'
+            }}
+        />
+    );
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,10 +48,22 @@ const Login = () => {
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
-            navigate("/2FA", {
-                replace: true,
-                state: { email: usuario.email }
-            });
+            console.log(response?.data);
+
+
+
+
+           if (response?.data.Login_directo == 0) {
+                navigate("/CambiarPassword", {
+                    replace: true,
+                    state: { email: usuario.email }
+                });
+            } else {
+                navigate("/2FA", {
+                    replace: true,
+                    state: { email: usuario.email }
+                });
+            }
         } catch (err) {
             let msg = '';
             if (!err?.response) {
@@ -49,135 +77,122 @@ const Login = () => {
             }
             toastRef.current?.notiError(msg);
         }
+        setLoading(false);
     };
 
     return (
-        <div style={{
-            position: 'relative',
-            height: '100vh',
-            overflow: 'hidden',
-            fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`
-        }}>
-            {/* Video de fondo */}
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                style={{
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    top: 0,
-                    left: 0,
-                    zIndex: -1
-                }}
-            >
-                <source src="/buses2.mp4" type="video/mp4" />
-                Tu navegador no soporta el video.
-            </video>
-
-            {/* Contenedor del login */}
-            <div style={{
+    <div style={{
+        position: 'relative',
+        height: '100vh',
+        overflow: 'hidden',
+        fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`
+    }}>
+        {/* Video de fondo */}
+        <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+                position: 'absolute',
+                width: '100%',
                 height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center'
-            }}>
-                <div style={{
+                objectFit: 'cover',
+                top: 0,
+                left: 0,
+                zIndex: -1
+            }}
+        >
+            <source src="/buses2.mp4" type="video/mp4" />
+            Tu navegador no soporta el video.
+        </video>
+
+        {/* Contenedor del login centrado */}
+        <div style={{
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}>
+            <Card 
+                title="Iniciar sesión"
+                header={header}
+                style={{
+                    maxWidth: '420px',
+                    textAlign: 'center',
                     backgroundColor: 'rgba(255, 255, 255, 0.93)',
                     backdropFilter: 'blur(4px)',
                     padding: '2.5rem 2rem',
                     borderRadius: '1.5rem',
                     boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-                    textAlign: 'center',
                     animation: 'fadeInUp 1s ease-out',
-                    maxWidth: '500px',
                     width: '90%'
-                }}>
-                    {/* Logo */}
-                    <img
-                        src="/tecnobus.png"
-                        alt="TecnoBus"
-                        style={{
-                            maxWidth: '150px',
-                            marginBottom: '1rem',
-                            borderRadius: '12px',
-                            backgroundColor: 'transparent',
-                            boxShadow: 'none'
+                }}
+            >
+                <Noti ref={toastRef} />
+
+                <form onSubmit={handleSubmit}>
+                    <Input2
+                        titulo={"Correo"}
+                        value={usuario.email}
+                        regex={CORREO_REGEX}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setUsuario(prev => ({ ...prev, email: val }));
                         }}
+                        required={true}
                     />
 
-                    {/* Título */}
-                    <h2 style={{
-                        fontWeight: 600,
-                        fontSize: '1.5rem',
-                        color: '#333',
-                        margin: '0 0 1.5rem 0'
-                    }}>
-                        Iniciar sesión
-                    </h2>
+                    <Input2
+                        type="password"
+                        titulo={"Contraseña"}
+                        value={usuario.password}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setUsuario(prev => ({ ...prev, password: val }));
+                        }}
+                        required={true}
+                    />
 
-                    <Noti ref={toastRef} />
-
-                    {/* Formulario */}
-                    <form onSubmit={handleSubmit}>
-                        <Input2
-                            titulo={"Correo"}
-                            value={usuario.email}
-                            regex={CORREO_REGEX}
-                            onChange={(e) => setUsuario(prev => ({ ...prev, email: e.target.value }))}
-                            required={true}
-                        />
-
-                        <Input2
-                            type="password"
-                            titulo={"Contraseña"}
-                            value={usuario.password}
-                            onChange={(e) => setUsuario(prev => ({ ...prev, password: e.target.value }))}
-                            required={true}
-                        />
-
-                        <p>
-                            <Button label="Cancelar" type="button" onClick={() => navigate('/')} severity="secondary" />
-                            <Button label="Ingresar" type="submit" style={{ marginLeft: '0.5em' }} />
-                        </p>
-                    </form>
-
-                    <Divider />
-
-                    <p style={{ marginTop: '0.5em' }}>
-                        ¿Necesitas una cuenta?
-                        <br />
-                        <Link to="/registrarse">Registrarse</Link>
+                    <p>
+                        <Button label="Cancelar" type="button" onClick={() => navigate('/links')} severity="secondary" />
+                        <Button label="Ingresar" type="submit" loading={loading} style={{ marginLeft: '0.5em' }} />
                     </p>
+                </form>
 
-                    <p style={{ marginTop: '0.5em' }}>
-                        ¿Perdiste tu Contraseña?
-                        <br />
-                        <Link to="/recuperarpassword">Recuperar Contraseña</Link>
-                    </p>
-                </div>
-            </div>
+                <Divider />
 
-            {/* Animación */}
-            <style>
-                {`
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                `}
-            </style>
+                <p style={{ marginTop: '0.5em' }}>
+                    ¿Necesitas una cuenta?
+                    <br />
+                    <Link to="/registrarse">Registrarse</Link>
+                </p>
+                <p style={{ marginTop: '0.5em' }}>
+                    ¿Perdiste tu Contraseña?
+                    <br />
+                    <Link to="/recuperarpassword">Recuperar Contraseña</Link>
+                </p>
+            </Card>
         </div>
-    );
+
+        {/* Animación */}
+        <style>
+            {`
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            `}
+        </style>
+    </div>
+);
+
 };
 
 export default Login;
