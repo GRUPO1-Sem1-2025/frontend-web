@@ -19,6 +19,7 @@ import CompraExitosa from "./Paginas/Ventas/CompraExitosa.jsx";
 import Stripe from "./Paginas/Ventas/Stripe.jsx";
 import RecuperarPassword from "./Paginas/Usuarios/RecuperarPassword.jsx";
 import CambiarPassword from "./Componentes/CambiarPassword.jsx";
+import PerfilUsuario from "./Paginas/Usuarios/PerfilUsuario.jsx";
 
 //const ROLES = { User: 100, Vendedor: 200, Admin: 300 };
 
@@ -36,6 +37,7 @@ function App() {
         <Route path="/sinAutorizacion" element={<Unauthorized />} />
         <Route path="/recuperarpassword" element={<RecuperarPassword />} />
         <Route path="/CambiarPassword" element={<CambiarPassword />} />
+        <Route path="/perfil" element={<PerfilUsuario />} />
 
         {/* RUTA PROTEGIDA PARA USUARIOS REGISTRADOS*/}
         {/* <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}> */}

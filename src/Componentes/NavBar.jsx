@@ -28,9 +28,9 @@ const NavBar = () => {
   );
 
   const items = [
-    { label: "Link", icon: "pi pi-link", url: "/links" },
+    // { label: "Link", icon: "pi pi-link", url: "/links" },
     { label: "Home", icon: "pi pi-home", url: "/" },
-    { label: "Dashboard", icon: "pi pi-home", url: "/dashboard" },
+    { label: "Perfil", icon: "pi pi-user", url: "/perfil" },
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
