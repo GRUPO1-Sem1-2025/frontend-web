@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import AuthContext from "../Context/AuthProvider.jsx";
 // PrimeReact
 import { Button } from "primereact/button";
@@ -7,44 +7,40 @@ import { Toolbar } from "primereact/toolbar";
 import { Image } from "primereact/image";
 import { TabMenu } from "primereact/tabmenu";
 import { Avatar } from "primereact/avatar";
-import { Badge } from "primereact/badge";
+import { Menu } from "primereact/menu";
 
 const NavBar = () => {
   const { auth, setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
-  const location = useLocation(); // Para leer la URL actual
+  const location = useLocation();
+  const menuRef = useRef(null);
 
-  const logout = async () => {
-    // if used in more components, this should be in context
-    // axios to /logout endpoint
-    setAuth(null); // Limpiar el estado de autenticación
-    localStorage.removeItem("auth"); // Limpiar el almacenamiento local
-    // Redirigir al usuario a la página de inicio o a la página de inicio de sesión 
+  const logout = () => {
+    setAuth(null);
+    localStorage.removeItem("auth");
     navigate("/");
   };
 
   const logoIzq = (
     <div>
-      <Image src="/tecnobus.png" alt="Image" width="70" className="mr-2" />
+      <Image src="/tecnobus.png" alt="Logo" width="70" className="mr-2" />
     </div>
   );
 
   const items = [
-    // { label: "Link", icon: "pi pi-link", url: "/links" },
     { label: "Home", icon: "pi pi-home", url: "/" },
-    { label: "Perfil", icon: "pi pi-user", url: "/perfil" },
+    // { label: "Perfil", icon: "pi pi-user", url: "/perfil" },
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Ajustar activeIndex basado en la URL actual
   useEffect(() => {
     const path = location.pathname.toLowerCase();
     const index = items.findIndex((item) => item.url.toLowerCase() === path);
     if (index !== -1) {
       setActiveIndex(index);
     }
-  }, [location.pathname]); // Se actualiza cada vez que cambia la URL
+  }, [location.pathname]);
 
   const links = (
     <div>
@@ -54,26 +50,39 @@ const NavBar = () => {
         activeIndex={activeIndex}
         onTabChange={(e) => {
           setActiveIndex(e.index);
-          navigate(items[e.index].url); // Navegar al hacer clic
+          navigate(items[e.index].url);
         }}
       />
     </div>
   );
 
-  console.log("Variable sesión actual", auth);
+  const menuItems = [
+    {
+      label: "Perfil de Usuario",
+      icon: "pi pi-user",
+      command: () => navigate("/perfil"),
+    },
+    {
+      label: "Cerrar sesión",
+      icon: "pi pi-sign-out",
+      command: logout,
+    },
+  ];
+
   const menuUsuario = auth ? (
-    <Avatar
-      className="p-overlay-badge"
-      icon="pi pi-sign-out"
-      size="medium"
-      onClick={logout}
-    >
-      <Badge value="4" />
-      <label>
-        {auth?.email.length > 4 ? auth.email.slice(0, 4) + "..." : auth.email}
-      </label>
-      {/* No borrar comentairo <Button onClick={logout} icon="pi pi-sign-out" />icon="pi pi-user"  */}
-    </Avatar>
+    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <Avatar
+        label={auth?.nombreUsuario?.charAt(0)?.toUpperCase()}
+        size="medium"
+        shape="circle"
+        style={{ backgroundColor: "#2196F3", color: "#fff", cursor: "pointer" }}
+        onClick={(e) => menuRef.current.toggle(e)}
+      />
+      <span style={{ fontWeight: "500", color: "#333" }}>
+        {auth?.nombreUsuario}
+      </span>
+      <Menu model={menuItems} popup ref={menuRef} />
+    </div>
   ) : (
     <Button onClick={() => navigate("/ingresar")} icon="pi pi-sign-in" />
   );
@@ -94,4 +103,5 @@ const NavBar = () => {
     </div>
   );
 };
+
 export default NavBar;

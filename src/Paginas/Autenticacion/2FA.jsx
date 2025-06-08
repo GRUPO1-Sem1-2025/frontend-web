@@ -91,6 +91,7 @@ export default function TwoFA({ email }) {
 
             setAuth({
                 token,
+                nombreUsuario: payload.nombreUsuario || '',
                 email: payload.sub || '',
                 rol: payload.rol || '',
                 emision: new Date(payload.iat * 1000),

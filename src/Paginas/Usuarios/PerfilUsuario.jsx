@@ -6,7 +6,7 @@ import { Card } from 'primereact/card';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const logoSrc = "/tecnobus.png";
+const logoSrc = "/tecnobus.png"; // Cambiá esto si querés usar otra imagen, como "/perfil.png"
 
 const Perfil = () => {
     const [usuario, setUsuario] = useState({
@@ -119,7 +119,27 @@ const Perfil = () => {
             <div className="rectangulo-centrado">
                 <Card className="cardCentrada" style={{ backgroundColor: '#c9f0ff' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                        <img src={logoSrc} alt="Logo Tecnobus" style={{ width: '120px', height: 'auto', objectFit: 'contain' }} />
+                        <div
+                            style={{
+                                width: '150px',
+                                height: '150px',
+                                borderRadius: '50%',
+                                overflow: 'hidden',
+                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                                border: '4px solid white',
+                                backgroundColor: '#fff'
+                            }}
+                        >
+                            <img
+                                src={logoSrc}
+                                alt="Logo Tecnobus"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                }}
+                            />
+                        </div>
                     </div>
 
                     <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Mi Perfil</h2>
