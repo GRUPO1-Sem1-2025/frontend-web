@@ -17,8 +17,10 @@ const NavBar = () => {
   const logout = async () => {
     // if used in more components, this should be in context
     // axios to /logout endpoint
-    setAuth({});
-    navigate("/links");
+    setAuth(null); // Limpiar el estado de autenticación
+    localStorage.removeItem("auth"); // Limpiar el almacenamiento local
+    // Redirigir al usuario a la página de inicio o a la página de inicio de sesión 
+    navigate("/");
   };
 
   const logoIzq = (
