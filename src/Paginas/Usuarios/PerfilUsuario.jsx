@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../../Componentes/NavBar';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Card } from 'primereact/card';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-// Asegurate de que la imagen esté en public o importada
-// Si está en public, usá esta ruta:
-const logoSrc = "/tecnobus.png"; // desde /public
+const logoSrc = "/tecnobus.png";
 
 const Perfil = () => {
     const [usuario, setUsuario] = useState({
-        nombre: 'Pablo',
-        apellido: 'Sanchez',
-        email: 'pablofing2013@gmail.com',
-        cedula: 'CI',
-        fechaNacimiento: 'Fecha',
+        id: null,
+        nombre: '',
+        apellido: '',
+        email: '',
+        cedula: '',
+        fechaNacimiento: '',
     });
 
     const [editando, setEditando] = useState({
@@ -26,6 +26,36 @@ const Perfil = () => {
         fechaNacimiento: false,
     });
 
+    useEffect(() => {
+        const cargarUsuario = async () => {
+            try {
+                const storedAuth = localStorage.getItem('auth');
+                if (!storedAuth) return;
+
+                const { email } = JSON.parse(storedAuth);
+
+                const response = await axios.get(`https://backend.tecnobus.uy/usuarios/emails/?email=${email}`);
+                const data = response.data;
+
+                setUsuario({
+                    id: data.id || null,
+                    nombre: data.nombre || '',
+                    apellido: data.apellido || '',
+                    email: data.email || '',
+                    cedula: data.ci || '',
+                    fechaNacimiento: data.fechaNac || '',
+                });
+
+                console.log("ID del usuario cargado:", data.id);
+
+            } catch (error) {
+                console.error("Error al cargar el usuario:", error);
+            }
+        };
+
+        cargarUsuario();
+    }, []);
+
     const handleInputChange = (e, campo) => {
         const val = e.target.value;
         setUsuario(prev => ({ ...prev, [campo]: val }));
@@ -35,8 +65,52 @@ const Perfil = () => {
         setEditando(prev => ({ ...prev, [campo]: !prev[campo] }));
     };
 
-    const handleGuardar = () => {
-        console.log('Datos guardados:', usuario);
+    const handleGuardar = async () => {
+        try {
+            const payload = {
+                id: usuario.id,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                email: usuario.email
+            };
+
+            const response = await axios.post('https://backend.tecnobus.uy/usuarios/modificarPerfil', payload, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log("Perfil actualizado:", response.data);
+            alert("Perfil actualizado correctamente.");
+        } catch (error) {
+            console.error("Error al guardar los cambios:", error);
+            alert("Hubo un error al actualizar el perfil.");
+        }
+    };
+
+    const handleDesactivarCuenta = async () => {
+        const confirmacion = window.confirm("¿Estás seguro de que deseas desactivar tu cuenta? Esta acción no se puede deshacer.");
+
+        if (!confirmacion) return;
+
+        try {
+            const formData = new FormData();
+            formData.append('email', usuario.email);
+
+            const response = await axios.post(
+                'https://backend.tecnobus.uy/usuarios/borrarUsuario',
+                formData
+            );
+
+            console.log("Cuenta desactivada:", response.data);
+            alert("Tu cuenta ha sido desactivada.");
+
+            localStorage.removeItem("auth");
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Error al desactivar la cuenta:", error);
+            alert("No se pudo desactivar la cuenta.");
+        }
     };
 
     return (
@@ -44,18 +118,8 @@ const Perfil = () => {
             <NavBar />
             <div className="rectangulo-centrado">
                 <Card className="cardCentrada" style={{ backgroundColor: '#c9f0ff' }}>
-                    
-                    {/* Imagen del logo */}
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                        <img
-                            src={logoSrc}
-                            alt="Logo Tecnobus"
-                            style={{
-                                width: '120px',
-                                height: 'auto',
-                                objectFit: 'contain',
-                            }}
-                        />
+                        <img src={logoSrc} alt="Logo Tecnobus" style={{ width: '120px', height: 'auto', objectFit: 'contain' }} />
                     </div>
 
                     <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Mi Perfil</h2>
@@ -89,9 +153,18 @@ const Perfil = () => {
                     ))}
 
                     <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-                        <a href="#" style={{ color: 'darkred', textDecoration: 'underline', display: 'inline-block', marginBottom: '1rem' }}>
+                        <span
+                            onClick={handleDesactivarCuenta}
+                            style={{
+                                color: 'darkred',
+                                textDecoration: 'underline',
+                                display: 'inline-block',
+                                marginBottom: '1rem',
+                                cursor: 'pointer'
+                            }}
+                        >
                             Desactivar mi cuenta
-                        </a>
+                        </span>
                         <br />
                         <Button
                             label="Guardar"

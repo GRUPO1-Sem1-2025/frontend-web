@@ -77,7 +77,7 @@ const Registro = () => {
 		//Fix fechas Java
 		const usuarioFormateado = {
 			...usuario,
-			fecha_Nac: formatearFecha(usuario.fecha_nac),
+			fecha_nac: formatearFecha(usuario.fecha_nac),
 			ci: limpiarNumeroDocumento(usuario.ci)
 		};
 
