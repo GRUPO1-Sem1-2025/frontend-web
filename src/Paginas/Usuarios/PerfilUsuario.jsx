@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import NavBar from '../../Componentes/NavBar';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Card } from 'primereact/card';
 import { Link } from 'react-router-dom';
+import { Toast } from 'primereact/toast';
 import axios from 'axios';
+import AuthContext from '../../Context/AuthProvider';
 
-const logoSrc = "/tecnobus.png"; // Cambiá esto si querés usar otra imagen, como "/perfil.png"
+const logoSrc = "/tecnobus.png";
 
 const Perfil = () => {
+    const { setAuth } = useContext(AuthContext);
+    const toast = useRef(null);
+
     const [usuario, setUsuario] = useState({
         id: null,
         nombre: '',
@@ -33,9 +38,8 @@ const Perfil = () => {
                 if (!storedAuth) return;
 
                 const { email } = JSON.parse(storedAuth);
-
                 const response = await axios.get(`https://backend.tecnobus.uy/usuarios/emails/?email=${email}`);
-                const data = response.data;
+                const data = response.data.OK;
 
                 setUsuario({
                     id: data.id || null,
@@ -81,16 +85,40 @@ const Perfil = () => {
             });
 
             console.log("Perfil actualizado:", response.data);
-            alert("Perfil actualizado correctamente.");
+
+            // ✅ Actualizar localStorage
+            const storedAuth = localStorage.getItem("auth");
+            if (storedAuth) {
+                const authParsed = JSON.parse(storedAuth);
+                authParsed.nombreUsuario = usuario.nombre;
+                localStorage.setItem("auth", JSON.stringify(authParsed));
+            }
+
+            // ✅ Actualizar contexto global
+            setAuth(prev => ({
+                ...prev,
+                nombreUsuario: usuario.nombre
+            }));
+
+            toast.current.show({
+                severity: 'success',
+                summary: 'Éxito',
+                detail: 'Perfil actualizado correctamente',
+                life: 3000
+            });
         } catch (error) {
             console.error("Error al guardar los cambios:", error);
-            alert("Hubo un error al actualizar el perfil.");
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Hubo un error al actualizar el perfil',
+                life: 3000
+            });
         }
     };
 
     const handleDesactivarCuenta = async () => {
         const confirmacion = window.confirm("¿Estás seguro de que deseas desactivar tu cuenta? Esta acción no se puede deshacer.");
-
         if (!confirmacion) return;
 
         try {
@@ -103,19 +131,24 @@ const Perfil = () => {
             );
 
             console.log("Cuenta desactivada:", response.data);
-            alert("Tu cuenta ha sido desactivada.");
-
             localStorage.removeItem("auth");
             window.location.href = "/";
+
         } catch (error) {
             console.error("Error al desactivar la cuenta:", error);
-            alert("No se pudo desactivar la cuenta.");
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'No se pudo desactivar la cuenta',
+                life: 3000
+            });
         }
     };
 
     return (
         <>
             <NavBar />
+            <Toast ref={toast} />
             <div className="rectangulo-centrado">
                 <Card className="cardCentrada" style={{ backgroundColor: '#c9f0ff' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
@@ -133,11 +166,7 @@ const Perfil = () => {
                             <img
                                 src={logoSrc}
                                 alt="Logo Tecnobus"
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                }}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                         </div>
                     </div>

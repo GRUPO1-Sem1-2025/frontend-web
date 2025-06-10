@@ -9,21 +9,24 @@ export const AuthProvider = ({ children }) => {
 
         try {
             const parsed = JSON.parse(stored);
-            const now = Date.now();
 
-            // Si hay fecha de expiración y ya expiró
+            // Verificar expiración si existe
+            const now = Date.now();
             if (parsed.expira && new Date(parsed.expira).getTime() < now) {
+                console.warn("Token expirado, limpiando auth");
                 localStorage.removeItem("auth");
                 return null;
             }
 
             return parsed;
-        } catch {
+        } catch (error) {
+            console.error("Error al parsear auth desde localStorage:", error);
             localStorage.removeItem("auth");
             return null;
         }
     });
 
+    // Sincronizar localStorage cada vez que cambia auth
     useEffect(() => {
         if (auth?.token) {
             localStorage.setItem("auth", JSON.stringify(auth));

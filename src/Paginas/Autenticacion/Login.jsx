@@ -24,15 +24,16 @@ const Login = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
-    //Variables componentes
     const header = (
-        <img alt="Card" src="/tecnobus.png"
+        <img
+            alt="Logo Tecnobus"
+            src="/tecnobus.png"
             style={{
                 width: '100%',
                 maxWidth: '500px',
                 minWidth: '300px',
-                height: '250px',         // Altura fija para forma rectangular
-                objectFit: 'cover',      // Rellena y recorta lo que sobra
+                height: '250px',
+                objectFit: 'cover',
                 display: 'block',
                 borderRadius: '1%'
             }}
@@ -41,6 +42,8 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+
         try {
             const response = await axios.post(`${URL_USUARIOSCONTROLLER}/login`,
                 JSON.stringify(usuario),
@@ -48,12 +51,10 @@ const Login = () => {
                     headers: { 'Content-Type': 'application/json' }
                 }
             );
+
             console.log(response?.data);
 
-
-
-
-           if (response?.data.Login_directo == 0) {
+            if (response?.data.Login_directo === 0) {
                 navigate("/CambiarPassword", {
                     replace: true,
                     state: { email: usuario.email }
@@ -77,122 +78,124 @@ const Login = () => {
             }
             toastRef.current?.notiError(msg);
         }
+
         setLoading(false);
     };
 
     return (
-    <div style={{
-        position: 'relative',
-        height: '100vh',
-        overflow: 'hidden',
-        fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`
-    }}>
-        {/* Video de fondo */}
-        <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                top: 0,
-                left: 0,
-                zIndex: -1
-            }}
-        >
-            <source src="/buses2.mp4" type="video/mp4" />
-            Tu navegador no soporta el video.
-        </video>
-
-        {/* Contenedor del login centrado */}
         <div style={{
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            position: 'relative',
+            height: '100vh',
+            overflow: 'hidden',
+            fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`
         }}>
-            <Card 
-                title="Iniciar sesión"
-                header={header}
+            {/* Video de fondo */}
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
                 style={{
-                    maxWidth: '420px',
-                    textAlign: 'center',
-                    backgroundColor: 'rgba(255, 255, 255, 0.93)',
-                    backdropFilter: 'blur(4px)',
-                    padding: '2.5rem 2rem',
-                    borderRadius: '1.5rem',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-                    animation: 'fadeInUp 1s ease-out',
-                    width: '90%'
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    top: 0,
+                    left: 0,
+                    zIndex: -1
                 }}
             >
-                <Noti ref={toastRef} />
+                <source src="/buses2.mp4" type="video/mp4" />
+                Tu navegador no soporta el video.
+            </video>
 
-                <form onSubmit={handleSubmit}>
-                    <Input2
-                        titulo={"Correo"}
-                        value={usuario.email}
-                        regex={CORREO_REGEX}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setUsuario(prev => ({ ...prev, email: val }));
-                        }}
-                        required={true}
-                    />
+            {/* Contenedor del login centrado */}
+            <div style={{
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
+                <Card
+                    title="Iniciar sesión"
+                    header={header}
+                    style={{
+                        maxWidth: '420px',
+                        textAlign: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.93)',
+                        backdropFilter: 'blur(4px)',
+                        padding: '2.5rem 2rem',
+                        borderRadius: '1.5rem',
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                        animation: 'fadeInUp 1s ease-out',
+                        width: '90%'
+                    }}
+                >
+                    <Noti ref={toastRef} />
 
-                    <Input2
-                        type="password"
-                        titulo={"Contraseña"}
-                        value={usuario.password}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setUsuario(prev => ({ ...prev, password: val }));
-                        }}
-                        required={true}
-                    />
+                    <form onSubmit={handleSubmit}>
+                        <Input2
+                            id="inputCorreo"
+                            titulo="Correo"
+                            value={usuario.email}
+                            regex={CORREO_REGEX}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setUsuario(prev => ({ ...prev, email: val }));
+                            }}
+                            required={true}
+                        />
 
-                    <p>
-                        <Button label="Cancelar" type="button" onClick={() => navigate('/links')} severity="secondary" />
-                        <Button label="Ingresar" type="submit" loading={loading} style={{ marginLeft: '0.5em' }} />
+                        <Input2
+                            id="inputPassword"
+                            type="password"
+                            titulo="Contraseña"
+                            value={usuario.password}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setUsuario(prev => ({ ...prev, password: val }));
+                            }}
+                            required={true}
+                        />
+
+                        <p>
+                            <Button label="Cancelar" type="button" onClick={() => navigate('/links')} severity="secondary" />
+                            <Button label="Ingresar" type="submit" loading={loading} style={{ marginLeft: '0.5em' }} />
+                        </p>
+                    </form>
+
+                    <Divider />
+
+                    <p style={{ marginTop: '0.5em' }}>
+                        ¿Necesitas una cuenta?
+                        <br />
+                        <Link to="/registrarse">Registrarse</Link>
                     </p>
-                </form>
+                    <p style={{ marginTop: '0.5em' }}>
+                        ¿Perdiste tu Contraseña?
+                        <br />
+                        <Link to="/recuperarpassword">Recuperar Contraseña</Link>
+                    </p>
+                </Card>
+            </div>
 
-                <Divider />
-
-                <p style={{ marginTop: '0.5em' }}>
-                    ¿Necesitas una cuenta?
-                    <br />
-                    <Link to="/registrarse">Registrarse</Link>
-                </p>
-                <p style={{ marginTop: '0.5em' }}>
-                    ¿Perdiste tu Contraseña?
-                    <br />
-                    <Link to="/recuperarpassword">Recuperar Contraseña</Link>
-                </p>
-            </Card>
+            {/* Animación */}
+            <style>
+                {`
+                    @keyframes fadeInUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(30px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                `}
+            </style>
         </div>
-
-        {/* Animación */}
-        <style>
-            {`
-            @keyframes fadeInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            `}
-        </style>
-    </div>
-);
-
+    );
 };
 
 export default Login;
