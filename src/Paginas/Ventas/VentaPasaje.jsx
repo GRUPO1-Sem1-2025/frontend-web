@@ -1,68 +1,88 @@
-// ... importaciones previas ...
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NavBar from "../../Componentes/NavBar.jsx";
-import { useRef, useState, useEffect } from "react";
+import Footer from "../../Componentes/Footer.jsx";
+import { useLocation } from "react-router-dom";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import { Stepper } from "primereact/stepper";
 import { StepperPanel } from "primereact/stepperpanel";
 import { Button } from "primereact/button";
-import { Divider } from "primereact/divider";
+import { Panel } from "primereact/panel";
 import Asientos from "./SeleccionAsiento.jsx";
+import "./styles.css";
+import axios from "../../Configuraciones/axios.js";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import useAuth from "../../Hooks/useAuth.jsx";
+import AuthContext from "../../Context/AuthProvider.jsx";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import TiempoRestante from "./TiempoRestante.jsx";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+import { Divider } from "primereact/divider";
 import { Card } from "primereact/card";
-import axios from "../../Configuraciones/axios.js";
-import useAuth from "../../Hooks/useAuth.jsx";
-
 const URL_USUARIOSCONTROLLER = "/usuarios";
 
-export default function VentaPasaje() {
+export default function BasicDemo() {
+  const [loading, setLoading] = useState(false);
+  const stepperRef = useRef(null);
   const navigate = useNavigate();
   const toast = useRef(null);
-  const stepperRef = useRef(null);
-  const { auth } = useAuth();
-  const location = useLocation();
+  const [rowClick, setRowClick] = useState(true);
+  const [visible, setVisible] = useState(false); // Manejo Mensaje Fin de Reserva
+  const footerContent = (
+    <div>
+      <Button
+        label="Ok"
+        onClick={() => navigate("/")}
+        autoFocus
+        loading={loading}
+      />
+    </div>
+  );
 
-  // Estado del usuario
+  // Estado compartido
+  const [asientosSeleccionados, setAsientosSeleccionados] = useState([]);
+  const [asientosVuelta, setAsientosVuelta] = useState([]);
   const [datosUsuario, setDatosUsuario] = useState([]);
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
+    console.log("auth", auth);
+    console.log("mail", auth.email);
     axios
       .get(`${URL_USUARIOSCONTROLLER}/emails/`, {
-        params: { email: auth?.email },
+        params: {
+          email: auth.email,
+        },
       })
-      .then((res) => setDatosUsuario(res.data))
+      .then((response) => {
+        setDatosUsuario(response.data.OK);
+      })
       .catch((err) => {
-        console.error("Error al cargar datos del usuario", err);
+        setError("Error al cargar datos del usuario");
+        console.error(err);
       });
   }, []);
 
-  // Datos recibidos de Home
+  // Datos de la busqueda
+  const location = useLocation();
+  const [viajeElegido, setViajeElegido] = useState("");
+  const [viajeElegidoVuelta, setViajeElegidoVuelta] = useState("");
+  const [compraIda, setCompraIda] = useState("");
+  const [compraVuelta, setCompraVuelta] = useState("");
+
   const {
+    //pasajes,
     esIdaVuelta,
     lugarOrigen,
+    idOrigen,
     lugarDestino,
+    idDestino,
     fechaIda,
     fechaVuelta,
     viajes,
     viajesVuelta,
   } = location.state || {};
 
-  // Estados generales
-  const [viajeElegido, setViajeElegido] = useState("");
-  const [viajeElegidoVuelta, setViajeElegidoVuelta] = useState("");
-  const [asientosSeleccionados, setAsientosSeleccionados] = useState([]);
-  const [asientosVuelta, setAsientosVuelta] = useState([]);
-  const [compraIda, setCompraIda] = useState("");
-  const [compraVuelta, setCompraVuelta] = useState("");
-  const [showTimer, setShowTimer] = useState(false);
-  const [startTimer, setStartTimer] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Datos estructurados para Stripe
   const [pasajeDataIda, setPasajeDataIda] = useState({
     nombre: "",
     apellido: "",
@@ -71,7 +91,7 @@ export default function VentaPasaje() {
     origen: lugarOrigen,
     asientos: [],
     precio: "",
-    fechaSalida: fechaIda,
+    fechaSalida: fechaIda.toLocaleDateString(),
     horaSalida: "",
     fechaArribo: "",
     horaArribo: "",
@@ -84,40 +104,59 @@ export default function VentaPasaje() {
     ci: "",
     destino: lugarOrigen,
     origen: lugarDestino,
-    asientos: [],
+    asientos: "",
     precio: "",
-    fechaSalida: fechaVuelta,
+    fechaSalida: esIdaVuelta ? fechaVuelta.toLocaleDateString() : "",
     horaSalida: "",
     fechaArribo: "",
     horaArribo: "",
     via: "web",
   });
-
-  // Utilidad para mostrar fechas correctamente
-  const formatearFecha = (fecha) => {
-    if (!fecha) return "";
-    if (typeof fecha === "string") return fecha;
-    return new Date(fecha).toLocaleDateString();
-  };
+  const [showTimer, setShowTimer] = useState(false);
+  const [startTimer, setStartTimer] = useState(false);
 
   const handleStart = () => {
     setShowTimer(true);
     setStartTimer(true);
   };
+  const handleFinish = () => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Se acabo el tiempo de su reserva",
+      life: 3000,
+    });
+  };
+
+  const formateaFecha = (fecha) => {
+    const [year, month, day] = fecha.split("-");
+    const fechaFormateada = `${day}/${month}/${year}`; // "19/06/2025"
+    return fechaFormateada;
+  };
 
   const cancelarCompra = async () => {
     try {
       await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
-        params: { idCompra: compraIda },
+        params: {
+          idCompra: compraIda,
+        },
       });
+
       if (esIdaVuelta) {
-        await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
-          params: { idCompra: compraVuelta },
-        });
+        try {
+          await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
+            params: {
+              idCompra: compraVuelta,
+            },
+          });
+          navigate("/");
+        } catch (error) {
+          console.error("Error cancelando vuelta:", error);
+        }
       }
       navigate("/");
     } catch (error) {
-      console.error("Error cancelando compra:", error);
+      console.error("Error cancelando ida:", error);
     }
   };
 
@@ -125,41 +164,72 @@ export default function VentaPasaje() {
     <>
       <NavBar />
       <Toast ref={toast} />
-      {showTimer && (
-        <TiempoRestante
-          minutes={10}
-          start={startTimer}
-          onFinish={() => setVisible(true)}
-        />
-      )}
-
+      {console.log(viajes)}
+      {console.log("Datos user: ", datosUsuario)}
+      <h2>
+        {showTimer && (
+          <TiempoRestante
+            minutes={10}
+            start={startTimer}
+            onFinish={() => setVisible(true)}
+          />
+        )}
+      </h2>
       <div className="card flex justify-content-center">
         <Stepper ref={stepperRef} style={{ flexBasis: "50rem" }} linear>
-          {/* Paso 1: Selección de viaje ida */}
-          <StepperPanel header={esIdaVuelta ? "Viaje de Ida" : "Viaje"}>
-            <h5>Origen: {lugarOrigen}</h5>
-            <h5>Destino: {lugarDestino}</h5>
-            <h5>Fecha: {formatearFecha(fechaIda)}</h5>
-            <Divider />
-            <DataTable
-              value={viajes}
-              selectionMode="radiobutton"
-              selection={viajeElegido}
-              onSelectionChange={(e) => setViajeElegido(e.value)}
-              dataKey="viajeId"
-              tableStyle={{ minWidth: "50rem" }}
-            >
-              <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
-              <Column field="busId" header="Omnibus" />
-              <Column field="horaInicio" header="Hora Salida" />
-              <Column field="horaFin" header="Hora Llegada" />
-              <Column field="precioPasaje" header="Precio" />
-            </DataTable>
+          <StepperPanel
+            header={esIdaVuelta ? "Seleccion Viaje de Ida" : "Seleccion Viaje"}
+          >
+            <div className="flex flex-column h-12rem">
+              <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                <h5>Origen: {lugarOrigen}</h5>
+                <h5>Destino: {lugarDestino}</h5>
+                <h5>Fecha:{fechaIda.toLocaleDateString()}</h5>
+                <Divider />
+              </div>
+              <div className="card">
+                <DataTable
+                  value={viajes}
+                  selectionMode="radiobutton"
+                  selection={viajeElegido}
+                  onSelectionChange={(e) => setViajeElegido(e.value)}
+                  dataKey="viajeId"
+                  tableStyle={{ minWidth: "50rem" }}
+                >
+                  <Column
+                    selectionMode="single"
+                    headerStyle={{ width: "3rem" }}
+                  ></Column>
+                  <Column field="busId" header="Omnibus"></Column>
+                  <Column field="horaInicio" header="Hora Salida"></Column>
+                  <Column
+                    field="cantAsientosDisponibles"
+                    header="Asientos Disponibles"
+                  ></Column>
+                  <Column field="horaFin" header="Hora Llegada"></Column>
+                  <Column field="fechaFin" header="Hora Llegada"></Column>
+                  <Column field="precioPasaje" header="Precio"></Column>
+                </DataTable>
+              </div>
+            </div>
             <div className="flex pt-4 justify-content-end">
-              <Button label="Cancelar" severity="danger" onClick={() => navigate("/")} />
+              <Button
+                label="  Cancelar"
+                severity="danger"
+                icon="pi pi-times"
+                onClick={() => navigate("/")}
+              />
               <Button
                 label="Siguiente"
+                className="next-button"
+                icon="pi pi-arrow-right"
+                iconPos="right"
                 onClick={() => {
+                  console.log(
+                    "fechaFormateada",
+                    formateaFecha(viajeElegido.fechaFin)
+                  );
+
                   setPasajeDataIda((prev) => ({
                     ...prev,
                     nombre: datosUsuario.nombre,
@@ -167,34 +237,48 @@ export default function VentaPasaje() {
                     ci: datosUsuario.ci,
                     horaArribo: viajeElegido.horaFin,
                     horaSalida: viajeElegido.horaInicio,
-                    fechaArribo: formatearFecha(viajeElegido.fechaFin),
+                    fechaArribo: formateaFecha(viajeElegido.fechaFin),
                     precio: viajeElegido.precioPasaje,
                   }));
+
                   stepperRef.current.nextCallback();
+                  console.log(pasajeDataIda);
                 }}
-                disabled={!viajeElegido}
+                disabled={viajeElegido === ""}
               />
             </div>
           </StepperPanel>
-
-          {/* Paso 2: Selección asiento ida */}
-          <StepperPanel header="Asientos Ida">
-            <Asientos
-              seleccionados={asientosSeleccionados}
-              setSeleccionados={setAsientosSeleccionados}
-              idBus={viajeElegido.busId}
-              idViaje={viajeElegido.viajeId}
-            />
+          <StepperPanel
+            header={
+              esIdaVuelta ? "Seleccion Asiento de Ida" : "Seleccion Asiento"
+            }
+          >
+            <div className="flex flex-column h-12rem">
+              <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                <Asientos
+                  seleccionados={asientosSeleccionados}
+                  setSeleccionados={setAsientosSeleccionados}
+                  idBus={viajeElegido.busId}
+                  idViaje={viajeElegido.viajeId}
+                />
+              </div>
+            </div>
             <div className="flex pt-4 justify-content-between">
               <Button
-                label="Atrás"
+                label="Atras"
+                severity="secondary"
+                icon="pi pi-arrow-left"
                 onClick={() => {
                   setViajeElegido("");
+                  setAsientosSeleccionados([]);
                   stepperRef.current.prevCallback();
                 }}
               />
               <Button
-                label="Reservar"
+                label="Siguiente"
+                className="next-button"
+                icon="pi pi-arrow-right"
+                iconPos="right"
                 loading={loading}
                 onClick={() => {
                   setPasajeDataIda((prev) => ({
@@ -202,6 +286,10 @@ export default function VentaPasaje() {
                     asientos: asientosSeleccionados,
                   }));
                   setLoading(true);
+                  console.log("Click comprado", asientosSeleccionados);
+                  console.log("usuarioId: ", datosUsuario.id);
+                  console.log("viajeId: ", viajeElegido.viajeId);
+                  console.log("asientos numero: ", asientosSeleccionados);
                   axios
                     .post(`${URL_USUARIOSCONTROLLER}/comprarPasaje`, {
                       usuarioId: datosUsuario.id,
@@ -210,166 +298,289 @@ export default function VentaPasaje() {
                       estadoCompra: "RESERVADA",
                     })
                     .then((res) => {
+                      console.log("Compra exitosa:", res.data);
+                      //startTimer;
+                      //setShowTimer(true);
+                      handleStart();
                       setCompraIda(res.data.idCompra);
                       setLoading(false);
-                      handleStart();
                       stepperRef.current.nextCallback();
                     })
                     .catch((err) => {
+                      console.error(
+                        "Error al comprar:",
+                        err.response.data.asientosOcupados,
+                        err.response?.data || err.message
+                      );
                       setLoading(false);
                       toast.current.show({
                         severity: "error",
                         summary: "Error",
                         detail:
-                          "Algunos asientos ya no están disponibles: " +
+                          "Algunos asientos elegidos ya no estan disponibles:" +
                           err.response.data.asientosOcupados,
                         life: 3000,
                       });
                     });
                 }}
-                disabled={asientosSeleccionados.length === 0}
+                disabled={asientosSeleccionados.length === 0} // Boton deshabilitado si no tiene asientos elegidos
               />
             </div>
           </StepperPanel>
-
-          {/* Paso 3 y 4: Vuelta (si aplica) */}
           {esIdaVuelta && (
-            <>
-              <StepperPanel header="Viaje de Vuelta">
-                <h5>Origen: {lugarDestino}</h5>
-                <h5>Destino: {lugarOrigen}</h5>
-                <h5>Fecha: {formatearFecha(fechaVuelta)}</h5>
-                <Divider />
-                <DataTable
-                  value={viajesVuelta}
-                  selectionMode="radiobutton"
-                  selection={viajeElegidoVuelta}
-                  onSelectionChange={(e) => setViajeElegidoVuelta(e.value)}
-                  dataKey="viajeId"
-                  tableStyle={{ minWidth: "50rem" }}
-                >
-                  <Column selectionMode="single" headerStyle={{ width: "3rem" }} />
-                  <Column field="busId" header="Omnibus" />
-                  <Column field="horaInicio" header="Hora Salida" />
-                  <Column field="horaFin" header="Hora Llegada" />
-                  <Column field="precioPasaje" header="Precio" />
-                </DataTable>
-                <div className="flex pt-4 justify-content-end">
-                  <Button label="Cancelar" onClick={() => navigate("/")} />
-                  <Button
-                    label="Siguiente"
-                    onClick={() => {
-                      setPasajeDataVuelta((prev) => ({
-                        ...prev,
-                        nombre: datosUsuario.nombre,
-                        apellido: datosUsuario.apellido,
-                        ci: datosUsuario.ci,
-                        horaArribo: viajeElegidoVuelta.horaFin,
-                        horaSalida: viajeElegidoVuelta.horaInicio,
-                        fechaArribo: formatearFecha(viajeElegidoVuelta.fechaFin),
-                        precio: viajeElegidoVuelta.precioPasaje,
-                      }));
-                      stepperRef.current.nextCallback();
-                    }}
-                    disabled={!viajeElegidoVuelta}
-                  />
+            <StepperPanel header="Selecciona Viaje de Vuelta">
+              <div className="flex flex-column h-12rem">
+                <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                  <h5>Origen: {lugarDestino}</h5>
+                  <h5>Destino: {lugarOrigen}</h5>
+                  <h5>
+                    Fecha:
+                    {fechaVuelta.toLocaleDateString()}
+                  </h5>
                 </div>
-              </StepperPanel>
-
-              <StepperPanel header="Asientos Vuelta">
-                <Asientos
-                  seleccionados={asientosVuelta}
-                  setSeleccionados={setAsientosVuelta}
-                  idBus={viajeElegidoVuelta.busId}
-                  idViaje={viajeElegidoVuelta.viajeId}
+                <div className="card">
+                  <DataTable
+                    value={viajesVuelta}
+                    selectionMode="radiobutton"
+                    selection={viajeElegidoVuelta}
+                    onSelectionChange={(e) => setViajeElegidoVuelta(e.value)}
+                    dataKey="viajeId"
+                    tableStyle={{ minWidth: "50rem" }}
+                  >
+                    <Column
+                      selectionMode="single"
+                      headerStyle={{ width: "3rem" }}
+                    ></Column>
+                    <Column field="busId" header="Omnibus"></Column>
+                    <Column field="horaInicio" header="Hora Salida"></Column>
+                    <Column
+                      field="cantAsientosDisponibles"
+                      header="Asientos Disponibles"
+                    ></Column>
+                    <Column field="horaFin" header="Hora Llegada"></Column>
+                    <Column field="precioPasaje" header="Precio"></Column>
+                  </DataTable>
+                </div>
+              </div>
+              <div className="flex pt-4 justify-content-end">
+                <Button
+                  label="  Cancelar"
+                  severity="danger"
+                  icon="pi pi-times"
+                  onClick={() => navigate("/")}
                 />
-                <div className="flex pt-4 justify-content-between">
-                  <Button
-                    label="Atrás"
-                    onClick={() => {
-                      setViajeElegidoVuelta("");
-                      stepperRef.current.prevCallback();
-                    }}
-                  />
-                  <Button
-                    label="Reservar"
-                    onClick={() => {
-                      setPasajeDataVuelta((prev) => ({
-                        ...prev,
-                        asientos: asientosVuelta,
-                      }));
-                      setLoading(true);
-                      axios
-                        .post(`${URL_USUARIOSCONTROLLER}/comprarPasaje`, {
-                          usuarioId: datosUsuario.id,
-                          viajeId: viajeElegidoVuelta.viajeId,
-                          numerosDeAsiento: asientosVuelta,
-                          estadoCompra: "RESERVADA",
-                        })
-                        .then((res) => {
-                          setCompraVuelta(res.data.idCompra);
-                          setLoading(false);
-                          stepperRef.current.nextCallback();
-                        })
-                        .catch((err) => {
-                          setLoading(false);
-                          toast.current.show({
-                            severity: "error",
-                            summary: "Error",
-                            detail:
-                              "Asientos ocupados: " +
-                              err.response.data.asientosOcupados,
-                            life: 3000,
-                          });
-                        });
-                    }}
-                    disabled={asientosVuelta.length !== asientosSeleccionados.length}
+                <Button
+                  label="Siguiente"
+                  className="next-button"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  onClick={() => {
+                    setPasajeDataVuelta((prev) => ({
+                      ...prev,
+                      nombre: datosUsuario.nombre,
+                      apellido: datosUsuario.apellido,
+                      ci: datosUsuario.ci,
+                      horaArribo: viajeElegidoVuelta.horaFin,
+                      horaSalida: viajeElegidoVuelta.horaInicio,
+                      fechaArribo: formateaFecha(viajeElegidoVuelta.fechaFin),
+                      precio: viajeElegidoVuelta.precioPasaje,
+                    }));
+                    stepperRef.current.nextCallback();
+                    console.log(pasajeDataIda);
+                  }}
+                  disabled={viajeElegidoVuelta === ""}
+                />
+              </div>
+            </StepperPanel>
+          )}
+          {esIdaVuelta && (
+            <StepperPanel header="Seleccion Asiento de Vuelta">
+              <div className="flex flex-column h-12rem">
+                <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                  <Asientos
+                    seleccionados={asientosVuelta}
+                    setSeleccionados={setAsientosVuelta}
+                    idBus={viajeElegidoVuelta.busId}
+                    idViaje={viajeElegidoVuelta.viajeId}
                   />
                 </div>
-              </StepperPanel>
-            </>
+              </div>
+              <div className="flex pt-4 justify-content-between">
+                <Button
+                  label="Atras"
+                  severity="secondary"
+                  icon="pi pi-arrow-left"
+                  onClick={() => {
+                    setViajeElegidoVuelta("");
+                    setAsientosVuelta([]);
+                    stepperRef.current.prevCallback();
+                  }}
+                />
+                <Button
+                  label="Siguiente"
+                  className="next-button"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  loading={loading}
+                  onClick={() => {
+                    setPasajeDataVuelta((prev) => ({
+                      ...prev,
+                      asientos: asientosVuelta,
+                    }));
+                    console.log("Antes de call");
+                    setLoading(true);
+                    axios
+                      .post(`${URL_USUARIOSCONTROLLER}/comprarPasaje`, {
+                        usuarioId: datosUsuario.id,
+                        viajeId: viajeElegidoVuelta.viajeId,
+                        numerosDeAsiento: asientosVuelta,
+                        estadoCompra: "RESERVADA",
+                      })
+                      .then((res) => {
+                        console.log("Compra exitosa:", res.data);
+                        setCompraVuelta(res.data.idCompra);
+                        console.log("aca");
+                        setLoading(false);
+                        stepperRef.current.nextCallback();
+                      })
+                      .catch((err) => {
+                        //console.error(
+                        //  "Error al comprar:",
+                        //  err.response.data.asientosOcupados,
+                        //  err.response?.data || err.message
+                        //);
+                        toast.current.show({
+                          severity: "error",
+                          summary: "Error",
+                          detail:
+                            "Algunos asientos elegidos ya no estan disponibles:" +
+                            err.response.data.asientosOcupados,
+                          life: 3000,
+                        });
+                      });
+                  }}
+                  disabled={
+                    asientosVuelta.length !== asientosSeleccionados.length
+                  } // Boton deshabilitado si no tiene asientos elegidos
+                />
+              </div>
+            </StepperPanel>
           )}
 
-          {/* Paso Final */}
-          <StepperPanel header="Resumen y Pago">
-            <Card title="Viaje de Ida">
-              <p><strong>Fecha de Salida:</strong> {formatearFecha(pasajeDataIda.fechaSalida)}</p>
-              <p><strong>Hora de Salida:</strong> {pasajeDataIda.horaSalida}</p>
-              <p><strong>Fecha de Arribo:</strong> {pasajeDataIda.fechaArribo}</p>
-              <p><strong>Hora de Arribo:</strong> {pasajeDataIda.horaArribo}</p>
-              <p><strong>Asientos:</strong> {asientosSeleccionados.join(", ")}</p>
-            </Card>
+          <StepperPanel header="Verificar Datos">
+            <div className="flex flex-column h-12rem">
+              <div className="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                <div className="card flex justify-content-center">
+                  {showTimer && (
+                    <Dialog
+                      header="Atención"
+                      visible={visible}
+                      style={{ width: "50vw" }}
+                      onHide={() => {
+                        navigate("/");
+                      }}
+                      footer={footerContent}
+                    >
+                      <p className="m-0">
+                        El tiempo de su reserva finalizo. Debe iniciar el
+                        proceso nuevamente.
+                      </p>
+                    </Dialog>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex flex-row flex-wrap gap-4-4">
+              <Card title="Viaje de Ida" className="w-1/2">
+                <p>
+                  <strong>Fecha de Salida:</strong> {pasajeDataIda.fechaSalida}
+                </p>
 
-            {esIdaVuelta && (
-              <Card title="Viaje de Vuelta">
-                <p><strong>Fecha de Salida:</strong> {formatearFecha(pasajeDataVuelta.fechaSalida)}</p>
-                <p><strong>Hora de Salida:</strong> {pasajeDataVuelta.horaSalida}</p>
-                <p><strong>Fecha de Arribo:</strong> {pasajeDataVuelta.fechaArribo}</p>
-                <p><strong>Hora de Arribo:</strong> {pasajeDataVuelta.horaArribo}</p>
-                <p><strong>Asientos:</strong> {asientosVuelta.join(", ")}</p>
+                <p>
+                  <strong>Hora de Salida:</strong> {pasajeDataIda.horaSalida}
+                </p>
+
+                <p>
+                  <strong>Fecha de Arribo:</strong> {pasajeDataIda.fechaArribo}
+                </p>
+
+                <p>
+                  <strong>Hora de Arribo:</strong> {pasajeDataIda.horaArribo}
+                </p>
+
+                <p>
+                  <strong>Asientos seleccionados:</strong>{" "}
+                  {asientosSeleccionados.join(", ")}
+                </p>
               </Card>
-            )}
+              <Divider />
+              {esIdaVuelta ? (
+                <Card title="Viaje de Vuelta" className="w-1/2">
+                  <p>
+                    <strong>Fecha de Salida:</strong>{" "}
+                    {pasajeDataVuelta.fechaSalida}
+                  </p>
 
-            <div className="flex pt-4 justify-content-start">
-              <Button label="Cancelar" severity="secondary" onClick={cancelarCompra} />
+                  <p>
+                    <strong>Hora de Salida:</strong>{" "}
+                    {pasajeDataVuelta.horaSalida}
+                  </p>
+
+                  <p>
+                    <strong>Fecha de Arribo:</strong>{" "}
+                    {pasajeDataVuelta.fechaArribo}
+                  </p>
+
+                  <p>
+                    <strong>Hora de Arribo:</strong>{" "}
+                    {pasajeDataVuelta.horaArribo}
+                  </p>
+
+                  <p>
+                    <strong>Asientos seleccionados:</strong>{" "}
+                    {asientosVuelta.join(", ")}
+                  </p>
+                </Card>
+              ) : (
+                ""
+              )}
+            </div>
+            <div className="flex pt-4 justify-content-start" padding-top>
+              <Button
+                label="Cancelar"
+                severity="secondary"
+                icon="pi pi-times"
+                style={{ marginTop: "1rem" }}
+                onClick={() => {
+                  cancelarCompra();
+                  navigate("/");
+                }}
+              />
               <Button
                 label="Pagar"
+                className="next-button"
+                icon="pi pi-arrow-right"
+                iconPos="right"
+                style={{ marginTop: "1rem" }}
                 onClick={() => {
-                  navigate("./../Stripe", {
-                    state: {
-                      compraIda,
-                      compraVuelta,
-                      pasajeDataIda,
-                      esIdaVuelta,
-                      pasajeDataVuelta,
-                    },
-                  });
+                  console.log(compraIda);
+                  console.log(pasajeDataIda),
+                    navigate("./../Stripe", {
+                      state: {
+                        compraIda,
+                        compraVuelta,
+                        pasajeDataIda,
+                        esIdaVuelta,
+                        pasajeDataVuelta,
+                      },
+                    });
                 }}
               />
             </div>
           </StepperPanel>
         </Stepper>
       </div>
+      <Footer />
     </>
   );
 }

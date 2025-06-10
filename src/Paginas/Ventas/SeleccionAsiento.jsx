@@ -8,13 +8,25 @@ const URL_BUSESCONTROLLER = "/buses";
 const URL_VIAJESCONTROLLER = "/viajes";
 
 const cargarAsientos = async (idBus) => {
-  try {
+  /*try {
     const response = await axios.get(
       `${URL_BUSESCONTROLLER}/obtenerOmnibusActivos`
     );
     const omnibus = response.data.find((o) => o.id === idBus);
     return omnibus.cant_asientos;
-  } catch {}
+  } catch {}*/
+  try {
+    const response = await axios.get(
+      `${URL_BUSESCONTROLLER}/obtenerOmnibusPorId`,
+      {
+        params: { idBus },
+      }
+    );
+    console.log(response.data); // Aquí recibís el objeto DtoBus
+    return response.data.cant_asientos;
+  } catch {
+    console.log("Cagada");
+  }
 };
 
 const cargarAsientosLibres = async (idViaje) => {
@@ -79,16 +91,20 @@ export default function SeleccionAsientos({
     const filas = Math.ceil(cantAsientos / (2 * columnasPorLado)); // Redondea para arriba, filas completas necesarias + 1
     console.log("desde func", cantAsientos);
     console.log("aLibres", asientosLibres);
+    console.log("filas: ", filas);
     const rows = [];
     let asientoCount = 1; // Inicia el contador de asientos
 
     for (let i = 0; i < filas; i++) {
       const row = [];
+      console.log("fila: ", i);
+      console.log("row: ", row);
 
       // Lado izquierdo
       for (let j = 0; j < columnasPorLado; j++) {
         if (asientoCount > cantAsientos) break;
         const asiento = asientoCount++;
+        console.log("cont:Asiento: ", asiento);
         const ocupado = asientosOcupados.includes(asiento);
         const seleccionado = seleccionados.includes(asiento);
 
@@ -117,31 +133,43 @@ export default function SeleccionAsientos({
       row.push(<div key={`pasillo-${i}`} style={{ width: "30px" }}></div>);
 
       // Lado derecho
-      if (asientoCount > cantAsientos) break;
-      for (let j = 0; j < columnasPorLado; j++) {
-        const asiento = asientoCount++;
-        const ocupado = asientosOcupados.includes(asiento);
-        const seleccionado = seleccionados.includes(asiento);
 
-        row.push(
-          <Button
-            key={asiento}
-            label={String(asiento)}
-            severity={
-              ocupado ? "danger" : seleccionado ? "success" : "secondary"
-            }
-            disabled={ocupado}
-            onClick={() => toggleAsiento(asiento)}
-            style={{
-              margin: "4px",
-              width: "50px", // Fijamos un ancho fijo para todos los botones
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center", // Asegura que el contenido esté centrado
-              height: "50px", // Mantiene la altura fija
-            }}
-          />
-        );
+      for (let j = 0; j < columnasPorLado; j++) {
+        const final = false;
+        if (asientoCount > cantAsientos) {
+          // Agrega un botón invisible para mantener el espacio
+          row.push(
+            <div
+              key={`fake-left-${i}-${j}`}
+              style={{ width: "50px", margin: "4px" }}
+            ></div>
+          );
+        } else {
+          const asiento = asientoCount++;
+          console.log("cont_siento: ", asiento);
+          const ocupado = asientosOcupados.includes(asiento);
+          const seleccionado = seleccionados.includes(asiento);
+
+          row.push(
+            <Button
+              key={asiento}
+              label={String(asiento)}
+              severity={
+                ocupado ? "danger" : seleccionado ? "success" : "secondary"
+              }
+              disabled={ocupado}
+              onClick={() => toggleAsiento(asiento)}
+              style={{
+                margin: "4px",
+                width: "50px", // Fijamos un ancho fijo para todos los botones
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center", // Asegura que el contenido esté centrado
+                height: "50px", // Mantiene la altura fija
+              }}
+            />
+          );
+        }
       }
 
       rows.push(
@@ -157,7 +185,7 @@ export default function SeleccionAsientos({
         </div>
       );
     }
-
+    console.log("rows: ", rows);
     return rows;
   };
 

@@ -19,7 +19,8 @@ export default function Stripe() {
 
   console.log("Compra Ida:", compraIda);
   console.log("Compra Vuelta:", compraVuelta);
-
+  console.log("pasajeData: ", pasajeDataIda);
+  console.log("ida?vuelta: ", esIdaVuelta);
   const cancelarCompra = async () => {
     try {
       await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
