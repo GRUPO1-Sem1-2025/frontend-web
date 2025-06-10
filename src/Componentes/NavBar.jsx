@@ -72,14 +72,14 @@ const NavBar = () => {
   const menuUsuario = auth ? (
     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
       <Avatar
-        label={auth?.nombreUsuario?.charAt(0)?.toUpperCase()}
+        label={auth?.nombreUsuario?.charAt(0)?.toUpperCase() || "U"}
         size="medium"
         shape="circle"
         style={{ backgroundColor: "#2196F3", color: "#fff", cursor: "pointer" }}
         onClick={(e) => menuRef.current.toggle(e)}
       />
-      <span style={{ fontWeight: "500", color: "#333" }}>
-        {auth?.nombreUsuario}
+      <span style={{ fontWeight: "500", color: "#333", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        {auth?.nombreUsuario || "Usuario"}
       </span>
       <Menu model={menuItems} popup ref={menuRef} />
     </div>

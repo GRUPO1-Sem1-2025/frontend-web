@@ -19,8 +19,7 @@ export default function TwoFA({ email }) {
         codigo: '',
     });
 
-    const { setAuth } = useAuth();
-    const { auth } = useAuth();
+    const { setAuth, auth } = useAuth();
     const [codigo2FA, setTokens] = useState();
 
     const navigate = useNavigate();
@@ -43,6 +42,11 @@ export default function TwoFA({ email }) {
         }
     }, [location.state?.email]);
 
+    // Para ver cambios en auth después de setAuth
+    useEffect(() => {
+        console.log("Auth actualizado:", auth);
+    }, [auth]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         usuario.codigo = codigo2FA?.trim();
@@ -61,8 +65,9 @@ export default function TwoFA({ email }) {
                 }
             );
 
-            console.log(response?.data.token);
-            guardarTokenEnAuth(response?.data.token);
+            const token = response?.data?.token;
+            console.log("Token recibido:", token);
+            guardarTokenEnAuth(token);
             navigate(from, { replace: true });
         } catch (err) {
             let msg = '';
@@ -82,31 +87,35 @@ export default function TwoFA({ email }) {
     };
 
     const guardarTokenEnAuth = (token) => {
-        if (typeof token !== 'string') throw new Error("Token inválido");
+        if (typeof token !== 'string') {
+            console.error("Token inválido:", token);
+            return;
+        }
 
         try {
             const payloadBase64 = token.split('.')[1];
             const payloadJson = atob(payloadBase64);
             const payload = JSON.parse(payloadJson);
 
-            setAuth({
+            const nuevoAuth = {
                 token,
                 nombreUsuario: payload.nombreUsuario || '',
                 email: payload.sub || '',
                 rol: payload.rol || '',
                 emision: new Date(payload.iat * 1000),
                 expira: new Date(payload.exp * 1000),
-            });
+            };
 
-            console.log("Variable sesión guardada", auth);
+            setAuth(nuevoAuth);
+            console.log("Variable sesión guardada:", nuevoAuth);
         } catch (error) {
-            console.error('Token inválido:', error);
+            console.error('Error al decodificar el token:', error);
         }
     };
 
     const reenviarCodigo = async () => {
         try {
-            console.log("Reenviar codigo a ", usuario.email);
+            console.log("Reenviar código a:", usuario.email);
             const response = await axios.post(
                 `${URL_USUARIOSCONTROLLER}/reenviarCodigo?email=${encodeURIComponent(usuario.email)}`
             );
@@ -126,7 +135,7 @@ export default function TwoFA({ email }) {
     };
 
     const header = (
-        <img alt="Card" src="/tecnobus.png"
+        <img alt="Logo Tecnobus" src="/tecnobus.png"
             style={{
                 width: '100%',
                 maxWidth: '500px',
@@ -173,7 +182,7 @@ export default function TwoFA({ email }) {
                             Enviar nuevo código
                         </Button>
                     </span>
-                </p> 
+                </p>
             </Card>
         </div>
     );
