@@ -1,59 +1,45 @@
 import { useEffect, useRef } from "react";
-import Pasaje from "./ImprimirPasajes.jsx";
-import { useLocation } from "react-router-dom";
+import axios from "../../Configuraciones/axios.js";
 import NavBar from "../../Componentes/NavBar.jsx";
 import Footer from "../../Componentes/Footer.jsx";
-import axios from "../../Configuraciones/axios.js";
 const URL_USUARIOSCONTROLLER = "/usuarios";
 
-export default function Print() {
-  const location = useLocation();
-  const idaString = localStorage.getItem("dataIDA");
-  const ida = JSON.parse(idaString);
-  const pasajeDataIda = ida.pasajeData;
-
-  const vueltaString = localStorage.getItem("dataVUELTA");
-  const vuelta = JSON.parse(vueltaString);
-  const pasajeDataVuelta = vuelta.pasajeData;
-
+export default function Stripe() {
+  const calledRef = useRef(false);
   const ivString = localStorage.getItem("esIdayVuelta");
   const esIdaVuelta = ivString === "true";
 
   const compraIda = localStorage.getItem("compraIda");
   const compraVuelta = localStorage.getItem("compraVuelta");
-  const calledRef = useRef(false);
 
   useEffect(() => {
-    const confirmarCompra = async () => {
+    const cancelarCompra = async () => {
       if (calledRef.current) return; // ya se llamó, salimos
       calledRef.current = true;
       try {
-        await axios.post(
-          `${URL_USUARIOSCONTROLLER}/cambiarEstadoCompra`,
-          compraIda,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
+          params: {
+            idCompra: compraIda,
+          },
+        });
+
         if (esIdaVuelta) {
           try {
-            await axios.post(
-              `${URL_USUARIOSCONTROLLER}/cambiarEstadoCompra`,
-              compraVuelta,
-              {
-                headers: { "Content-Type": "application/json" },
-              }
-            );
+            await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
+              params: {
+                idCompra: compraVuelta,
+              },
+            });
           } catch (error) {
-            console.error("Error compra Vuelta:", error);
+            console.error("Error cancelando vuelta:", error);
           }
         }
       } catch (error) {
-        console.error("Error compra Ida:", error);
+        console.error("Error cancelando ida:", error);
       }
     };
 
-    confirmarCompra();
+    cancelarCompra();
 
     localStorage.removeItem("dataIDA");
     localStorage.removeItem("dataVUELTA");
@@ -61,7 +47,6 @@ export default function Print() {
     localStorage.removeItem("compraIda");
     localStorage.removeItem("compraVuelta");
   }, []);
-
   return (
     <>
       <NavBar />
@@ -89,17 +74,8 @@ export default function Print() {
               marginBottom: "2rem",
             }}
           >
-            Gracias por su compra!
+            La compra fue cancelada
           </h1>
-          <h4>Pasaje/s de Ida </h4>
-          <Pasaje pasaje={pasajeDataIda} />
-
-          {esIdaVuelta && (
-            <>
-              <h4 style={{ marginTop: "2rem" }}>Pasaje/s de Vuelta </h4>
-              <Pasaje pasaje={pasajeDataVuelta} />
-            </>
-          )}
         </div>
       </div>
 

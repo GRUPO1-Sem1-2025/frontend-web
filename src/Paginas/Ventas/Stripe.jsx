@@ -1,104 +1,35 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import axios from "../../Configuraciones/axios.js";
-import NavBar from "../../Componentes/NavBar.jsx";
-import Footer from "../../Componentes/Footer.jsx";
-import { Button } from "primereact/button";
-const URL_USUARIOSCONTROLLER = "/usuarios";
-
-export default function Stripe() {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const {
-    compraIda,
-    compraVuelta,
-    pasajeDataIda,
-    esIdaVuelta,
-    pasajeDataVuelta,
-  } = location.state || {};
-
-  console.log("Compra Ida:", compraIda);
-  console.log("Compra Vuelta:", compraVuelta);
-  console.log("pasajeData: ", pasajeDataIda);
-  console.log("ida?vuelta: ", esIdaVuelta);
-  const cancelarCompra = async () => {
-    try {
-      await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
-        params: {
-          idCompra: compraIda,
-        },
-      });
-
-      if (esIdaVuelta) {
-        try {
-          await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
-            params: {
-              idCompra: compraVuelta,
-            },
-          });
-          navigate("/");
-        } catch (error) {
-          console.error("Error cancelando vuelta:", error);
-        }
-      }
-      navigate("/");
-    } catch (error) {
-      console.error("Error cancelando ida:", error);
-    }
-  };
-
-  const confirmarCompra = async () => {
-    try {
-      await axios.post(
-        `${URL_USUARIOSCONTROLLER}/cambiarEstadoCompra`,
-        compraIda,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      if (esIdaVuelta) {
-        try {
-          await axios.post(
-            `${URL_USUARIOSCONTROLLER}/cambiarEstadoCompra`,
-            compraVuelta,
-            {
-              headers: { "Content-Type": "application/json" },
-            }
-          );
-        } catch (error) {
-          console.error("Error compra Vuelta:", error);
-        }
-      }
-      navigate("./../CompraExitosa", {
-        state: {
-          compraIda,
-          compraVuelta,
-          pasajeDataIda,
-          esIdaVuelta,
-          pasajeDataVuelta,
-        },
-      });
-    } catch (error) {
-      console.error("Error compra Ida:", error);
-    }
-  };
-
-  return (
-    <>
-      <NavBar />
-      <div>
-        <Button
-          label="Confirmar compra"
-          severity="success"
-          onClick={confirmarCompra}
-        />
-        <Button
-          label="Cancelar compra"
-          severity="danger"
-          onClick={cancelarCompra}
-        />
-      </div>
-      <Footer />
-    </>
+export async function Stripe(monto) {
+  const STRIPE_API_URL = import.meta.env.VITE_STRIPE_API_URL;
+  const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
+  console.log("Aca estoy");
+  const params = new URLSearchParams();
+  params.append("success_url", "http://localhost:5173/Venta/CompraExitosa");
+  params.append("cancel_url", "http://localhost:5173/Venta/PagoCancelado");
+  params.append("mode", "payment");
+  params.append("line_items[0][price_data][currency]", "uyu");
+  params.append(
+    "line_items[0][price_data][product_data][name]",
+    "Pasaje de ómnibus"
   );
+  params.append("line_items[0][price_data][unit_amount]", String(monto * 100)); // en centavos
+  params.append("line_items[0][quantity]", "1");
+
+  const response = await fetch(`${STRIPE_API_URL}/v1/checkout/sessions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.url) {
+    throw new Error(
+      data?.error?.message || "No se pudo crear la sesión de pago"
+    );
+  }
+
+  return data.url;
 }

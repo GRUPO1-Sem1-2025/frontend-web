@@ -2,8 +2,7 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import RequireAuth from "./Hooks/RequireAuth.jsx";
-import { ROLES } from './Configuraciones/Constantes.js';
-
+import { ROLES } from "./Configuraciones/Constantes.js";
 
 //Paginas
 import LinkPage from "./Paginas/Testing/LinkPage.jsx";
@@ -16,14 +15,12 @@ import Missing from "./Paginas/Basicas/Missing.jsx";
 import Unauthorized from "./Paginas/Basicas/Unauthorized.jsx";
 import Venta from "./Paginas/Ventas/VentaPasaje.jsx";
 import CompraExitosa from "./Paginas/Ventas/CompraExitosa.jsx";
-import Stripe from "./Paginas/Ventas/Stripe.jsx";
+import PagoCancelado from "./Paginas/Ventas/PagoCancelado.jsx";
 import RecuperarPassword from "./Paginas/Usuarios/RecuperarPassword.jsx";
 import CambiarPassword from "./Componentes/CambiarPassword.jsx";
 import PerfilUsuario from "./Paginas/Usuarios/PerfilUsuario.jsx";
 
 //const ROLES = { User: 100, Vendedor: 200, Admin: 300 };
-
-
 
 function App() {
   return (
@@ -46,7 +43,7 @@ function App() {
         <Route path="/Venta/VentaPasaje" element={<Venta />} />
         <Route path="/links" element={<LinkPage />} />
         <Route path="/Venta/CompraExitosa" element={<CompraExitosa />} />
-        <Route path="/Venta/Stripe" element={<Stripe />} />
+        <Route path="/Venta/PagoCancelado" element={<PagoCancelado />} />
 
         {/* cualquier otra ruta no especificada*/}
         <Route path="*" element={<Missing />} />

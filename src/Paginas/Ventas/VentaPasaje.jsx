@@ -6,19 +6,18 @@ import React, { useRef, useState, useEffect, useContext } from "react";
 import { Stepper } from "primereact/stepper";
 import { StepperPanel } from "primereact/stepperpanel";
 import { Button } from "primereact/button";
-import { Panel } from "primereact/panel";
 import Asientos from "./SeleccionAsiento.jsx";
 import "./styles.css";
 import axios from "../../Configuraciones/axios.js";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import useAuth from "../../Hooks/useAuth.jsx";
 import AuthContext from "../../Context/AuthProvider.jsx";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import TiempoRestante from "./TiempoRestante.jsx";
 import { Divider } from "primereact/divider";
 import { Card } from "primereact/card";
+import { Stripe } from "./Stripe.jsx";
 const URL_USUARIOSCONTROLLER = "/usuarios";
 
 export default function BasicDemo() {
@@ -26,8 +25,8 @@ export default function BasicDemo() {
   const stepperRef = useRef(null);
   const navigate = useNavigate();
   const toast = useRef(null);
-  const [rowClick, setRowClick] = useState(true);
   const [visible, setVisible] = useState(false); // Manejo Mensaje Fin de Reserva
+
   const footerContent = (
     <div>
       <Button
@@ -38,6 +37,16 @@ export default function BasicDemo() {
       />
     </div>
   );
+
+  const handlePagar = async (total) => {
+    try {
+      const url = await Stripe(total);
+      window.location.href = url; // redirige a Stripe
+    } catch (error) {
+      console.error("Error al iniciar pago:", error);
+      alert("Hubo un error al iniciar el pago.");
+    }
+  };
 
   // Estado compartido
   const [asientosSeleccionados, setAsientosSeleccionados] = useState([]);
@@ -134,11 +143,11 @@ export default function BasicDemo() {
     return fechaFormateada;
   };
 
-  const cancelarCompra = async () => {
+  const cancelarCompra = async (idIda, idVuelta) => {
     try {
       await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
         params: {
-          idCompra: compraIda,
+          idCompra: idIda,
         },
       });
 
@@ -146,7 +155,7 @@ export default function BasicDemo() {
         try {
           await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
             params: {
-              idCompra: compraVuelta,
+              idCompra: idVuelta,
             },
           });
           navigate("/");
@@ -552,8 +561,7 @@ export default function BasicDemo() {
                 icon="pi pi-times"
                 style={{ marginTop: "1rem" }}
                 onClick={() => {
-                  cancelarCompra();
-                  navigate("/");
+                  cancelarCompra(compraIda, compraVuelta);
                 }}
               />
               <Button
@@ -563,17 +571,30 @@ export default function BasicDemo() {
                 iconPos="right"
                 style={{ marginTop: "1rem" }}
                 onClick={() => {
-                  console.log(compraIda);
-                  console.log(pasajeDataIda),
-                    navigate("./../Stripe", {
-                      state: {
-                        compraIda,
-                        compraVuelta,
-                        pasajeDataIda,
-                        esIdaVuelta,
-                        pasajeDataVuelta,
-                      },
-                    });
+                  let total =
+                    pasajeDataIda.precio * asientosSeleccionados.length;
+                  if (pasajeDataVuelta) {
+                    total +=
+                      pasajeDataVuelta.precio * asientosSeleccionados.length;
+                  }
+                  localStorage.setItem(
+                    "dataIDA",
+                    JSON.stringify({
+                      pasajeData: pasajeDataIda,
+                    })
+                  );
+                  localStorage.setItem("esIdayVuelta", esIdaVuelta);
+                  localStorage.setItem("compraIda", compraIda);
+                  localStorage.setItem("compraVuelta", compraVuelta);
+                  localStorage.setItem(
+                    "dataVUELTA",
+                    JSON.stringify({
+                      pasajeData: pasajeDataVuelta,
+                    })
+                  );
+                  {
+                    handlePagar(total);
+                  }
                 }}
               />
             </div>
