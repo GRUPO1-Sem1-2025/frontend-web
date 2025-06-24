@@ -11,10 +11,13 @@ import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { CascadeSelect } from "primereact/cascadeselect";
 import { FloatLabel } from "primereact/floatlabel";
-import { ToggleButton } from "primereact/togglebutton";
+
+// Firebase
+import { solicitarPermisoYObtenerToken } from "../../firebase-token"; // Ajusta si cambia la ruta
 
 const URL_LOCALIDADESCONTROLLER = "/localidades";
 const URL_VIAJESCONTROLLER = "/viajes";
+const URL_REGISTRO_TOKEN = "https://notificaciones.tecnobus.uy/usuarios/token";
 
 const Home = () => {
   const { auth } = useContext(AuthContext);
@@ -28,16 +31,60 @@ const Home = () => {
   const [fechaVuelta, setFechaVuelta] = useState(null);
   const [esIdaVuelta, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const fechaActual = new Date();
+
+  const yaPidioPermiso = useRef(false);
+
+  // 🚀 Pedir permiso de notificaciones y registrar token
+  /*
+  useEffect(() => {
+    if (auth?.token && auth?.id && !yaPidioPermiso.current) {
+      yaPidioPermiso.current = true;
+
+      solicitarPermisoYObtenerToken()
+        .then((tokenFCM) => {
+          return axios.post(URL_REGISTRO_TOKEN, {
+            usuarioId: auth.id,
+            token: tokenFCM,
+          });
+        })
+        .then(() => {
+          console.log("✅ Token registrado correctamente");
+        })
+        .catch((err) => {
+          console.error("❌ Error con notificaciones:", err.message);
+        });
+    }
+  }, [auth]);
+*/
+
+  useEffect(() => {
+  if (auth?.token && auth?.email && !yaPidioPermiso.current) {
+    yaPidioPermiso.current = true;
+
+    solicitarPermisoYObtenerToken()
+      .then((tokenFCM) => {
+        return axios.post(URL_REGISTRO_TOKEN, {
+          usuarioId: auth.email, // <-- aquí usamos email
+          token: tokenFCM,
+        });
+      })
+      .then(() => {
+        console.log("✅ Token registrado correctamente");
+      })
+      .catch((err) => {
+        console.error("❌ Error con notificaciones:", err.message);
+      });
+  }
+}, [auth]);
+
 
   useEffect(() => {
     axios
       .get(`${URL_LOCALIDADESCONTROLLER}/obtenerLocalidadesActivas`)
       .then((res) => setLocalidades(res.data))
       .catch((err) => {
-        setError("Error al cargar localidades");
-        console.error(err);
+        console.error("Error al cargar localidades", err);
       });
   }, []);
 
@@ -80,6 +127,7 @@ const Home = () => {
           },
         }
       );
+
       if (responseIda.data.length === 0) {
         setLoading(false);
         toast.current.show({
@@ -90,7 +138,6 @@ const Home = () => {
             : "No hay viajes para esa fecha",
           life: 3000,
         });
-
         return;
       }
 
@@ -113,7 +160,8 @@ const Home = () => {
           }
         );
         viajesVuelta = responseVuelta.data;
-        if (responseVuelta.data.length === 0) {
+
+        if (viajesVuelta.length === 0) {
           setLoading(false);
           toast.current.show({
             severity: "error",
@@ -121,7 +169,6 @@ const Home = () => {
             detail: "No hay viajes para esa fecha de vuelta",
             life: 3000,
           });
-
           return;
         }
       }
@@ -140,16 +187,14 @@ const Home = () => {
         },
       });
     } catch (err) {
-      setError("Error al buscar viajes");
+      console.error("Error al buscar viajes", err);
       setLoading(false);
     }
   };
 
   if (!auth?.token) {
     return (
-      <div
-        style={{ position: "relative", height: "100vh", overflow: "hidden" }}
-      >
+      <div style={{ position: "relative", height: "100vh", overflow: "hidden" }}>
         <video
           autoPlay
           loop
@@ -197,11 +242,7 @@ const Home = () => {
               Por favor, ingresa para continuar.
             </p>
             <Link to="/ingresar">
-              <Button
-                label="Ingresar"
-                icon="pi pi-sign-in"
-                className="p-button-info"
-              />
+              <Button label="Ingresar" icon="pi pi-sign-in" className="p-button-info" />
             </Link>
           </div>
         </div>
@@ -236,30 +277,15 @@ const Home = () => {
             maxWidth: "600px",
           }}
         >
-          <h1
-            style={{
-              fontSize: "2rem",
-              fontWeight: "bold",
-              marginBottom: "2rem",
-            }}
-          >
+          <h1 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "2rem" }}>
             Buscar pasajes de ómnibus
           </h1>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "1rem",
-              justifyContent: "center",
-              marginBottom: "1rem",
-            }}
-          >
+          <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginBottom: "1rem" }}>
             <Button
               label="Ida"
-              onClick={() => (setChecked(false), console.log("auth: ", auth))}
-              className={
-                !esIdaVuelta ? "p-button-warning" : "p-button-outlined"
-              }
+              onClick={() => setChecked(false)}
+              className={!esIdaVuelta ? "p-button-warning" : "p-button-outlined"}
             />
             <Button
               label="Ida y vuelta"
@@ -268,14 +294,7 @@ const Home = () => {
             />
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-              alignItems: "center",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem", alignItems: "center" }}>
             <FloatLabel>
               <Calendar
                 value={fechaIda}
@@ -286,6 +305,7 @@ const Home = () => {
               />
               <label>Fecha Ida</label>
             </FloatLabel>
+
             {esIdaVuelta && (
               <FloatLabel>
                 <Calendar
@@ -311,6 +331,7 @@ const Home = () => {
               />
               <label>Origen</label>
             </FloatLabel>
+
             <FloatLabel>
               <CascadeSelect
                 value={locDestino}
@@ -323,6 +344,7 @@ const Home = () => {
               />
               <label>Destino</label>
             </FloatLabel>
+
             <Button
               label="Buscar pasajes"
               loading={loading}
@@ -330,12 +352,7 @@ const Home = () => {
                 setLoading(true);
                 fetchViajes();
               }}
-              disabled={
-                !locOrigen ||
-                !locDestino ||
-                !fechaIda ||
-                (esIdaVuelta && !fechaVuelta)
-              }
+              disabled={!locOrigen || !locDestino || !fechaIda || (esIdaVuelta && !fechaVuelta)}
             />
           </div>
         </div>
