@@ -58,14 +58,34 @@ const Home = () => {
   }, [auth]);
 */
 
-  useEffect(() => {
-  if (auth?.token && auth?.email && !yaPidioPermiso.current) {
+useEffect(() => {
+  if (auth?.token && !yaPidioPermiso.current) {
     yaPidioPermiso.current = true;
+
+    function parseJwt(token) {
+      if (!token) return null;
+      const base64Payload = token.split('.')[1];
+      if (!base64Payload) return null;
+      const payload = atob(base64Payload.replace(/-/g, '+').replace(/_/g, '/'));
+      try {
+        return JSON.parse(payload);
+      } catch {
+        return null;
+      }
+    }
+
+    const payload = parseJwt(auth.token);
+    const userId = payload?.id; // ahora sacás el id
+
+    if (!userId) {
+      console.error("No se pudo obtener id del token JWT");
+      return;
+    }
 
     solicitarPermisoYObtenerToken()
       .then((tokenFCM) => {
         return axios.post(URL_REGISTRO_TOKEN, {
-          usuarioId: auth.email, // <-- aquí usamos email
+          usuarioId: userId, // uso el id aquí
           token: tokenFCM,
         });
       })
@@ -77,7 +97,6 @@ const Home = () => {
       });
   }
 }, [auth]);
-
 
   useEffect(() => {
     axios
