@@ -27,7 +27,7 @@ const Footer = () => {
                         <h3>Sobre Nosotros</h3>
                         <img src="/tecnobus.png" alt="Logo Tecnobus" class="footer-logo" />
                         <div class="payments">
-                            <img src="/paypal-logo.png" alt="Métodos de pago" class="payment-logo" />
+                            <img src="/stripe-logo.png" alt="Métodos de pago" class="payment-logo" />
                         </div>
                     </div>
 

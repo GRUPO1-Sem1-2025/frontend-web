@@ -41,7 +41,7 @@ function App() {
 
         {/* OTRAS RUTAS */}
         <Route path="/Venta/VentaPasaje" element={<Venta />} />
-        <Route path="/links" element={<LinkPage />} />
+        {/* <Route path="/links" element={<LinkPage />} /> */}
         <Route path="/Venta/CompraExitosa" element={<CompraExitosa />} />
         <Route path="/Venta/PagoCancelado" element={<PagoCancelado />} />
 

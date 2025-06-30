@@ -174,7 +174,7 @@ const Perfil = () => {
                     <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Mi Perfil</h2>
 
                     {['nombre', 'apellido', 'email', 'cedula', 'fechaNacimiento'].map(campo => (
-                        <div key={campo} style={{ marginBottom: '1.5rem' }}>
+                        <div key={campo} style={{ marginBottom: '0.45rem' }}>
                             <label htmlFor={campo} style={{ fontWeight: 'bold', display: 'block', marginBottom: '.5rem' }}>
                                 {campo === 'fechaNacimiento' ? 'Fecha de nacimiento' : campo.charAt(0).toUpperCase() + campo.slice(1)}
                             </label>
@@ -183,20 +183,22 @@ const Perfil = () => {
                                     id={campo}
                                     value={usuario[campo]}
                                     onChange={(e) => handleInputChange(e, campo)}
-                                    disabled={!editando[campo]}
+                                    disabled={campo === 'email' || !editando[campo]}
                                     style={{ width: '100%' }}
                                 />
-                                <i
-                                    className="pi pi-pencil"
-                                    onClick={() => toggleEdit(campo)}
-                                    style={{
-                                        position: 'absolute',
-                                        right: '10px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        cursor: 'pointer'
-                                    }}
-                                />
+                                {campo !== 'email' && (
+                                    <i
+                                        className="pi pi-pencil"
+                                        onClick={() => toggleEdit(campo)}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '10px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            cursor: 'pointer'
+                                        }}
+                                    />
+                                )}
                             </span>
                         </div>
                     ))}
