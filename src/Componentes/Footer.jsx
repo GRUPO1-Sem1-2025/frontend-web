@@ -36,8 +36,7 @@ const Footer = () => {
                         <ul>
                             <li><a href="#">Facebook</a></li>
                             <li><a href="#">Instagram</a></li>
-                            <li><a href="#">Twitter</a></li>
-                            <li><a href="#">YouTube</a></li>
+                            <li><a href="#">X</a></li>
                         </ul>
                     </div>
                 </div>
