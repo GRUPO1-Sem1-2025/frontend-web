@@ -19,7 +19,7 @@ import PagoCancelado from "./Paginas/Ventas/PagoCancelado.jsx";
 import RecuperarPassword from "./Paginas/Usuarios/RecuperarPassword.jsx";
 import CambiarPassword from "./Componentes/CambiarPassword.jsx";
 import PerfilUsuario from "./Paginas/Usuarios/PerfilUsuario.jsx";
-
+import ViajesUsuario from "./Paginas/Usuarios/ViajesUsuario.jsx";
 //const ROLES = { User: 100, Vendedor: 200, Admin: 300 };
 
 function App() {
@@ -35,6 +35,7 @@ function App() {
         <Route path="/recuperarpassword" element={<RecuperarPassword />} />
         <Route path="/CambiarPassword" element={<CambiarPassword />} />
         <Route path="/perfil" element={<PerfilUsuario />} />
+        <Route path="/viajesUsuario" element={<ViajesUsuario />} />
 
         {/* RUTA PROTEGIDA PARA USUARIOS REGISTRADOS*/}
         {/* <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}> */}

@@ -11,7 +11,7 @@ import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { CascadeSelect } from "primereact/cascadeselect";
 import { FloatLabel } from "primereact/floatlabel";
-import { ToggleButton } from "primereact/togglebutton";
+import { addLocale } from "primereact/api";
 
 const URL_LOCALIDADESCONTROLLER = "/localidades";
 const URL_VIAJESCONTROLLER = "/viajes";
@@ -30,6 +30,52 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fechaActual = new Date();
+
+  addLocale("es", {
+    firstDayOfWeek: 1,
+    showMonthAfterYear: false,
+    dayNames: [
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+    ],
+    dayNamesShort: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    dayNamesMin: ["D", "L", "M", "X", "J", "V", "S"],
+    monthNames: [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ],
+    monthNamesShort: [
+      "Ene",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dic",
+    ],
+    today: "Hoy",
+    clear: "Limpiar",
+  });
 
   useEffect(() => {
     axios
@@ -125,7 +171,7 @@ const Home = () => {
           return;
         }
       }
-
+      localStorage.setItem("pagoIniciado", "false");
       navigate("../Venta/VentaPasaje", {
         state: {
           esIdaVuelta,
@@ -256,15 +302,13 @@ const Home = () => {
           >
             <Button
               label="Ida"
-              onClick={() => (setChecked(false), console.log("auth: ", auth))}
-              className={
-                !esIdaVuelta ? "p-button-warning" : "p-button-outlined"
-              }
+              onClick={() => setChecked(false)}
+              className={!esIdaVuelta ? "" : "p-button-outlined"}
             />
             <Button
               label="Ida y vuelta"
               onClick={() => setChecked(true)}
-              className={esIdaVuelta ? "p-button-warning" : "p-button-outlined"}
+              className={esIdaVuelta ? "" : "p-button-outlined"}
             />
           </div>
 
@@ -282,6 +326,7 @@ const Home = () => {
                 minDate={fechaActual}
                 onChange={(e) => setFechaIda(e.value)}
                 showIcon
+                locale="es"
                 dateFormat="dd/mm/yy"
               />
               <label>Fecha Ida</label>
@@ -293,6 +338,7 @@ const Home = () => {
                   minDate={fechaIda}
                   onChange={(e) => setFechaVuelta(e.value)}
                   showIcon
+                  locale="es"
                   dateFormat="dd/mm/yy"
                 />
                 <label>Fecha Vuelta</label>

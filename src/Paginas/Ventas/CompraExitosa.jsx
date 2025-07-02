@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
-import Pasaje from "./ImprimirPasajes.jsx";
 import { useLocation } from "react-router-dom";
+import { Button } from "primereact/button";
 import NavBar from "../../Componentes/NavBar.jsx";
 import Footer from "../../Componentes/Footer.jsx";
 import axios from "../../Configuraciones/axios.js";
+import imprimirPasaje from "./printPasaje.jsx";
 const URL_USUARIOSCONTROLLER = "/usuarios";
 
 export default function Print() {
@@ -17,13 +18,14 @@ export default function Print() {
   const pasajeDataVuelta = vuelta.pasajeData;
 
   const ivString = localStorage.getItem("esIdayVuelta");
-  const esIdaVuelta = ivString === "true";
 
+  const esIdaVuelta = ivString === "true";
   const compraIda = localStorage.getItem("compraIda");
   const compraVuelta = localStorage.getItem("compraVuelta");
   const calledRef = useRef(false);
 
   useEffect(() => {
+    localStorage.removeItem("pagoIniciado");
     const confirmarCompra = async () => {
       if (calledRef.current) return; // ya se llamó, salimos
       calledRef.current = true;
@@ -92,12 +94,20 @@ export default function Print() {
             Gracias por su compra!
           </h1>
           <h4>Pasaje/s de Ida </h4>
-          <Pasaje pasaje={pasajeDataIda} />
-
+          {/*<Pasaje pasaje={pasajeDataIda} />*/}
+          <Button
+            label="Descargar pasajes"
+            icon="pi pi-download"
+            onClick={() => imprimirPasaje(pasajeDataIda)}
+          />
           {esIdaVuelta && (
             <>
               <h4 style={{ marginTop: "2rem" }}>Pasaje/s de Vuelta </h4>
-              <Pasaje pasaje={pasajeDataVuelta} />
+              <Button
+                label="Descargar pasajes"
+                icon="pi pi-download"
+                onClick={() => imprimirPasaje(pasajeDataVuelta)}
+              />
             </>
           )}
         </div>

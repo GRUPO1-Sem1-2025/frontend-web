@@ -14,10 +14,10 @@ import { Column } from "primereact/column";
 import AuthContext from "../../Context/AuthProvider.jsx";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
-import TiempoRestante from "./TiempoRestante.jsx";
 import { Divider } from "primereact/divider";
 import { Card } from "primereact/card";
 import { Stripe } from "./Stripe.jsx";
+import TiempoRestante from "./TiempoRestante.jsx";
 const URL_USUARIOSCONTROLLER = "/usuarios";
 
 export default function BasicDemo() {
@@ -26,7 +26,22 @@ export default function BasicDemo() {
   const navigate = useNavigate();
   const toast = useRef(null);
   const [visible, setVisible] = useState(false); // Manejo Mensaje Fin de Reserva
-
+  const [asientosSeleccionados, setAsientosSeleccionados] = useState([]);
+  const [asientosVuelta, setAsientosVuelta] = useState([]);
+  const [datosUsuario, setDatosUsuario] = useState([]);
+  const { auth } = useContext(AuthContext);
+  // Datos de la busqueda
+  const location = useLocation();
+  const [viajeElegido, setViajeElegido] = useState("");
+  const [viajeElegidoVuelta, setViajeElegidoVuelta] = useState("");
+  const [compraIda, setCompraIda] = useState("");
+  const [compraVuelta, setCompraVuelta] = useState("");
+  const [descuentoIda, setDescuentoIda] = useState(0);
+  const [descuentoVuelta, setDescuentoVuelta] = useState(0);
+  const [montoDescuentoIda, setMontoDescuentoIda] = useState(0);
+  const [montoDescuentoVuelta, setMontoDescuentoVuelta] = useState(0);
+  const [precioConDescuentoIda, setPrecioConDescuentoIda] = useState(0);
+  const [precioConDescuentoVuelta, setPrecioConDescuentoVuelta] = useState(0);
   const footerContent = (
     <div>
       <Button
@@ -40,7 +55,10 @@ export default function BasicDemo() {
 
   const handlePagar = async (total) => {
     try {
-      const url = await Stripe(total);
+      const totalRedondeado = Number(total.toFixed(2));
+
+      const url = await Stripe(totalRedondeado);
+      localStorage.setItem("pagoIniciado", "true");
       window.location.href = url; // redirige a Stripe
     } catch (error) {
       console.error("Error al iniciar pago:", error);
@@ -48,15 +66,13 @@ export default function BasicDemo() {
     }
   };
 
-  // Estado compartido
-  const [asientosSeleccionados, setAsientosSeleccionados] = useState([]);
-  const [asientosVuelta, setAsientosVuelta] = useState([]);
-  const [datosUsuario, setDatosUsuario] = useState([]);
-  const { auth } = useContext(AuthContext);
-
   useEffect(() => {
-    console.log("auth", auth);
-    console.log("mail", auth.email);
+    const pagoIniciado = localStorage.getItem("pagoIniciado");
+    if (pagoIniciado === "true") {
+      localStorage.removeItem("pagoIniciado");
+      navigate("/Venta/PagoCancelado");
+    }
+
     axios
       .get(`${URL_USUARIOSCONTROLLER}/emails/`, {
         params: {
@@ -71,13 +87,6 @@ export default function BasicDemo() {
         console.error(err);
       });
   }, []);
-
-  // Datos de la busqueda
-  const location = useLocation();
-  const [viajeElegido, setViajeElegido] = useState("");
-  const [viajeElegidoVuelta, setViajeElegidoVuelta] = useState("");
-  const [compraIda, setCompraIda] = useState("");
-  const [compraVuelta, setCompraVuelta] = useState("");
 
   const {
     //pasajes,
@@ -173,8 +182,6 @@ export default function BasicDemo() {
     <>
       <NavBar />
       <Toast ref={toast} />
-      {console.log(viajes)}
-      {console.log("Datos user: ", datosUsuario)}
       <h2>
         {showTimer && (
           <TiempoRestante
@@ -210,14 +217,30 @@ export default function BasicDemo() {
                     headerStyle={{ width: "3rem" }}
                   ></Column>
                   <Column field="busId" header="Omnibus"></Column>
-                  <Column field="horaInicio" header="Hora Salida"></Column>
+                  <Column
+                    field="horaInicio"
+                    header="Hora Salida"
+                    body={(rowData) => rowData.horaInicio.substring(0, 5)}
+                  ></Column>
                   <Column
                     field="cantAsientosDisponibles"
                     header="Asientos Disponibles"
                   ></Column>
-                  <Column field="horaFin" header="Hora Llegada"></Column>
-                  <Column field="fechaFin" header="Hora Llegada"></Column>
-                  <Column field="precioPasaje" header="Precio"></Column>
+                  <Column
+                    field="horaFin"
+                    header="Hora Llegada"
+                    body={(rowData) => rowData.horaFin.substring(0, 5)}
+                  ></Column>
+                  <Column
+                    field="fechaFin"
+                    header="Fecha Llegada"
+                    body={(rowData) => formateaFecha(rowData.fechaFin)}
+                  ></Column>
+                  <Column
+                    field="precioPasaje"
+                    header="Precio"
+                    body={(rowData) => "$" + rowData.precioPasaje}
+                  ></Column>
                 </DataTable>
               </div>
             </div>
@@ -234,11 +257,6 @@ export default function BasicDemo() {
                 icon="pi pi-arrow-right"
                 iconPos="right"
                 onClick={() => {
-                  console.log(
-                    "fechaFormateada",
-                    formateaFecha(viajeElegido.fechaFin)
-                  );
-
                   setPasajeDataIda((prev) => ({
                     ...prev,
                     nombre: datosUsuario.nombre,
@@ -251,7 +269,6 @@ export default function BasicDemo() {
                   }));
 
                   stepperRef.current.nextCallback();
-                  console.log(pasajeDataIda);
                 }}
                 disabled={viajeElegido === ""}
               />
@@ -295,10 +312,6 @@ export default function BasicDemo() {
                     asientos: asientosSeleccionados,
                   }));
                   setLoading(true);
-                  console.log("Click comprado", asientosSeleccionados);
-                  console.log("usuarioId: ", datosUsuario.id);
-                  console.log("viajeId: ", viajeElegido.viajeId);
-                  console.log("asientos numero: ", asientosSeleccionados);
                   axios
                     .post(`${URL_USUARIOSCONTROLLER}/comprarPasaje`, {
                       usuarioId: datosUsuario.id,
@@ -308,10 +321,15 @@ export default function BasicDemo() {
                     })
                     .then((res) => {
                       console.log("Compra exitosa:", res.data);
-                      //startTimer;
-                      //setShowTimer(true);
                       handleStart();
                       setCompraIda(res.data.idCompra);
+                      setDescuentoIda(res.data.descuento);
+                      const montoIda =
+                        (viajeElegido.precioPasaje * res.data.descuento) / 100;
+                      setMontoDescuentoIda(montoIda);
+                      setPrecioConDescuentoIda(
+                        viajeElegido.precioPasaje - montoIda
+                      );
                       setLoading(false);
                       stepperRef.current.nextCallback();
                     })
@@ -322,12 +340,16 @@ export default function BasicDemo() {
                         err.response?.data || err.message
                       );
                       setLoading(false);
+                      let detail = "";
+                      if (err?.response?.status === 400) {
+                        detail =
+                          "Algunos asientos elegidos ya no estan disponibles:" +
+                          err.response.data.asientosOcupados;
+                      } else detail = err.response?.data.error;
                       toast.current.show({
                         severity: "error",
                         summary: "Error",
-                        detail:
-                          "Algunos asientos elegidos ya no estan disponibles:" +
-                          err.response.data.asientosOcupados,
+                        detail: detail,
                         life: 3000,
                       });
                     });
@@ -361,13 +383,30 @@ export default function BasicDemo() {
                       headerStyle={{ width: "3rem" }}
                     ></Column>
                     <Column field="busId" header="Omnibus"></Column>
-                    <Column field="horaInicio" header="Hora Salida"></Column>
+                    <Column
+                      field="horaInicio"
+                      header="Hora Salida"
+                      body={(rowData) => rowData.horaInicio.substring(0, 5)}
+                    ></Column>
                     <Column
                       field="cantAsientosDisponibles"
                       header="Asientos Disponibles"
                     ></Column>
-                    <Column field="horaFin" header="Hora Llegada"></Column>
-                    <Column field="precioPasaje" header="Precio"></Column>
+                    <Column
+                      field="horaFin"
+                      header="Hora Llegada"
+                      body={(rowData) => rowData.horaFin.substring(0, 5)}
+                    ></Column>
+                    <Column
+                      field="fechaFin"
+                      header="Fecha Llegada"
+                      body={(rowData) => formateaFecha(rowData.fechaFin)}
+                    ></Column>
+                    <Column
+                      field="precioPasaje"
+                      header="Precio"
+                      body={(rowData) => "$" + rowData.precioPasaje}
+                    ></Column>
                   </DataTable>
                 </div>
               </div>
@@ -395,7 +434,6 @@ export default function BasicDemo() {
                       precio: viajeElegidoVuelta.precioPasaje,
                     }));
                     stepperRef.current.nextCallback();
-                    console.log(pasajeDataIda);
                   }}
                   disabled={viajeElegidoVuelta === ""}
                 />
@@ -436,8 +474,8 @@ export default function BasicDemo() {
                       ...prev,
                       asientos: asientosVuelta,
                     }));
-                    console.log("Antes de call");
                     setLoading(true);
+
                     axios
                       .post(`${URL_USUARIOSCONTROLLER}/comprarPasaje`, {
                         usuarioId: datosUsuario.id,
@@ -448,22 +486,37 @@ export default function BasicDemo() {
                       .then((res) => {
                         console.log("Compra exitosa:", res.data);
                         setCompraVuelta(res.data.idCompra);
-                        console.log("aca");
+                        setDescuentoVuelta(res.data.descuento);
+                        const montoVuelta =
+                          (viajeElegidoVuelta.precioPasaje *
+                            res.data.descuento) /
+                          100;
+                        setMontoDescuentoVuelta(montoVuelta);
+
+                        setPrecioConDescuentoVuelta(
+                          viajeElegidoVuelta.precioPasaje - montoVuelta
+                        );
+
                         setLoading(false);
                         stepperRef.current.nextCallback();
                       })
                       .catch((err) => {
-                        //console.error(
-                        //  "Error al comprar:",
-                        //  err.response.data.asientosOcupados,
-                        //  err.response?.data || err.message
-                        //);
+                        console.error(
+                          "Error al comprar:",
+                          err.response.data.asientosOcupados,
+                          err.response?.data || err.message
+                        );
+                        setLoading(false);
+                        let detail = "";
+                        if (err?.response?.status === 400) {
+                          detail =
+                            "Algunos asientos elegidos ya no estan disponibles:" +
+                            err.response.data.asientosOcupados;
+                        } else detail = err.response?.data.error;
                         toast.current.show({
                           severity: "error",
                           summary: "Error",
-                          detail:
-                            "Algunos asientos elegidos ya no estan disponibles:" +
-                            err.response.data.asientosOcupados,
+                          detail: detail,
                           life: 3000,
                         });
                       });
@@ -506,7 +559,8 @@ export default function BasicDemo() {
                 </p>
 
                 <p>
-                  <strong>Hora de Salida:</strong> {pasajeDataIda.horaSalida}
+                  <strong>Hora de Salida:</strong>{" "}
+                  {pasajeDataIda.horaSalida.substring(0, 5)}
                 </p>
 
                 <p>
@@ -514,13 +568,48 @@ export default function BasicDemo() {
                 </p>
 
                 <p>
-                  <strong>Hora de Arribo:</strong> {pasajeDataIda.horaArribo}
+                  <strong>Hora de Arribo:</strong>{" "}
+                  {pasajeDataIda.horaArribo.substring(0, 5)}
                 </p>
 
                 <p>
                   <strong>Asientos seleccionados:</strong>{" "}
                   {asientosSeleccionados.join(", ")}
                 </p>
+                {datosUsuario.categoria === "GENERAL" ? (
+                  <p>
+                    <>
+                      <strong>Precio por pasaje:</strong> {"  $"}
+                      {pasajeDataIda.precio}
+                      <p>
+                        <strong>Total a Pagar:</strong> {"  $"}
+                        {pasajeDataIda.precio * asientosSeleccionados.length}
+                      </p>
+                    </>
+                  </p>
+                ) : (
+                  <>
+                    <p>
+                      <strong>Precio por pasaje:</strong> {"  $"}
+                      {pasajeDataIda.precio}
+                    </p>
+                    <p>
+                      <strong>Descuento Estudiante</strong> (-{descuentoIda}%)
+                      <strong>:</strong>
+                      {"  $"}
+                      {montoDescuentoIda}
+                    </p>
+
+                    <p>
+                      <strong>Precio con descuento:</strong> {"  $"}
+                      {precioConDescuentoIda}
+                    </p>
+                    <p>
+                      <strong>Total a Pagar:</strong> {"  $"}
+                      {precioConDescuentoIda * asientosSeleccionados.length}
+                    </p>
+                  </>
+                )}
               </Card>
               <Divider />
               {esIdaVuelta ? (
@@ -532,7 +621,7 @@ export default function BasicDemo() {
 
                   <p>
                     <strong>Hora de Salida:</strong>{" "}
-                    {pasajeDataVuelta.horaSalida}
+                    {pasajeDataVuelta.horaSalida.substring(0, 5)}
                   </p>
 
                   <p>
@@ -542,13 +631,48 @@ export default function BasicDemo() {
 
                   <p>
                     <strong>Hora de Arribo:</strong>{" "}
-                    {pasajeDataVuelta.horaArribo}
+                    {pasajeDataVuelta.horaArribo.substring(0, 5)}
                   </p>
 
                   <p>
                     <strong>Asientos seleccionados:</strong>{" "}
                     {asientosVuelta.join(", ")}
                   </p>
+                  {datosUsuario.categoria === "GENERAL" ? (
+                    <p>
+                      <>
+                        <strong>Precio por pasaje:</strong> {"  $"}
+                        {pasajeDataVuelta.precio}
+                        <p>
+                          <strong>Total a Pagar:</strong> {"  $"}
+                          {pasajeDataVuelta.precio * asientosVuelta.length}
+                        </p>
+                      </>
+                    </p>
+                  ) : (
+                    <>
+                      <p>
+                        <strong>Precio por pasaje:</strong> {"  $"}
+                        {pasajeDataVuelta.precio}
+                      </p>
+                      <p>
+                        <strong>Descuento Estudiante</strong> (-
+                        {descuentoVuelta}%)
+                        <strong>:</strong>
+                        {"  $"}
+                        {montoDescuentoVuelta}
+                      </p>
+
+                      <p>
+                        <strong>Precio con descuento:</strong> {"  $"}
+                        {precioConDescuentoVuelta}
+                      </p>
+                      <p>
+                        <strong>Total a Pagar:</strong> {"  $"}
+                        {precioConDescuentoVuelta * asientosVuelta.length}
+                      </p>
+                    </>
+                  )}
                 </Card>
               ) : (
                 ""
@@ -571,16 +695,33 @@ export default function BasicDemo() {
                 iconPos="right"
                 style={{ marginTop: "1rem" }}
                 onClick={() => {
-                  let total =
-                    pasajeDataIda.precio * asientosSeleccionados.length;
-                  if (pasajeDataVuelta) {
-                    total +=
-                      pasajeDataVuelta.precio * asientosSeleccionados.length;
+                  let total = 0;
+                  let ida, vuelta;
+                  if (datosUsuario.categoria != "GENERAL") {
+                    total =
+                      precioConDescuentoIda * asientosSeleccionados.length;
+                    ida = { ...pasajeDataIda, precio: precioConDescuentoIda };
+                    if (pasajeDataVuelta) {
+                      vuelta = {
+                        ...pasajeDataVuelta,
+                        precio: precioConDescuentoVuelta,
+                      };
+                      total +=
+                        precioConDescuentoVuelta * asientosSeleccionados.length;
+                    }
+                  } else {
+                    ida = pasajeDataIda;
+                    vuelta = pasajeDataVuelta;
+                    total = pasajeDataIda.precio * asientosSeleccionados.length;
+                    if (vuelta) {
+                      total +=
+                        pasajeDataVuelta.precio * asientosSeleccionados.length;
+                    }
                   }
                   localStorage.setItem(
                     "dataIDA",
                     JSON.stringify({
-                      pasajeData: pasajeDataIda,
+                      pasajeData: ida,
                     })
                   );
                   localStorage.setItem("esIdayVuelta", esIdaVuelta);
@@ -589,7 +730,7 @@ export default function BasicDemo() {
                   localStorage.setItem(
                     "dataVUELTA",
                     JSON.stringify({
-                      pasajeData: pasajeDataVuelta,
+                      pasajeData: vuelta,
                     })
                   );
                   {

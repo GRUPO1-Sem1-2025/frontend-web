@@ -8,13 +8,6 @@ const URL_BUSESCONTROLLER = "/buses";
 const URL_VIAJESCONTROLLER = "/viajes";
 
 const cargarAsientos = async (idBus) => {
-  /*try {
-    const response = await axios.get(
-      `${URL_BUSESCONTROLLER}/obtenerOmnibusActivos`
-    );
-    const omnibus = response.data.find((o) => o.id === idBus);
-    return omnibus.cant_asientos;
-  } catch {}*/
   try {
     const response = await axios.get(
       `${URL_BUSESCONTROLLER}/obtenerOmnibusPorId`,
@@ -22,10 +15,9 @@ const cargarAsientos = async (idBus) => {
         params: { idBus },
       }
     );
-    console.log(response.data); // Aquí recibís el objeto DtoBus
     return response.data.cant_asientos;
   } catch {
-    console.log("Cagada");
+    console.log("Error");
   }
 };
 
@@ -89,22 +81,17 @@ export default function SeleccionAsientos({
 
   const renderAsientos = () => {
     const filas = Math.ceil(cantAsientos / (2 * columnasPorLado)); // Redondea para arriba, filas completas necesarias + 1
-    console.log("desde func", cantAsientos);
-    console.log("aLibres", asientosLibres);
-    console.log("filas: ", filas);
+
     const rows = [];
     let asientoCount = 1; // Inicia el contador de asientos
 
     for (let i = 0; i < filas; i++) {
       const row = [];
-      console.log("fila: ", i);
-      console.log("row: ", row);
 
       // Lado izquierdo
       for (let j = 0; j < columnasPorLado; j++) {
         if (asientoCount > cantAsientos) break;
         const asiento = asientoCount++;
-        console.log("cont:Asiento: ", asiento);
         const ocupado = asientosOcupados.includes(asiento);
         const seleccionado = seleccionados.includes(asiento);
 
@@ -146,7 +133,6 @@ export default function SeleccionAsientos({
           );
         } else {
           const asiento = asientoCount++;
-          console.log("cont_siento: ", asiento);
           const ocupado = asientosOcupados.includes(asiento);
           const seleccionado = seleccionados.includes(asiento);
 
@@ -185,7 +171,6 @@ export default function SeleccionAsientos({
         </div>
       );
     }
-    console.log("rows: ", rows);
     return rows;
   };
 

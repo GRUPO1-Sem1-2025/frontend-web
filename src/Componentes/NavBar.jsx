@@ -63,6 +63,11 @@ const NavBar = () => {
       command: () => navigate("/perfil"),
     },
     {
+      label: "Mis Viajes",
+      icon: "pi pi-user",
+      command: () => navigate("/viajesUsuario"),
+    },
+    {
       label: "Cerrar sesión",
       icon: "pi pi-sign-out",
       command: logout,
@@ -78,7 +83,16 @@ const NavBar = () => {
         style={{ backgroundColor: "#2196F3", color: "#fff", cursor: "pointer" }}
         onClick={(e) => menuRef.current.toggle(e)}
       />
-      <span style={{ fontWeight: "500", color: "#333", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+      <span
+        style={{
+          fontWeight: "500",
+          color: "#333",
+          maxWidth: "150px",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
         {auth?.nombreUsuario || "Usuario"}
       </span>
       <Menu model={menuItems} popup ref={menuRef} />

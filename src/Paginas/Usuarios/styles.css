@@ -1,0 +1,4 @@
+.spinner-cargando .p-progress-spinner-circle {
+  stroke: #69c8f1 !important;
+  animation: none !important;
+}

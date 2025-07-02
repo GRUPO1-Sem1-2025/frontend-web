@@ -13,6 +13,7 @@ export default function Stripe() {
   const compraVuelta = localStorage.getItem("compraVuelta");
 
   useEffect(() => {
+    localStorage.removeItem("pagoIniciado");
     const cancelarCompra = async () => {
       if (calledRef.current) return; // ya se llamó, salimos
       calledRef.current = true;
