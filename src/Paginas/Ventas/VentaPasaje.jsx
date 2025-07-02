@@ -742,7 +742,7 @@ export default function BasicDemo() {
           </StepperPanel>
         </Stepper>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

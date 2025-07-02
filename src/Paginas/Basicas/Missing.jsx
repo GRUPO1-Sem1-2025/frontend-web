@@ -19,7 +19,7 @@ const Missing = () => {
                     ¿Querés volver al inicio o ingresar con tu cuenta?
                 </p>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-                    <Link to="/dashboard">
+                    <Link to="/">
                         <Button label="Ir al menú" icon="pi pi-home" severity="primary" />
                     </Link>
                     <Link to="/ingresar">
