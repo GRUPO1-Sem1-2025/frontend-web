@@ -89,7 +89,6 @@ export default function BasicDemo() {
   }, []);
 
   const {
-    //pasajes,
     esIdaVuelta,
     lugarOrigen,
     idOrigen,
@@ -114,6 +113,7 @@ export default function BasicDemo() {
     fechaArribo: "",
     horaArribo: "",
     via: "web",
+    categoria: "",
   });
 
   const [pasajeDataVuelta, setPasajeDataVuelta] = useState({
@@ -129,6 +129,7 @@ export default function BasicDemo() {
     fechaArribo: "",
     horaArribo: "",
     via: "web",
+    categoria: "",
   });
   const [showTimer, setShowTimer] = useState(false);
   const [startTimer, setStartTimer] = useState(false);
@@ -262,6 +263,7 @@ export default function BasicDemo() {
                     nombre: datosUsuario.nombre,
                     apellido: datosUsuario.apellido,
                     ci: datosUsuario.ci,
+                    categoria: datosUsuario.categoria,
                     horaArribo: viajeElegido.horaFin,
                     horaSalida: viajeElegido.horaInicio,
                     fechaArribo: formateaFecha(viajeElegido.fechaFin),
@@ -354,7 +356,7 @@ export default function BasicDemo() {
                       });
                     });
                 }}
-                disabled={asientosSeleccionados.length === 0} // Boton deshabilitado si no tiene asientos elegidos
+                disabled={asientosSeleccionados.length === 0}
               />
             </div>
           </StepperPanel>
@@ -428,6 +430,7 @@ export default function BasicDemo() {
                       nombre: datosUsuario.nombre,
                       apellido: datosUsuario.apellido,
                       ci: datosUsuario.ci,
+                      categoria: datosUsuario.categoria,
                       horaArribo: viajeElegidoVuelta.horaFin,
                       horaSalida: viajeElegidoVuelta.horaInicio,
                       fechaArribo: formateaFecha(viajeElegidoVuelta.fechaFin),
@@ -523,7 +526,7 @@ export default function BasicDemo() {
                   }}
                   disabled={
                     asientosVuelta.length !== asientosSeleccionados.length
-                  } // Boton deshabilitado si no tiene asientos elegidos
+                  }
                 />
               </div>
             </StepperPanel>

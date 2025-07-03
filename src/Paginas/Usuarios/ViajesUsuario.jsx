@@ -6,6 +6,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import Calificar from "./CalificarViaje.jsx";
 import imprimirPasaje from "../Ventas/printPasaje.jsx";
@@ -28,13 +29,13 @@ const Home = () => {
   const formateaFecha = (fecha) => {
     const [year, month, day] = fecha.split("-");
     const dia = +day + 1;
-    const fechaFormateada = `${dia}/${month}/${year}`; // "19/06/2025"
+    const fechaFormateada = `${dia}/${month}/${year}`;
     return fechaFormateada;
   };
 
   const compararFechas = (fechaAComparar) => {
-    const fechaViaje = new Date(fechaAComparar); // Convertimos el string a Date
-    const hoy = new Date(); // Fecha actual
+    const fechaViaje = new Date(fechaAComparar);
+    const hoy = new Date();
 
     // Eliminar la parte de hora para comparar solo por fecha:
     fechaViaje.setHours(0, 0, 0, 0);
@@ -62,11 +63,38 @@ const Home = () => {
 
       const url = await Stripe(totalRedondeado);
       localStorage.setItem("pagoIniciado", "true");
-      window.location.href = url; // redirige a Stripe
+      window.location.href = url;
     } catch (error) {
       console.error("Error al iniciar pago:", error);
       alert("Hubo un error al iniciar el pago.");
     }
+  };
+
+  const cancelarReserva = async (viaje) => {
+    try {
+      await axios.post(`${URL_USUARIOSCONTROLLER}/cancelarCompra`, null, {
+        params: {
+          idCompra: viaje,
+        },
+      });
+      mostrarToast("Se cancelo la reserva: ", "success", "Exito");
+      await cargarReservas(datosUsuario.id);
+    } catch (error) {
+      mostrarToast("Hubo un problema cancelando la reserva", "error", "Error");
+      console.error("Error cancelando ida:", error);
+    }
+  };
+
+  const handleCancelar = async (viaje) => {
+    confirmDialog({
+      message: "Quiere cancelar la reserva?",
+      header: "Atención",
+      icon: "pi pi-exclamation-triangle",
+      defaultFocus: "accept",
+      acceptLabel: "Sí",
+      rejectLabel: "No",
+      accept: () => cancelarReserva(viaje),
+    });
   };
 
   const cargarViajes = async () => {
@@ -162,7 +190,6 @@ const Home = () => {
         });
         const user = response.data.OK;
         setDatosUsuario(user);
-
         await cargarViajes();
         await cargarReservas(user.id);
       } catch (err) {
@@ -177,6 +204,7 @@ const Home = () => {
   return (
     <>
       <Toast ref={toast} />
+      <ConfirmDialog />
       <NavBar />
       <div className="flex flex-column h-12rem">
         <div className="card">
@@ -187,8 +215,6 @@ const Home = () => {
             paginator
             rows={5}
             selectionMode="button"
-            //selection={viajeElegido}
-            //onSelectionChange={(e) => setViajeElegido(e.value)}
             dataKey="indice"
             tableStyle={{ minWidth: "50rem" }}
             filterDisplay="row"
@@ -306,7 +332,23 @@ const Home = () => {
                     localStorage.setItem("esIdayVuelta", false);
                     localStorage.setItem("compraIda", rowData.compraId);
                     handlePagar(rowData.precio);
-                    imprimirPasaje(data);
+                  }}
+                />
+              )}
+            ></Column>
+
+            <Column
+              headerStyle={{ width: "3rem" }}
+              body={(rowData) => (
+                <Button
+                  className="cancelar-button"
+                  icon="pi pi-times"
+                  rounded
+                  severity="danger"
+                  tooltip="Cancelar Reserva"
+                  tooltipOptions={{ position: "top" }}
+                  onClick={() => {
+                    handleCancelar(rowData.compraId);
                   }}
                 />
               )}
@@ -324,8 +366,6 @@ const Home = () => {
             paginator
             rows={5}
             selectionMode="button"
-            //selection={viajeElegido}
-            //onSelectionChange={(e) => setViajeElegido(e.value)}
             dataKey="indice"
             tableStyle={{ minWidth: "50rem" }}
             filterDisplay="row"
@@ -452,7 +492,8 @@ const Home = () => {
                       horaSalida: rowData.horaInicio,
                       fechaArribo: formateaFecha(rowData.fechaFin),
                       horaArribo: rowData.horaFin,
-                      via: "web",
+                      via: "Web",
+                      categoria: datosUsuario.categoria,
                     };
                     imprimirPasaje(data);
                   }}
@@ -477,7 +518,6 @@ const Home = () => {
             setVisible(false);
           }}
         >
-          {console.log("viaje: ", viaje)}
           <Calificar
             viaje={viaje}
             usuario={datosUsuario.id}

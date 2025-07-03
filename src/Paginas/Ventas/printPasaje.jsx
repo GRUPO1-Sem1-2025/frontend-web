@@ -43,6 +43,7 @@ export default function imprimirPasaje(pasaje) {
         columns: [
           { text: "Nombre: " + pasaje.nombre + " " + pasaje.apellido },
           { text: "C.I.: " + pasaje.ci },
+          { text: "Categoría: " + pasaje.categoria },
         ],
       },
       { text: "\n" },
