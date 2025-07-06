@@ -212,6 +212,7 @@ const Home = () => {
             value={reservas}
             header={<h3 style={{ textAlign: "center" }}>Mis Reservas</h3>}
             loading={loading}
+            stripedRows
             paginator
             rows={5}
             selectionMode="button"
@@ -363,6 +364,7 @@ const Home = () => {
             value={viajes}
             header={<h3 style={{ textAlign: "center" }}>Mis Viajes</h3>}
             loading={loading}
+            stripedRows
             paginator
             rows={5}
             selectionMode="button"

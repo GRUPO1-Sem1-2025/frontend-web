@@ -210,6 +210,7 @@ export default function BasicDemo() {
                   selectionMode="radiobutton"
                   selection={viajeElegido}
                   onSelectionChange={(e) => setViajeElegido(e.value)}
+                  stripedRows
                   dataKey="viajeId"
                   tableStyle={{ minWidth: "50rem" }}
                 >
@@ -378,6 +379,7 @@ export default function BasicDemo() {
                     selection={viajeElegidoVuelta}
                     onSelectionChange={(e) => setViajeElegidoVuelta(e.value)}
                     dataKey="viajeId"
+                    stripedRows
                     tableStyle={{ minWidth: "50rem" }}
                   >
                     <Column

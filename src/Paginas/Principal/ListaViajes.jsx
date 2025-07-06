@@ -62,6 +62,7 @@ const ListaViajes = () => {
             value={viajesAgrupados}
             header={<h3 style={{ textAlign: "center" }}>Viajes Disponibles</h3>}
             loading={loading}
+            stripedRows
             paginator
             rows={10}
             selectionMode="button"
@@ -133,6 +134,10 @@ const ListaViajes = () => {
               filterPlaceholder="Precio"
               filterMatchMode="startsWith"
               showFilterMenu={false}
+            ></Column>
+            <Column
+              field="asientosLibres"
+              header="Asientos Disponibles"
             ></Column>
           </DataTable>
         </div>
