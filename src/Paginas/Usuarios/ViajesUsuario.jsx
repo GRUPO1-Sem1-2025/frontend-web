@@ -28,7 +28,7 @@ const Home = () => {
 
   const formateaFecha = (fecha) => {
     const [year, month, day] = fecha.split("-");
-    const dia = +day + 1;
+    const dia = +day;
     const fechaFormateada = `${dia}/${month}/${year}`;
     return fechaFormateada;
   };

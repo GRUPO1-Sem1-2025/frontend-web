@@ -83,7 +83,7 @@ const Home = () => {
   const yaPidioPermiso = useRef(false);
 
   // 🚀 Pedir permiso de notificaciones y registrar token
-  /*
+
   useEffect(() => {
     if (auth?.token && auth?.id && !yaPidioPermiso.current) {
       yaPidioPermiso.current = true;
@@ -103,7 +103,6 @@ const Home = () => {
         });
     }
   }, [auth]);
-*/
 
   useEffect(() => {
     if (auth?.token && !yaPidioPermiso.current) {

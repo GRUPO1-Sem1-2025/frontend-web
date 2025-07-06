@@ -29,6 +29,7 @@ const NavBar = () => {
 
   const items = [
     { label: "Home", icon: "pi pi-home", url: "/" },
+    { label: "Lista Viajes", icon: "pi pi-list", url: "/listaViajes" },
     // { label: "Perfil", icon: "pi pi-user", url: "/perfil" },
   ];
 
