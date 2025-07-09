@@ -24,6 +24,7 @@ export default function Print() {
   const compraVuelta = localStorage.getItem("compraVuelta");
   const calledRef = useRef(false);
 
+  const refPago = localStorage.getItem("pi_id");
   useEffect(() => {
     localStorage.removeItem("pagoIniciado");
     const confirmarCompra = async () => {
@@ -46,10 +47,30 @@ export default function Print() {
                 headers: { "Content-Type": "application/json" },
               }
             );
+            // Empieza Nuevo
+            const params = new URLSearchParams();
+            params.append("idCompra", compraVuelta);
+            params.append("referencia", refPago);
+
+            await axios.post(
+              `${URL_USUARIOSCONTROLLER}/guardarReferenciaPago`,
+              params
+            );
+            // Termina Nuevo
           } catch (error) {
             console.error("Error compra Vuelta:", error);
           }
         }
+        // Empieza Nuevo
+        const params = new URLSearchParams();
+        params.append("idCompra", compraIda);
+        params.append("referencia", localStorage.getItem("pi_id"));
+        console.log("ref:", refPago);
+        await axios.post(
+          `${URL_USUARIOSCONTROLLER}/guardarReferenciaPago`,
+          params
+        );
+        // Termina Nuevo
       } catch (error) {
         console.error("Error compra Ida:", error);
       }
@@ -62,6 +83,8 @@ export default function Print() {
     localStorage.removeItem("esIdayVuelta");
     localStorage.removeItem("compraIda");
     localStorage.removeItem("compraVuelta");
+    localStorage.removeItem("pi_id"); // Nuevo
+    console.log("--END--");
   }, []);
 
   return (

@@ -16,6 +16,7 @@ export async function Stripe(monto) {
   ); // en centavos
   params.append("line_items[0][quantity]", "1");
 
+  params.append("expand[]", "payment_intent");
   const response = await fetch(`${STRIPE_API_URL}/v1/checkout/sessions`, {
     method: "POST",
     headers: {
@@ -26,6 +27,7 @@ export async function Stripe(monto) {
   });
 
   const data = await response.json();
+  localStorage.setItem("pi_id", data.payment_intent.id); // Nuevo
 
   if (!response.ok || !data.url) {
     throw new Error(
