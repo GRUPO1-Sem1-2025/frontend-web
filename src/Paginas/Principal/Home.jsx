@@ -13,7 +13,6 @@ import { Calendar } from "primereact/calendar";
 import { CascadeSelect } from "primereact/cascadeselect";
 import { FloatLabel } from "primereact/floatlabel";
 import { addLocale } from "primereact/api";
-import { Dropdown } from "primereact/dropdown";
 
 // Firebase
 import { solicitarPermisoYObtenerToken } from "../../firebase-token"; // Ajusta si cambia la ruta
