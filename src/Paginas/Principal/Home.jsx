@@ -156,15 +156,6 @@ const Home = () => {
     cargar();
   }, []);
 
-  useEffect(() => {
-    axios
-      .get(`${URL_LOCALIDADESCONTROLLER}/obtenerLocalidadesActivas`)
-      .then((res) => setLocalidades(res.data))
-      .catch((err) => {
-        console.error("Error al cargar localidades", err);
-      });
-  }, []);
-
   const porDepartamento = [];
   localidades.forEach((loc) => {
     let grupo = porDepartamento.find((g) => g.name === loc.departamento);
