@@ -3,6 +3,7 @@ export async function Stripe(monto) {
   const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
   const params = new URLSearchParams();
   params.append("success_url", "https://tecnobus.uy/Venta/CompraExitosa");
+
   params.append("cancel_url", "https://tecnobus.uy/Venta/PagoCancelado");
   params.append("mode", "payment");
   params.append("line_items[0][price_data][currency]", "uyu");

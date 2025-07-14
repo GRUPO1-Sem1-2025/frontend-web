@@ -461,10 +461,17 @@ const Home = () => {
                   aria-label="Bookmark"
                   tooltip="Calificar viaje"
                   tooltipOptions={{ position: "top" }}
-                  disabled={compararFechas(rowData.fechaFin)}
                   onClick={() => {
-                    setViaje(rowData.viajeId);
-                    setVisible(true);
+                    if (compararFechas(rowData.fechaFin)) {
+                      mostrarToast(
+                        "No puedes calificar un viaje que aún no realizaste",
+                        "error",
+                        "Error"
+                      );
+                    } else {
+                      setViaje(rowData.viajeId);
+                      setVisible(true);
+                    }
                   }}
                 />
               )}
@@ -506,11 +513,6 @@ const Home = () => {
         </div>
       </div>
       <div className="card flex justify-content-center">
-        <Button
-          label="Show"
-          icon="pi pi-external-link"
-          onClick={() => setVisible(true)}
-        />
         <Dialog
           header="Calificar Viaje"
           visible={visible}

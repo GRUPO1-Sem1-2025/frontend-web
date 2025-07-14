@@ -5,6 +5,7 @@ import NavBar from "../../Componentes/NavBar.jsx";
 import Footer from "../../Componentes/Footer.jsx";
 import axios from "../../Configuraciones/axios.js";
 import { Toast } from "primereact/toast";
+import { obtenerLocalidadesAgrupadas } from "../../Servicios/LocalidadesServicio.js";
 
 // PrimeReact
 import { Button } from "primereact/button";
@@ -12,6 +13,7 @@ import { Calendar } from "primereact/calendar";
 import { CascadeSelect } from "primereact/cascadeselect";
 import { FloatLabel } from "primereact/floatlabel";
 import { addLocale } from "primereact/api";
+import { Dropdown } from "primereact/dropdown";
 
 // Firebase
 import { solicitarPermisoYObtenerToken } from "../../firebase-token"; // Ajusta si cambia la ruta
@@ -145,6 +147,15 @@ const Home = () => {
         });
     }
   }, [auth]);
+
+  useEffect(() => {
+    const cargar = async () => {
+      const agrupadas = await obtenerLocalidadesAgrupadas(auth.token);
+      console.log(agrupadas);
+      setLocalidades(agrupadas);
+    };
+    cargar();
+  }, []);
 
   useEffect(() => {
     axios
@@ -418,10 +429,10 @@ const Home = () => {
               <CascadeSelect
                 value={locOrigen}
                 onChange={(e) => setLocOrigen(e.value)}
-                options={porDepartamento}
-                optionLabel="cname"
+                options={localidades}
+                optionLabel="name"
                 optionGroupLabel="name"
-                optionGroupChildren={["items"]}
+                optionGroupChildren={["localidades"]}
                 style={{ minWidth: "14rem" }}
               />
               <label>Origen</label>
@@ -431,10 +442,10 @@ const Home = () => {
               <CascadeSelect
                 value={locDestino}
                 onChange={(e) => setLocDestino(e.value)}
-                options={porDepartamento}
-                optionLabel="cname"
+                options={localidades}
+                optionLabel="name"
                 optionGroupLabel="name"
-                optionGroupChildren={["items"]}
+                optionGroupChildren={["localidades"]}
                 style={{ minWidth: "14rem" }}
               />
               <label>Destino</label>

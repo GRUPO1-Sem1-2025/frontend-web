@@ -47,7 +47,6 @@ export default function Print() {
                 headers: { "Content-Type": "application/json" },
               }
             );
-            // Empieza Nuevo
             const params = new URLSearchParams();
             params.append("idCompra", compraVuelta);
             params.append("referencia", refPago);
@@ -56,21 +55,19 @@ export default function Print() {
               `${URL_USUARIOSCONTROLLER}/guardarReferenciaPago`,
               params
             );
-            // Termina Nuevo
           } catch (error) {
             console.error("Error compra Vuelta:", error);
           }
         }
-        // Empieza Nuevo
         const params = new URLSearchParams();
         params.append("idCompra", compraIda);
-        params.append("referencia", localStorage.getItem("pi_id"));
+        params.append("referencia", refPago);
         console.log("ref:", refPago);
+        console.log("4", compraIda, refPago);
         await axios.post(
           `${URL_USUARIOSCONTROLLER}/guardarReferenciaPago`,
           params
         );
-        // Termina Nuevo
       } catch (error) {
         console.error("Error compra Ida:", error);
       }
@@ -83,7 +80,7 @@ export default function Print() {
     localStorage.removeItem("esIdayVuelta");
     localStorage.removeItem("compraIda");
     localStorage.removeItem("compraVuelta");
-    localStorage.removeItem("pi_id"); // Nuevo
+    localStorage.removeItem("pi_id");
     console.log("--END--");
   }, []);
 

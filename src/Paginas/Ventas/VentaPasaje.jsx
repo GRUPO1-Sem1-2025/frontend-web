@@ -315,17 +315,27 @@ export default function BasicDemo() {
                     asientos: asientosSeleccionados,
                   }));
                   setLoading(true);
+                  console.log(auth.tok);
                   axios
-                    .post(`${URL_USUARIOSCONTROLLER}/comprarPasaje`, {
-                      usuarioId: datosUsuario.id,
-                      viajeId: viajeElegido.viajeId,
-                      numerosDeAsiento: asientosSeleccionados,
-                      estadoCompra: "RESERVADA",
-                    })
+                    .post(
+                      `${URL_USUARIOSCONTROLLER}/comprarPasaje`,
+                      {
+                        usuarioId: datosUsuario.id,
+                        viajeId: viajeElegido.viajeId,
+                        numerosDeAsiento: asientosSeleccionados,
+                        estadoCompra: "RESERVADA",
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${auth.token}`,
+                        },
+                      }
+                    )
                     .then((res) => {
                       console.log("Compra exitosa:", res.data);
                       handleStart();
                       setCompraIda(res.data.idCompra);
+                      console.log("compra ida", res.data);
                       setDescuentoIda(res.data.descuento);
                       const montoIda =
                         (viajeElegido.precioPasaje * res.data.descuento) / 100;
@@ -482,12 +492,20 @@ export default function BasicDemo() {
                     setLoading(true);
 
                     axios
-                      .post(`${URL_USUARIOSCONTROLLER}/comprarPasaje`, {
-                        usuarioId: datosUsuario.id,
-                        viajeId: viajeElegidoVuelta.viajeId,
-                        numerosDeAsiento: asientosVuelta,
-                        estadoCompra: "RESERVADA",
-                      })
+                      .post(
+                        `${URL_USUARIOSCONTROLLER}/comprarPasaje`,
+                        {
+                          usuarioId: datosUsuario.id,
+                          viajeId: viajeElegidoVuelta.viajeId,
+                          numerosDeAsiento: asientosVuelta,
+                          estadoCompra: "RESERVADA",
+                        },
+                        {
+                          headers: {
+                            Authorization: `Bearer ${auth.token}`,
+                          },
+                        }
+                      )
                       .then((res) => {
                         console.log("Compra exitosa:", res.data);
                         setCompraVuelta(res.data.idCompra);
