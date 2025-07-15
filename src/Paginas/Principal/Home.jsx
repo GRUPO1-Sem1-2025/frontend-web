@@ -276,6 +276,8 @@ const Home = () => {
             height: "100%",
             objectFit: "cover",
             zIndex: -1,
+            filter: "blur(8px)",
+            transform: "translateZ(0)"
           }}
         >
           <source src="buses1.mp4" type="video/mp4" />

@@ -89,25 +89,23 @@ const Login = () => {
             overflow: 'hidden',
             fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`
         }}>
-            {/* Video de fondo */}
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                style={{
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    top: 0,
-                    left: 0,
-                    zIndex: -1
-                }}
-            >
-                <source src="/buses2.mp4" type="video/mp4" />
-                Tu navegador no soporta el video.
-            </video>
+
+            {/* Imagen de fondo */}
+            <img
+            src="/terminal.png"
+            alt="Terminal de ómnibus"
+            style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover', // llena todo el contenedor sin deformarse
+                top: 0,
+                left: 0,
+                zIndex: -1,
+                filter: 'blur(4px)',   // ← opcional: quita esta línea si no quieres blur
+                transform: 'translateZ(0)' // opcional: ayuda a suavizar el blur en algunos navegadores
+            }}
+            />
 
             {/* Contenedor del login centrado */}
             <div style={{
