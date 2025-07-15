@@ -1,3 +1,4 @@
+// src/Paginas/PerfilUsuario.jsx
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import NavBar from '../../Componentes/NavBar';
 import { Button } from 'primereact/button';
@@ -8,19 +9,31 @@ import { Toast } from 'primereact/toast';
 import axios from 'axios';
 import AuthContext from '../../Context/AuthProvider';
 
-const logoSrc = "/tecnobus.png";
+const logoSrc = '/tecnobus.png';
 
-const Perfil = () => {
+/* ────────────────────────────────────────── *
+ * Utilidades de fecha                        *
+ * ────────────────────────────────────────── */
+
+/** Convierte "YYYY-MM-DD" a "DD-MM-YYYY" para mostrar. */
+const formatoMostrar = (iso) => {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('T')[0].split('-'); // por si viene con hora
+    return `${d}-${m}-${y}`;
+};
+
+const PerfilUsuario = () => {
     const { setAuth } = useContext(AuthContext);
     const toast = useRef(null);
 
+    /* ─────────── State ─────────── */
     const [usuario, setUsuario] = useState({
         id: null,
         nombre: '',
         apellido: '',
         email: '',
         cedula: '',
-        fechaNacimiento: '',
+        fechaNacimiento: '', // guardado siempre en formato ISO YYYY-MM-DD
     });
 
     const [editando, setEditando] = useState({
@@ -31,6 +44,7 @@ const Perfil = () => {
         fechaNacimiento: false,
     });
 
+    /* ─────────── Cargar datos al montar ─────────── */
     useEffect(() => {
         const cargarUsuario = async () => {
             try {
@@ -38,35 +52,34 @@ const Perfil = () => {
                 if (!storedAuth) return;
 
                 const { email } = JSON.parse(storedAuth);
-                const response = await axios.get(`https://backend.tecnobus.uy/usuarios/emails/?email=${email}`);
-                const data = response.data.OK;
+                const { data } = await axios.get(
+                    `https://backend.tecnobus.uy/usuarios/emails/?email=${email}`,
+                );
+                const u = data.OK;
 
                 setUsuario({
-                    id: data.id || null,
-                    nombre: data.nombre || '',
-                    apellido: data.apellido || '',
-                    email: data.email || '',
-                    cedula: data.ci || '',
-                    fechaNacimiento: data.fechaNac || '',
+                    id: u.id ?? null,
+                    nombre: u.nombre ?? '',
+                    apellido: u.apellido ?? '',
+                    email: u.email ?? '',
+                    cedula: u.ci ?? '',
+                    fechaNacimiento: u.fechaNac ?? '',
                 });
-
-                console.log("ID del usuario cargado:", data.id);
-
-            } catch (error) {
-                console.error("Error al cargar el usuario:", error);
+            } catch (err) {
+                console.error('Error al cargar el usuario:', err);
             }
         };
 
         cargarUsuario();
     }, []);
 
+    /* ─────────── Handlers ─────────── */
     const handleInputChange = (e, campo) => {
-        const val = e.target.value;
-        setUsuario(prev => ({ ...prev, [campo]: val }));
+        setUsuario((prev) => ({ ...prev, [campo]: e.target.value }));
     };
 
     const toggleEdit = (campo) => {
-        setEditando(prev => ({ ...prev, [campo]: !prev[campo] }));
+        setEditando((prev) => ({ ...prev, [campo]: !prev[campo] }));
     };
 
     const handleGuardar = async () => {
@@ -75,92 +88,95 @@ const Perfil = () => {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 apellido: usuario.apellido,
-                email: usuario.email
+                email: usuario.email,
             };
 
-            const response = await axios.post('https://backend.tecnobus.uy/usuarios/modificarPerfil', payload, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            await axios.post(
+                'https://backend.tecnobus.uy/usuarios/modificarPerfil',
+                payload,
+                { headers: { 'Content-Type': 'application/json' } },
+            );
 
-            console.log("Perfil actualizado:", response.data);
-
-            // ✅ Actualizar localStorage
-            const storedAuth = localStorage.getItem("auth");
+            // Actualizar localStorage y contexto global
+            const storedAuth = localStorage.getItem('auth');
             if (storedAuth) {
                 const authParsed = JSON.parse(storedAuth);
                 authParsed.nombreUsuario = usuario.nombre;
-                localStorage.setItem("auth", JSON.stringify(authParsed));
+                localStorage.setItem('auth', JSON.stringify(authParsed));
             }
-
-            // ✅ Actualizar contexto global
-            setAuth(prev => ({
-                ...prev,
-                nombreUsuario: usuario.nombre
-            }));
+            setAuth((prev) => ({ ...prev, nombreUsuario: usuario.nombre }));
 
             toast.current.show({
                 severity: 'success',
                 summary: 'Éxito',
                 detail: 'Perfil actualizado correctamente',
-                life: 3000
+                life: 3000,
             });
-        } catch (error) {
-            console.error("Error al guardar los cambios:", error);
+        } catch (err) {
+            console.error('Error al guardar los cambios:', err);
             toast.current.show({
                 severity: 'error',
                 summary: 'Error',
                 detail: 'Hubo un error al actualizar el perfil',
-                life: 3000
+                life: 3000,
             });
         }
     };
 
     const handleDesactivarCuenta = async () => {
-        const confirmacion = window.confirm("¿Estás seguro de que deseas desactivar tu cuenta? Esta acción no se puede deshacer.");
-        if (!confirmacion) return;
+        if (
+            !window.confirm(
+                '¿Estás seguro de que deseas desactivar tu cuenta? Esta acción no se puede deshacer.',
+            )
+        )
+            return;
 
         try {
             const formData = new FormData();
             formData.append('email', usuario.email);
 
-            const response = await axios.post(
+            await axios.post(
                 'https://backend.tecnobus.uy/usuarios/borrarUsuario',
-                formData
+                formData,
             );
 
-            console.log("Cuenta desactivada:", response.data);
-            localStorage.removeItem("auth");
-            window.location.href = "/";
-
-        } catch (error) {
-            console.error("Error al desactivar la cuenta:", error);
+            localStorage.removeItem('auth');
+            window.location.href = '/';
+        } catch (err) {
+            console.error('Error al desactivar la cuenta:', err);
             toast.current.show({
                 severity: 'error',
                 summary: 'Error',
                 detail: 'No se pudo desactivar la cuenta',
-                life: 3000
+                life: 3000,
             });
         }
     };
 
+    /* ─────────── Render ─────────── */
     return (
         <>
             <NavBar />
             <Toast ref={toast} />
             <div className="rectangulo-centrado">
                 <Card className="cardCentrada" style={{ backgroundColor: '#c9f0ff' }}>
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                    {/* Avatar */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            marginBottom: '1rem',
+                        }}
+                    >
                         <div
                             style={{
                                 width: '150px',
                                 height: '150px',
                                 borderRadius: '50%',
                                 overflow: 'hidden',
-                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+                                boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
                                 border: '4px solid white',
-                                backgroundColor: '#fff'
+                                backgroundColor: '#fff',
                             }}
                         >
                             <img
@@ -173,35 +189,58 @@ const Perfil = () => {
 
                     <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Mi Perfil</h2>
 
-                    {['nombre', 'apellido', 'email', 'cedula', 'fechaNacimiento'].map(campo => (
-                        <div key={campo} style={{ marginBottom: '0.45rem' }}>
-                            <label htmlFor={campo} style={{ fontWeight: 'bold', display: 'block', marginBottom: '.5rem' }}>
-                                {campo === 'fechaNacimiento' ? 'Fecha de nacimiento' : campo.charAt(0).toUpperCase() + campo.slice(1)}
-                            </label>
-                            <span className="p-input-icon-right" style={{ width: '100%' }}>
-                                <InputText
-                                    id={campo}
-                                    value={usuario[campo]}
-                                    onChange={(e) => handleInputChange(e, campo)}
-                                    disabled={campo === 'email' || !editando[campo]}
-                                    style={{ width: '100%' }}
-                                />
-                                {campo !== 'email' && (
-                                    <i
-                                        className="pi pi-pencil"
-                                        onClick={() => toggleEdit(campo)}
+                    {['nombre', 'apellido', 'email', 'cedula', 'fechaNacimiento'].map(
+                        (campo) => {
+                            const esSoloLectura =
+                                campo === 'email' || campo === 'fechaNacimiento';
+
+                            return (
+                                <div key={campo} style={{ marginBottom: '0.45rem' }}>
+                                    <label
+                                        htmlFor={campo}
                                         style={{
-                                            position: 'absolute',
-                                            right: '10px',
-                                            top: '50%',
-                                            transform: 'translateY(-50%)',
-                                            cursor: 'pointer'
+                                            fontWeight: 'bold',
+                                            display: 'block',
+                                            marginBottom: '.5rem',
                                         }}
-                                    />
-                                )}
-                            </span>
-                        </div>
-                    ))}
+                                    >
+                                        {campo === 'fechaNacimiento'
+                                            ? 'Fecha de nacimiento'
+                                            : campo.charAt(0).toUpperCase() + campo.slice(1)}
+                                    </label>
+
+                                    <span className="p-input-icon-right" style={{ width: '100%' }}>
+                                        <InputText
+                                            id={campo}
+                                            value={
+                                                campo === 'fechaNacimiento'
+                                                    ? formatoMostrar(usuario[campo])
+                                                    : usuario[campo]
+                                            }
+                                            onChange={(e) => handleInputChange(e, campo)}
+                                            disabled={esSoloLectura || !editando[campo]}
+                                            style={{ width: '100%' }}
+                                        />
+
+                                        {/* Icono lápiz solo si se puede editar */}
+                                        {!esSoloLectura && (
+                                            <i
+                                                className="pi pi-pencil"
+                                                onClick={() => toggleEdit(campo)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: '10px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    cursor: 'pointer',
+                                                }}
+                                            />
+                                        )}
+                                    </span>
+                                </div>
+                            );
+                        },
+                    )}
 
                     <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
                         <span
@@ -211,7 +250,7 @@ const Perfil = () => {
                                 textDecoration: 'underline',
                                 display: 'inline-block',
                                 marginBottom: '1rem',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
                             }}
                         >
                             Desactivar mi cuenta
@@ -224,7 +263,10 @@ const Perfil = () => {
                             style={{ marginTop: '1rem', width: '60%' }}
                         />
                         <div style={{ marginTop: '1rem' }}>
-                            <Link to="/CambiarPassword" style={{ color: '#007bff', textDecoration: 'underline' }}>
+                            <Link
+                                to="/CambiarPassword"
+                                style={{ color: '#007bff', textDecoration: 'underline' }}
+                            >
                                 ¿Olvidaste tu contraseña?
                             </Link>
                         </div>
@@ -235,4 +277,4 @@ const Perfil = () => {
     );
 };
 
-export default Perfil;
+export default PerfilUsuario;
