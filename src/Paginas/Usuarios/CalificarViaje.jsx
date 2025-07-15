@@ -75,8 +75,6 @@ export default function Calificar({ viaje, usuario, cerrar, onMostrarToast }) {
   const handleCalificar = () => {
     if (calificacion === null) {
       onMostrarToast("Debe seleecionar la calificiación", "error", "Error");
-    } else if (comentario === "") {
-      onMostrarToast("Debe ingresar un comentario", "error", "Error");
     } else {
       calificarViaje();
       cerrar();
@@ -125,7 +123,7 @@ export default function Calificar({ viaje, usuario, cerrar, onMostrarToast }) {
         htmlFor="comentario"
         style={{ display: "block", paddingTop: "25px" }}
       >
-        Comentario
+        Comentario (opcional)
       </label>
       <InputTextarea
         id="comentario"
