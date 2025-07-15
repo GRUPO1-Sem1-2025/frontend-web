@@ -224,7 +224,7 @@ const Perfil = () => {
                             style={{ marginTop: '1rem', width: '60%' }}
                         />
                         <div style={{ marginTop: '1rem' }}>
-                            <Link to="/recuperarpassword" style={{ color: '#007bff', textDecoration: 'underline' }}>
+                            <Link to="/CambiarPassword" style={{ color: '#007bff', textDecoration: 'underline' }}>
                                 ¿Olvidaste tu contraseña?
                             </Link>
                         </div>
