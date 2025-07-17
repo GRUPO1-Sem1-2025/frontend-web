@@ -31,9 +31,6 @@ export default function Print() {
       if (calledRef.current) return; // ya se llamó, salimos
       calledRef.current = true;
       try {
-        if (!compraIda) {
-          throw new Error("compraIda no está disponible");
-        }
         await axios.post(
           `${URL_USUARIOSCONTROLLER}/cambiarEstadoCompra`,
           compraIda,
@@ -43,9 +40,6 @@ export default function Print() {
         );
         if (esIdaVuelta) {
           try {
-            if (!compraVuelta) {
-              throw new Error("compraIda es null");
-            }
             await axios.post(
               `${URL_USUARIOSCONTROLLER}/cambiarEstadoCompra`,
               compraVuelta,
