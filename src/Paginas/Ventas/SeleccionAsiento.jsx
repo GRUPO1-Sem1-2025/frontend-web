@@ -17,7 +17,7 @@ const cargarAsientos = async (idBus) => {
     );
     return response.data.cant_asientos;
   } catch {
-    console.log("Error");
+    console.error("Error cargando datos del omnibus");
   }
 };
 

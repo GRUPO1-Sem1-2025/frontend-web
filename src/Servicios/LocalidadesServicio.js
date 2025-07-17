@@ -5,7 +5,6 @@ export const obtenerLocalidades = async () => {
     const response = await axios.get(
       `${URL_LOCALIDADESCONTROLLER}/obtenerLocalidadesActivas`
     );
-    console.log("Cantidad de localidades:", response.data.length);
     return response.data;
   } catch (error) {
     console.error("Error al obtener localidades:", error);
@@ -24,7 +23,6 @@ export const obtenerLocalidadesAgrupadas = async (token) => {
       }
     );
     const data = response.data;
-    console.log("data: ", response.data);
     data.sort((a, b) => a.departamento.localeCompare(b.departamento));
 
     const departamentosMap = {};
@@ -53,7 +51,6 @@ export const obtenerLocalidadesAgrupadas = async (token) => {
       })
     );
 
-    console.log("ret: ", localidadesAgrupadas);
     return localidadesAgrupadas;
   } catch (error) {
     console.error("Error al obtener localidades agrupadas:", error);

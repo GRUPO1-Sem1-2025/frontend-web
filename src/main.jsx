@@ -23,7 +23,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
     .then((registration) => {
-      console.log("Service Worker registrado:", registration);
+      console.error("Service Worker registrado:", registration);
     })
     .catch((error) => {
       console.error("Error al registrar Service Worker:", error);
@@ -32,7 +32,6 @@ if ("serviceWorker" in navigator) {
 
 // Escucho mensajes push en primer plano
 onMessage(messaging, (payload) => {
-  console.log("Mensaje recibido: ", payload);
   const { title, body, icon } = payload.notification;
   if (Notification.permission === "granted") {
     new Notification(title, { body, icon });

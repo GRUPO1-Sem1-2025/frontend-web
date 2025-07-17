@@ -66,7 +66,6 @@ export default function Calificar({ viaje, usuario, cerrar, onMostrarToast }) {
           },
         }
       );
-      console.log("Mensaje: ", response.data);
     } catch (error) {
       console.error("Error en la respuesta:", error.response.data);
     }

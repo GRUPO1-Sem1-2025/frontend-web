@@ -315,7 +315,6 @@ export default function BasicDemo() {
                     asientos: asientosSeleccionados,
                   }));
                   setLoading(true);
-                  console.log(auth.tok);
                   axios
                     .post(
                       `${URL_USUARIOSCONTROLLER}/comprarPasaje`,
@@ -332,10 +331,8 @@ export default function BasicDemo() {
                       }
                     )
                     .then((res) => {
-                      console.log("Compra exitosa:", res.data);
                       handleStart();
                       setCompraIda(res.data.idCompra);
-                      console.log("compra ida", res.data);
                       setDescuentoIda(res.data.descuento);
                       const montoIda =
                         (viajeElegido.precioPasaje * res.data.descuento) / 100;
@@ -507,7 +504,7 @@ export default function BasicDemo() {
                         }
                       )
                       .then((res) => {
-                        console.log("Compra exitosa:", res.data);
+                        ç;
                         setCompraVuelta(res.data.idCompra);
                         setDescuentoVuelta(res.data.descuento);
                         const montoVuelta =

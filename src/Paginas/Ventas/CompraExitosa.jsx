@@ -62,8 +62,6 @@ export default function Print() {
         const params = new URLSearchParams();
         params.append("idCompra", compraIda);
         params.append("referencia", refPago);
-        console.log("ref:", refPago);
-        console.log("4", compraIda, refPago);
         await axios.post(
           `${URL_USUARIOSCONTROLLER}/guardarReferenciaPago`,
           params
@@ -81,7 +79,6 @@ export default function Print() {
     localStorage.removeItem("compraIda");
     localStorage.removeItem("compraVuelta");
     localStorage.removeItem("pi_id");
-    console.log("--END--");
   }, []);
 
   return (

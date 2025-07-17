@@ -1,189 +1,209 @@
-import { useRef, useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import useAuth from '../../Hooks/useAuth.jsx';
+import { useRef, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import useAuth from "../../Hooks/useAuth.jsx";
 // PrimeReact
-import { Card } from 'primereact/card';
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
-import { InputOtp } from 'primereact/inputotp';
+import { Card } from "primereact/card";
+import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
+import { InputOtp } from "primereact/inputotp";
 // Conexión
-import axios from '../../Configuraciones/axios';
-const URL_USUARIOSCONTROLLER = '/usuarios';
+import axios from "../../Configuraciones/axios";
+const URL_USUARIOSCONTROLLER = "/usuarios";
 
 export default function TwoFA({ email }) {
-    const [usuario, setUsuario] = useState({
-        nombre: '',
-        apellido: '',
-        email: '',
-        password: '',
-        codigo: '',
+  const [usuario, setUsuario] = useState({
+    nombre: "",
+    apellido: "",
+    email: "",
+    password: "",
+    codigo: "",
+  });
+
+  const { setAuth, auth } = useAuth();
+  const [codigo2FA, setTokens] = useState();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
+  const toast = useRef(null);
+
+  const showWarn = (message) => {
+    toast.current.show({
+      severity: "warn",
+      summary: "Error",
+      detail: message,
+      life: 3000,
     });
+  };
 
-    const { setAuth, auth } = useAuth();
-    const [codigo2FA, setTokens] = useState();
+  const showError = (message) => {
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: message,
+      life: 6000,
+    });
+  };
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+  useEffect(() => {
+    if (location.state?.email) {
+      setUsuario((prev) => ({ ...prev, email: location.state.email }));
+    }
+  }, [location.state?.email]);
 
-    const toast = useRef(null);
+  // Para ver cambios en auth después de setAuth
+  useEffect(() => {
+    console.error("Auth actualizado:", auth);
+  }, [auth]);
 
-    const showWarn = (message) => {
-        toast.current.show({ severity: 'warn', summary: 'Error', detail: message, life: 3000 });
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    usuario.codigo = codigo2FA?.trim();
 
-    const showError = (message) => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: message, life: 6000 });
-    };
+    if (!usuario.codigo || usuario.codigo.length !== 5) {
+      showWarn("El código debe tener 5 dígitos.");
+      return;
+    }
 
-    useEffect(() => {
-        if (location.state?.email) {
-            setUsuario(prev => ({ ...prev, email: location.state.email }));
+    try {
+      const response = await axios.post(
+        `${URL_USUARIOSCONTROLLER}/verificarCodigo`,
+        JSON.stringify(usuario),
+        {
+          headers: { "Content-Type": "application/json" },
         }
-    }, [location.state?.email]);
+      );
 
-    // Para ver cambios en auth después de setAuth
-    useEffect(() => {
-        console.log("Auth actualizado:", auth);
-    }, [auth]);
+      const token = response?.data?.token;
+      guardarTokenEnAuth(token);
+      navigate(from, { replace: true });
+    } catch (err) {
+      let msg = "";
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        usuario.codigo = codigo2FA?.trim();
+      if (!err?.response) {
+        msg = "No responde el servidor:\n" + err;
+      } else if (err.response?.status === 400) {
+        msg = "Código incorrecto";
+      } else if (err.response?.status === 401) {
+        msg = "Sin autorización";
+      } else {
+        msg = "Error al ingresar";
+      }
 
-        if (!usuario.codigo || usuario.codigo.length !== 5) {
-            showWarn('El código debe tener 5 dígitos.');
-            return;
-        }
+      showError(msg);
+    }
+  };
 
-        try {
-            const response = await axios.post(
-                `${URL_USUARIOSCONTROLLER}/verificarCodigo`,
-                JSON.stringify(usuario),
-                {
-                    headers: { 'Content-Type': 'application/json' }
-                }
-            );
+  const guardarTokenEnAuth = (token) => {
+    if (typeof token !== "string") {
+      console.error("Token inválido:", token);
+      return;
+    }
 
-            const token = response?.data?.token;
-            console.log("Token recibido:", token);
-            guardarTokenEnAuth(token);
-            navigate(from, { replace: true });
-        } catch (err) {
-            let msg = '';
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const payloadJson = atob(payloadBase64);
+      const payload = JSON.parse(payloadJson);
 
-            if (!err?.response) {
-                msg = 'No responde el servidor:\n' + err;
-            } else if (err.response?.status === 400) {
-                msg = 'Código incorrecto';
-            } else if (err.response?.status === 401) {
-                msg = 'Sin autorización';
-            } else {
-                msg = 'Error al ingresar';
-            }
+      const nuevoAuth = {
+        token,
+        nombreUsuario: payload.nombreUsuario || "",
+        email: payload.sub || "",
+        rol: payload.rol || "",
+        emision: new Date(payload.iat * 1000),
+        expira: new Date(payload.exp * 1000),
+      };
 
-            showError(msg);
-        }
-    };
+      setAuth(nuevoAuth);
+    } catch (error) {
+      console.error("Error al decodificar el token:", error);
+    }
+  };
 
-    const guardarTokenEnAuth = (token) => {
-        if (typeof token !== 'string') {
-            console.error("Token inválido:", token);
-            return;
-        }
+  const reenviarCodigo = async () => {
+    try {
+      const response = await axios.post(
+        `${URL_USUARIOSCONTROLLER}/reenviarCodigo?email=${encodeURIComponent(
+          usuario.email
+        )}`
+      );
 
-        try {
-            const payloadBase64 = token.split('.')[1];
-            const payloadJson = atob(payloadBase64);
-            const payload = JSON.parse(payloadJson);
+      toast.current.show({
+        severity: "success",
+        summary: "Código reenviado",
+        detail: "Revisa tu correo electrónico",
+        life: 5000,
+      });
+    } catch (err) {
+      console.error(err);
+      showError("No se pudo reenviar el código");
+    }
+  };
 
-            const nuevoAuth = {
-                token,
-                nombreUsuario: payload.nombreUsuario || '',
-                email: payload.sub || '',
-                rol: payload.rol || '',
-                emision: new Date(payload.iat * 1000),
-                expira: new Date(payload.exp * 1000),
-            };
+  const header = (
+    <img
+      alt="Logo Tecnobus"
+      src="/tecnobus.png"
+      style={{
+        width: "100%",
+        maxWidth: "500px",
+        minWidth: "400px",
+        height: "250px",
+        objectFit: "cover",
+        display: "block",
+        borderRadius: "1%",
+      }}
+    />
+  );
 
-            setAuth(nuevoAuth);
-            console.log("Variable sesión guardada:", nuevoAuth);
-        } catch (error) {
-            console.error('Error al decodificar el token:', error);
-        }
-    };
+  return (
+    <div className="rectangulo-centrado" style={{ padding: "0px" }}>
+      <Card
+        title="Autenticación de dos factores"
+        header={header}
+        style={{ maxWidth: "420px", textAlign: "center" }}
+      >
+        <Toast ref={toast} />
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="otp">Código</label>
+          <div className="card flex justify-content-center">
+            <InputOtp
+              onChange={(e) => setTokens(e.value)}
+              value={codigo2FA}
+              length={5}
+              integerOnly
+              style={{ justifyContent: "center", marginTop: "1rem" }}
+            />
+          </div>
 
-    const reenviarCodigo = async () => {
-        try {
-            console.log("Reenviar código a:", usuario.email);
-            const response = await axios.post(
-                `${URL_USUARIOSCONTROLLER}/reenviarCodigo?email=${encodeURIComponent(usuario.email)}`
-            );
-
-            toast.current.show({
-                severity: 'success',
-                summary: 'Código reenviado',
-                detail: 'Revisa tu correo electrónico',
-                life: 5000
-            });
-
-            console.log(response.data);
-        } catch (err) {
-            console.error(err);
-            showError('No se pudo reenviar el código');
-        }
-    };
-
-    const header = (
-        <img alt="Logo Tecnobus" src="/tecnobus.png"
+          <div
             style={{
-                width: '100%',
-                maxWidth: '500px',
-                minWidth: '400px',
-                height: '250px',
-                objectFit: 'cover',
-                display: 'block',
-                borderRadius: '1%'
+              marginTop: "2rem",
+              display: "flex",
+              justifyContent: "center",
+              gap: "1rem",
             }}
-        />
-    );
+          >
+            <Button
+              label="Cancelar"
+              type="button"
+              onClick={() => navigate("/ingresar")}
+              severity="secondary"
+            />
+            <Button label="Validar" type="submit" />
+          </div>
+        </form>
 
-    return (
-        <div className='rectangulo-centrado' style={{ padding: "0px" }}>
-            <Card title="Autenticación de dos factores" header={header} style={{ maxWidth: '420px', textAlign: 'center' }}>
-                <Toast ref={toast} />
-                <form onSubmit={handleSubmit}>
-                    <label htmlFor="otp">Código</label>
-                    <div className="card flex justify-content-center">
-                        <InputOtp
-                            onChange={(e) => setTokens(e.value)}
-                            value={codigo2FA}
-                            length={5}
-                            integerOnly
-                            style={{ justifyContent: "center", marginTop: "1rem" }}
-                        />
-                    </div>
-
-                    <div style={{
-                        marginTop: "2rem",
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: "1rem"
-                    }}>
-                        <Button label="Cancelar" type="button" onClick={() => navigate('/ingresar')} severity="secondary" />
-                        <Button label="Validar" type="submit" />
-                    </div>
-                </form>
-
-                <p>
-                    ¿Necesitas un nuevo código? <br />
-                    <span>
-                        <Button onClick={reenviarCodigo} style={{ marginTop: "1rem" }}>
-                            Enviar nuevo código
-                        </Button>
-                    </span>
-                </p>
-            </Card>
-        </div>
-    );
+        <p>
+          ¿Necesitas un nuevo código? <br />
+          <span>
+            <Button onClick={reenviarCodigo} style={{ marginTop: "1rem" }}>
+              Enviar nuevo código
+            </Button>
+          </span>
+        </p>
+      </Card>
+    </div>
+  );
 }

@@ -96,11 +96,8 @@ const Home = () => {
             token: tokenFCM,
           });
         })
-        .then(() => {
-          console.log("✅ Token registrado correctamente");
-        })
         .catch((err) => {
-          console.error("❌ Error con notificaciones:", err.message);
+          console.error("Error con notificaciones:", err.message);
         });
     }
   }, [auth]);
@@ -138,9 +135,6 @@ const Home = () => {
             token: tokenFCM,
           });
         })
-        .then(() => {
-          console.log("✅ Token registrado correctamente");
-        })
         .catch((err) => {
           console.error("❌ Error con notificaciones:", err.message);
         });
@@ -150,7 +144,6 @@ const Home = () => {
   useEffect(() => {
     const cargar = async () => {
       const agrupadas = await obtenerLocalidadesAgrupadas(auth.token);
-      console.log(agrupadas);
       setLocalidades(agrupadas);
     };
     cargar();
@@ -277,7 +270,7 @@ const Home = () => {
             objectFit: "cover",
             zIndex: -1,
             filter: "blur(8px)",
-            transform: "translateZ(0)"
+            transform: "translateZ(0)",
           }}
         >
           <source src="buses1.mp4" type="video/mp4" />
