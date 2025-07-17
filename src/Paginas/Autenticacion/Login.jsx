@@ -54,7 +54,7 @@ const Login = () => {
 
             console.log(response?.data);
 
-            if (response?.data.Login_directo === 0) {
+            if (response?.data.Login_directo == 0) {
                 navigate("/CambiarPassword", {
                     replace: true,
                     state: { email: usuario.email }
