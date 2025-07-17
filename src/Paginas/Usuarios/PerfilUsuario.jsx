@@ -191,8 +191,8 @@ const PerfilUsuario = () => {
 
                     {['nombre', 'apellido', 'email', 'cedula', 'fechaNacimiento'].map(
                         (campo) => {
-                            const esSoloLectura =
-                                campo === 'email' || campo === 'fechaNacimiento';
+                            const esSoloLectura = campo === 'fechaNacimiento';
+                                // campo === 'email' || campo === 'fechaNacimiento';
 
                             return (
                                 <div key={campo} style={{ marginBottom: '0.45rem' }}>
