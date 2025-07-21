@@ -504,7 +504,6 @@ export default function BasicDemo() {
                         }
                       )
                       .then((res) => {
-                        ç;
                         setCompraVuelta(res.data.idCompra);
                         setDescuentoVuelta(res.data.descuento);
                         const montoVuelta =
