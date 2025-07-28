@@ -2,7 +2,7 @@ import { messaging } from "./firebase-config"; // Ajusta la ruta a tu firebase-c
 import { getToken } from "firebase/messaging";
 
 const VAPID_KEY =
-  "BHpjwtaKwEL3LAzYITZlSbfrbo9-cBojgR-0kVp2Vl4K3G_QCcEME2iteCyGmj3rd6OHxEHfQa6b7_c9sn1Uy_Y";
+  "api_key";
 
 export async function solicitarPermisoYObtenerToken() {
   if (!("Notification" in window) || !("serviceWorker" in navigator)) {
